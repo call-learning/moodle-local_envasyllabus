@@ -110,6 +110,7 @@
 
 .local-envasyllabus-ccat .course-card {
     height: 350px;
+    min-width: 300px;
 }
 .local-envasyllabus-ccat .course-card .card-img-top {
     height: 200px;
