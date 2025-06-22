@@ -192,7 +192,7 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
      *
      * @return void
      */
-    public function create_courses_categories() {
+    public function create_courses_categories(): void {
         $generator = $this->getDataGenerator();
         for ($catindex = 1; $catindex < self::MAX_CAT; $catindex++) {
             $catdef = ['idnumber' => 'CAT' . $catindex];
@@ -223,7 +223,7 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
     /**
      * Test execute API CALL with no instance
      */
-    public function test_execute_no_courses() {
+    public function test_execute_no_courses(): void {
         $this->resetAfterTest();
         $this->expectException('require_login_exception');
         $courses = $this->get_filtered_courses(0);
@@ -247,12 +247,12 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
     public function test_get_all_courses() {
         $this->resetAfterTest();
         $this->setAdminUser();
-        $courses = $this->get_filtered_courses($this->categories['CAT1']->id);
-        $this->assertCount(9, $courses);
+        $filter = $this->get_filtered_courses($this->categories['CAT1']->id);
+        $this->assertCount(9, $filter['courses']);
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
-        $courses = $this->get_filtered_courses($this->categories['CAT1']->id);
-        $this->assertCount(8, $courses);
+        $filter = $this->get_filtered_courses($this->categories['CAT1']->id);
+        $this->assertCount(8, $filter['courses']);
     }
 
     /**
@@ -261,7 +261,7 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
      * @param array $expected
      * @dataProvider filter_dataprovider
      */
-    public function test_get_filtered_courses($filters, $expected) {
+    public function test_get_filtered_courses($filters, $expected): void {
         $this->resetAfterTest();
         foreach ($expected as $usertype => $expectedcount) {
             switch($usertype) {
@@ -276,8 +276,8 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
                     $this->setUser($user);
                     break;
             }
-            $courses = $this->get_filtered_courses($this->categories['CAT1']->id, 'fr', $filters);
-            $this->assertCount($expectedcount, $courses);
+            $filter = $this->get_filtered_courses($this->categories['CAT1']->id, 'fr', $filters);
+            $this->assertCount($expectedcount, $filter['courses']);
         }
     }
 
@@ -288,7 +288,7 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
      * @param array $expected
      * @dataProvider filter_dataprovider
      */
-    public function test_get_filtered_courses_for_user($filters, $expected) {
+    public function test_get_filtered_courses_for_user($filters, $expected): void {
         $this->resetAfterTest();
         $this->setAdminUser();
         // Search courses as admin first. This is to check if there are no side effect to the cache.
@@ -306,8 +306,8 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
                     $this->setUser($user);
                     break;
             }
-            $courses = $this->get_filtered_courses($this->categories['CAT1']->id, 'fr', $filters);
-            $this->assertCount($expectedcount, $courses);
+            $filter = $this->get_filtered_courses($this->categories['CAT1']->id, 'fr', $filters);
+            $this->assertCount($expectedcount, $filter['courses']);
         }
     }
 
@@ -318,15 +318,16 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
      * @param array $expected
      * @dataProvider sort_dataprovider
      */
-    public function test_get_filtered_courses_sort(string $cfname, string $sortorder, array $expected) {
+    public function test_get_filtered_courses_sort(string $cfname, string $sortorder, array $expected): void {
         $this->resetAfterTest();
         $this->setAdminUser();
-        $courses = $this->get_filtered_courses(
+        $filter = $this->get_filtered_courses(
             $this->categories['CAT1']->id,
             'fr',
             [],
             ['field' => "customfield_" . $cfname, 'order' => $sortorder]
         );
+        $courses = $filter['courses'];
         $this->assertCount(9, $courses);
         $courseyears = array_map(function($course) use ($cfname) {
             foreach ($course['customfields'] as $customfield) {
