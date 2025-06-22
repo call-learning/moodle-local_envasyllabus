@@ -18,6 +18,7 @@ namespace local_envasyllabus;
 use core_customfield\category;
 use core_customfield\category_controller;
 use core_customfield\field;
+use stdClass;
 
 /**
  * Plugin administration pages are defined here.
@@ -58,11 +59,8 @@ class setup {
      *    ""ispassword"":""0"",""link"":"""",""locked"":""0"",""visibility"":""2""}"
      *
      * @param string $configtext the list of values/fields to setup in csv format
-     * @throws \coding_exception
-     * @throws \dml_exception
-     * @throws \moodle_exception
      */
-    public static function create_customfields_fromdef($configtext):void {
+    public static function create_customfields_fromdef($configtext): void {
         $configs = explode(PHP_EOL, $configtext);
         $csvheader = str_getcsv(array_shift($configs), ';');
         foreach ($configs as $csvrow) {
@@ -73,42 +71,51 @@ class setup {
             }
             $field = array_combine($csvheader, $csvrowarray);
             $field = (object) $field;
-            $category = category::get_record(['name' => $field->catname, 'component' => 'core_course']);
-            if (!$category) {
-                // Create it.
-                $categoryrecord = (object) [
-                    'name' => $field->catname,
-                    'component' => 'core_course',
-                    'area' => 'course',
-                    'itemid' => '0',
-                    'sortorder' => category::count_records() + 1,
-                    'contextid' => \context_system::instance()->id,
-                ];
-                $category = category_controller::create(0, $categoryrecord);
-                $category->save();
+            self::create_customfields_fromobj($field);
+        }
+    }
+
+    /**
+     * Create or update a custom field from an object definition.
+     *
+     * @param stdClass $fielddef the field definition object
+     */
+    public static function create_customfields_fromobj(stdClass $fielddef): void {
+        $category = category::get_record(['name' => $fielddef->catname, 'component' => 'core_course']);
+        if (!$category) {
+            // Create it.
+            $categoryrecord = (object) [
+                'name' => $fielddef->catname,
+                'component' => 'core_course',
+                'area' => 'course',
+                'itemid' => '0',
+                'sortorder' => category::count_records() + 1,
+                'contextid' => \context_system::instance()->id,
+            ];
+            $category = category_controller::create(0, $categoryrecord);
+            $category->save();
+        }
+        $categorycontroller = category_controller::create($category->get('id'));
+        if ($rfield = field::get_record(['categoryid' => $category->get('id'), 'shortname' => $fielddef->shortname])) {
+            unset($fielddef->catname);
+            foreach ($fielddef as $fname => $fvalue) {
+                $fvalue = trim($fvalue, '"');
+                $rfield->set($fname, $fvalue);
             }
-            $categorycontroller = category_controller::create($category->get('id'));
-            if ($rfield = field::get_record(['categoryid' => $category->get('id'), 'shortname' => $field->shortname])) {
-                unset($field->catname);
-                foreach ($field as $fname => $fvalue) {
-                    $fvalue = trim($fvalue, '"');
-                    $rfield->set($fname, $fvalue);
-                }
-                $rfield->set('descriptionformat', FORMAT_HTML);
-                $rfield->set('categoryid', $category->get('id'));
-                $rfield->save();
-            } else {
-                $rfield = \core_customfield\field_controller::create(0, (object) [
-                    'name' => $field->name,
-                    'shortname' => $field->shortname,
-                    'type' => $field->type,
-                    'description' => $field->description,
-                    'sortorder' => $field->sortorder,
-                    'configdata' => $field->configdata,
-                ],
-                    $categorycontroller);
-                $rfield->save();
-            }
+            $rfield->set('descriptionformat', FORMAT_HTML);
+            $rfield->set('categoryid', $category->get('id'));
+            $rfield->save();
+        } else {
+            $rfield = \core_customfield\field_controller::create(0, (object) [
+                'name' => $fielddef->name,
+                'shortname' => $fielddef->shortname,
+                'type' => $fielddef->type,
+                'description' => $fielddef->description,
+                'sortorder' => $fielddef->sortorder,
+                'configdata' => $fielddef->configdata,
+            ],
+                $categorycontroller);
+            $rfield->save();
         }
     }
 }

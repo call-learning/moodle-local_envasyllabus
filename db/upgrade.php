@@ -55,5 +55,21 @@ function xmldb_local_envasyllabus_upgrade($oldversion) {
         setup::install_update($CFG->dirroot . '/local/envasyllabus/tests/fixtures/customfields_defs.txt');
         upgrade_plugin_savepoint(true, 2022082105, 'local', 'envasyllabus');
     }
+
+    if ($oldversion < 2025062200) {
+        $data = [
+            'shortname' => 'programme',
+            'name' => 'Programme',
+            'type' => 'sprogramme',
+            'description' => 'Programme de la formation',
+            'descriptionformat' => 'Programme de la formation',
+            'sortorder' => 10,
+            'configdata' =>
+                '{"required":"0","uniquevalues":"0","locked":"0","visibility":"0","defaultvalue":"","defaultvalueformat":"1"}',
+            'catname' => 'Syllabus - informations littérales',
+        ];
+        setup::create_customfields_fromobj((object)$data);
+        upgrade_plugin_savepoint(true, 2025062200, 'local', 'envasyllabus');
+    }
     return true;
 }
