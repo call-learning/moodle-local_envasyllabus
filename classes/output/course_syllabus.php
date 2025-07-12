@@ -19,6 +19,7 @@ namespace local_envasyllabus\output;
 use core_course\external\course_summary_exporter;
 use core_course_category;
 use local_competvetsuivi\matrix\matrix;
+use local_envasyllabus\utils;
 use local_envasyllabus\visibility;
 use customfield_sprogramme\local\api\programme;
 use moodle_exception;
@@ -182,11 +183,15 @@ class course_syllabus implements renderable, templatable {
         ];
         $contextdata->prerequisites = $this->get_cf_displayable_info('uc_prerequis', $cfdata, $output);
 
-        $programme = new \customfield_sprogramme\output\programme($this->courseid);
-        $renderer = $PAGE->get_renderer('customfield_sprogramme');
-        $formfield = new \customfield_sprogramme\output\formfield();
-        $programmehtml = $renderer->render($formfield) . $renderer->render($programme);
-        $contextdata->programme = $programmehtml;
+        if (!utils::is_new_programme_enabled($this->courseid)) {
+            $contextdata->programme = $this->get_cf_displayable_info('programme', $cfdata, $output);
+        } else {
+            $programme = new \customfield_sprogramme\output\programme($this->courseid);
+            $renderer = $PAGE->get_renderer('customfield_sprogramme');
+            $formfield = new \customfield_sprogramme\output\formfield();
+            $programmehtml = $renderer->render($formfield) . $renderer->render($programme);
+            $contextdata->programme = $programmehtml;
+        }
 
         $contextdata->vaq = $this->get_cf_displayable_info('uc_validation', $cfdata, $output);
         $contextdata->additionalinfos = $this->get_cf_displayable_info('uc_infos_compl', $cfdata, $output);
@@ -223,11 +228,14 @@ class course_syllabus implements renderable, templatable {
      */
     protected function get_header_data(array $fieldinfolist, array $customfields): array {
         $programmetotals = [];
-        $data = programme::get_data($this->courseid);
-        $columnstructure = programme::get_column_structure($this->courseid);
-        $programmetotals = programme::get_column_totals($data, $columnstructure);
-
         $hasprogramme = programme::has_data($this->courseid);
+        if (utils::is_new_programme_enabled($this->courseid)) {
+            $data = programme::get_data($this->courseid);
+            $columnstructure = programme::get_column_structure($this->courseid);
+            $programmetotals = programme::get_column_totals($data, $columnstructure);
+        } else {
+            $hasprogramme = false;
+        }
         $headerdata = [];
         foreach ($fieldinfolist as $fieldinfo) {
             if (!empty($fieldinfo['type'])) {

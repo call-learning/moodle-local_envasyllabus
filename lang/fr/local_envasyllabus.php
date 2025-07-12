@@ -30,6 +30,11 @@ $string['defaultmatrixid'] = 'Default Matrix ID';
 $string['defaultmatrixid_desc'] = 'Default Matrix ID';
 $string['enableenvasyllabus'] = 'Active le module de syllabus de l\'ENVA';
 $string['enableenvasyllabus_help'] = 'Active le module de syllabus de l\'ENVA (menu additionnel dans les cours)';
+$string['enablenewprogramme'] = 'Activate new programme';
+$string['enablenewprogramme_desc'] = 'Activate new programme for all courses';
+$string['enablenewprogrammeforcourse'] = 'Active le nouveau programme pour des cours spécifiques';
+$string['enablenewprogrammeforcourse_desc'] = 'Active le nouveau programme pour des cours spécifiques.
+Si aucun cours n\'est spécifié, l\'ancien champs est utilisé.';
 $string['generalsettings'] = 'Enva Syllabus settings';
 $string['courses:index'] = 'Le cursus à l\'ENVA';
 $string['course:summary'] = 'Résumé';

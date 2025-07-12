@@ -85,6 +85,25 @@ if ($hassiteconfig) {
                 join(',', visibility::PUBLIC_SYLLABUS_FIELDS)
             );
             $generalsettingspage->add($publicfields);
+
+            $settingname = get_string('enablenewprogramme', 'local_envasyllabus');
+            $settingdescription = get_string('enablenewprogramme_desc', 'local_envasyllabus');
+            $enablenewprogramme = new admin_setting_configcheckbox(
+                'local_envasyllabus/enablenewprogramme',
+                $settingname,
+                $settingdescription,
+                false
+            );
+            $generalsettingspage->add($enablenewprogramme);
+            $settingname = get_string('enablenewprogrammeforcourse', 'local_envasyllabus');
+            $settingdescription = get_string('enablenewprogrammeforcourse_desc', 'local_envasyllabus');
+            $newprogrammecourses = new admin_setting_configtext(
+                'local_envasyllabus/enablenewprogrammeforcourse',
+                $settingname,
+                $settingdescription,
+                ''
+            );
+            $generalsettingspage->add($newprogrammecourses);
         }
     }
     $optionalsubsystems = $ADMIN->locate('optionalsubsystems');

@@ -43,6 +43,11 @@ $string['defaultmatrixid_desc'] = 'Default Matrix ID';
 $string['programme'] = 'See programme';
 $string['enableenvasyllabus'] = 'Activate ENVA Syllabus functionalities';
 $string['enableenvasyllabus_help'] = 'Activate ENVA Syllabus functionalities (additional menus in course)';
+$string['enablenewprogramme'] = 'Activate new programme';
+$string['enablenewprogramme_desc'] = 'Activate new programme for all courses';
+$string['enablenewprogrammeforcourse'] = 'Activate new programme for specific courses';
+$string['enablenewprogrammeforcourse_desc'] = 'Activate new programme for specific courses.
+If no course selected, the old programme field will be used.';
 $string['enddate'] = 'Date de fin';
 $string['extendedmode'] = 'Extended mode';
 $string['generalsettings'] = 'Enva Syllabus settings';
