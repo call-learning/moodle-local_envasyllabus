@@ -17,7 +17,7 @@
 namespace local_envasyllabus\output;
 
 use core_course\external\course_summary_exporter;
-use core_course_category;
+use customfield_sprogramme\output\formfield;
 use local_competvetsuivi\matrix\matrix;
 use local_envasyllabus\utils;
 use local_envasyllabus\visibility;
@@ -183,15 +183,7 @@ class course_syllabus implements renderable, templatable {
         ];
         $contextdata->prerequisites = $this->get_cf_displayable_info('uc_prerequis', $cfdata, $output);
 
-        if (!utils::is_new_programme_enabled($this->courseid)) {
-            $contextdata->programme = $this->get_cf_displayable_info('programme', $cfdata, $output);
-        } else {
-            $programme = new \customfield_sprogramme\output\programme($this->courseid);
-            $renderer = $PAGE->get_renderer('customfield_sprogramme');
-            $formfield = new \customfield_sprogramme\output\formfield();
-            $programmehtml = $renderer->render($formfield) . $renderer->render($programme);
-            $contextdata->programme = $programmehtml;
-        }
+        $contextdata->programme = $this->get_cf_displayable_info('uc_programme', $cfdata, $output);
 
         $contextdata->vaq = $this->get_cf_displayable_info('uc_validation', $cfdata, $output);
         $contextdata->additionalinfos = $this->get_cf_displayable_info('uc_infos_compl', $cfdata, $output);
@@ -387,10 +379,16 @@ class course_syllabus implements renderable, templatable {
         if (!visibility::is_syllabus_public_field($cfname)) {
             return '';
         }
+        if ($cfname == 'uc_programme' && utils::is_new_programme_enabled($this->courseid)) {
+            $programme = new \customfield_sprogramme\output\programme($this->courseid);
+            $formfield = new formfield();
+            return $output->render($formfield) . $output->render($programme);
+        }
         if (!empty($this->lang)) {
             $cfname = "{$cfname}_{$this->lang}";
         }
         $cffieldvalue = '';
+
         foreach ($cfdata as $cfdatacontroller) {
             if ($cfdatacontroller->get_field()->get('shortname') == $cfname) {
                 $cffieldvalue = $cfdatacontroller->export_value($output);
