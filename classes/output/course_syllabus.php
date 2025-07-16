@@ -91,6 +91,14 @@ class course_syllabus implements renderable, templatable {
      * @var string $lang lang display mode
      */
     protected $lang = '';
+    /**
+     * @var bool $hasnewprogramme has new programme
+     */
+    private bool $hasnewprogramme;
+    /**
+     * @var array $programmetotals programme total
+     */
+    private array $programmetotals;
 
     /**
      * Constructor
@@ -101,7 +109,16 @@ class course_syllabus implements renderable, templatable {
     public function __construct(int $courseid, string $lang = '') {
         $this->courseid = $courseid;
         $this->lang = $lang;
-
+        $this->programmetotals = [];
+        $this->hasnewprogramme = programme::has_data($this->courseid);
+        $this->programmetotals = [];
+        if (utils::is_new_programme_enabled($this->courseid)) {
+            $data = programme::get_data($this->courseid);
+            $columnstructure = programme::get_column_structure($this->courseid);
+            $this->programmetotals = programme::get_column_totals($data, $columnstructure);
+        } else {
+            $this->hasnewprogramme = false;
+        }
     }
 
     /**
@@ -219,15 +236,6 @@ class course_syllabus implements renderable, templatable {
      * @throws \coding_exception
      */
     protected function get_header_data(array $fieldinfolist, array $customfields): array {
-        $programmetotals = [];
-        $hasprogramme = programme::has_data($this->courseid);
-        if (utils::is_new_programme_enabled($this->courseid)) {
-            $data = programme::get_data($this->courseid);
-            $columnstructure = programme::get_column_structure($this->courseid);
-            $programmetotals = programme::get_column_totals($data, $columnstructure);
-        } else {
-            $hasprogramme = false;
-        }
         $headerdata = [];
         foreach ($fieldinfolist as $fieldinfo) {
             if (!empty($fieldinfo['type'])) {
@@ -242,11 +250,8 @@ class course_syllabus implements renderable, templatable {
                     $fieldinfo['icon'] ?? '');
                 switch ($fieldinfo['type']) {
                     case 'cf':
-                        $fieldname = $fieldinfo['fieldname'];
-                        $headerinfo->value = empty($customfields[$fieldname]) ? '-' : $customfields[$fieldname];
-                        if (isset($fieldinfo['programmenames']) && $hasprogramme) {
-                            $headerinfo->value = $this->get_programme_sum($fieldinfo['programmenames'], $programmetotals);
-                        }
+                        $sum = $this->get_programme_sum($fieldinfo, $customfields);
+                        $headerinfo->value = $sum > 0 ? (string)$sum : '-';;
                         $headerdata[] = $headerinfo;
                         break;
                     case 'categorysum':
@@ -269,23 +274,27 @@ class course_syllabus implements renderable, templatable {
     /**
      * Get programme sum
      *
-     * @param string $programmenames
-     * @param array $programmetotals
-     * @return string
+     * @param array $fieldinfo
+     * @param array $customfields
+     * @return int
      */
-    protected function get_programme_sum(string $programmenames, array $programmetotals): string {
-        if (empty($programmenames)) {
-            return '';
+    protected function get_programme_sum(array $fieldinfo,  array $customfields): int {
+        $fieldname = $fieldinfo['fieldname'];
+        $programmenames = $fieldinfo['programmenames'] ?? '';
+        if (empty($fieldname)) {
+            return 0;
+        }
+        if (empty($programmenames) || $this->hasnewprogramme === false) {
+            return intval($customfields[$fieldname]) ?? 0;
         }
         $programmmenames = explode(',', $programmenames);
         $sum = 0;
         foreach ($programmmenames as $programmename) {
-            $sum += array_reduce($programmetotals, function ($carry, $item) use ($programmename) {
+            $sum += array_reduce($this->programmetotals, function ($carry, $item) use ($programmename) {
                 return $item['column'] == $programmename ? $item['sum'] : $carry;
             }, 0);
-
         }
-        return $sum > 0 ? (string)$sum : '-';
+        return $sum;
     }
 
     /**
@@ -319,8 +328,7 @@ class course_syllabus implements renderable, templatable {
             if (!empty($fieldinfo['type'])) {
                 switch ($fieldinfo['type']) {
                     case 'cf':
-                        $fieldname = $fieldinfo['fieldname'];
-                        $total += empty($customfields[$fieldname]) ? 0 : $customfields[$fieldname];
+                        $total += $this->get_programme_sum($fieldinfo, $customfields);
                         break;
                     case 'categorysum':
                         $total += $this->get_header_sum($fieldinfo['fields'], $customfields);
@@ -331,6 +339,42 @@ class course_syllabus implements renderable, templatable {
         }
         return $total;
     }
+
+    /**
+     * Get header data for course summary
+     *
+     * @param array $fieldinfolist
+     * @param array $customfields
+     * @param array $programmetotals
+     * @return int
+     */
+    protected function get_header_sum_with_new_programme(
+        array $fieldinfolist,
+        array $customfields,
+        array $programmetotals
+    ): int {
+        $total = 0;
+        foreach ($fieldinfolist as $fieldinfo) {
+            if (!empty($fieldinfo['type'])) {
+                switch ($fieldinfo['type']) {
+                    case 'cf':
+                        $fieldname = $fieldinfo['fieldname'];
+                        if (isset($fieldinfo['programmenames'])) {
+                            $total += $this->get_programme_sum($fieldinfo['programmenames'], $programmetotals);
+                        } else {
+                            $total += empty($customfields[$fieldname]) ? 0 : $customfields[$fieldname];
+                        }
+                        break;
+                    case 'categorysum':
+                        $total += $this->get_header_sum($fieldinfo['fields'], $customfields);
+                        break;
+                }
+
+            }
+        }
+        return $total;
+    }
+
 
     /**
      * Get graph for course
