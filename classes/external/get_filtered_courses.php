@@ -191,7 +191,7 @@ class get_filtered_courses extends external_api {
     protected static function get_courses(int $rootcategoryid): array {
         $cache = cache::make('local_envasyllabus', 'filteredcourses');
         if ($courses = $cache->get($rootcategoryid)) {
-            return $courses;
+            //return $courses;
         }
         $category = \core_course_category::get($rootcategoryid);
         // Get all courses from this category.
@@ -265,12 +265,19 @@ class get_filtered_courses extends external_api {
             'column' => 'perso',
             'label' => 'Perso',
         ];
+        $activecolumn = [
+            'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
+            'column' => 'active',
+            'label' => '%Actif',
+        ];
         $totalcolumn = [
             'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
             'column' => 'total',
             'label' => 'Total',
         ];
+
         $programmecolumns[] = $persocolumn;
+        $programmecolumns[] = $activecolumn;
         $programmecolumns[] = $totalcolumn;
         return $programmecolumns;
     }
@@ -300,6 +307,13 @@ class get_filtered_courses extends external_api {
             'label' => 'Perso',
             'sum' => $persosum,
         ];
+        $activepercentage = self::get_active_percentage($programmesums);
+        $active = [
+            'columnid' => 0,
+            'column' => 'active',
+            'label' => '% Actif',
+            'sum' => $activepercentage,
+        ];
         $total = [
             'columnid' => 0,
             'column' => 'total',
@@ -307,8 +321,38 @@ class get_filtered_courses extends external_api {
             'sum' => $totalvalue,
         ];
         $programmevalues[] = $perso;
+        $programmevalues[] = $active;
         $programmevalues[] = $total;
         return $programmevalues;
+    }
+
+    /**
+     * get the %active column value
+     * correspond to % of active learning methods used for the course
+     * The formula is : « % actif » = (TD + TP + TPa + AAS + TC + FMP) / (CM + TD + TP + TPa + AAS + TC + FMP)
+     * @param array $programmesums
+     * @return float
+     */
+    public static function get_active_percentage(array $programmesums): float {
+        foreach ($programmesums as $entry) {
+            if (isset($entry['column'])) {
+                $key = strtolower($entry['column']);
+                $sumarray[$key] = $entry;
+            }
+        }
+
+        $keys = ['cm', 'td', 'tp', 'tpa', 'aas', 'tc', 'fmp'];
+
+        foreach ($keys as $key) {
+            $$key = floatVal($sumarray[$key]['sum'] ?? 0);
+        }
+        $active = $td + $tp + $tpa + $aas + $tc + $fmp;
+        $total = $cm + $td + $tp + $tpa + $aas + $tc + $fmp;
+        if ($total == 0) {
+            return 0.0; // Avoid division by zero.
+        }
+        $activepercentage = ($active / $total) * 100;
+        return floor($activepercentage);
     }
 
     /**
