@@ -70,7 +70,11 @@
     {{/sortedCourses}}
 </div>
 {{#js}}
-    require(['theme_lambda/bootstrap', 'jquery'], function(bootstrap, $) {
-        $('[data-toggle="popover"]').popover();
-    });
+    require(['jquery'], function($) {
+        $(document).ready(function() {
+            $('[data-toggle="popover"]').popover().on('shown.bs.popover', function () {
+                    $('th.hashelp').not(this).popover('hide');
+                });
+            });
+        });
 {{/js}}
