@@ -69,12 +69,3 @@
         {{/semesters}}
     {{/sortedCourses}}
 </div>
-{{#js}}
-    require(['jquery'], function($) {
-        $(document).ready(function() {
-            $('[data-toggle="popover"]').popover().on('shown.bs.popover', function () {
-                    $('th.hashelp').not(this).popover('hide');
-                });
-            });
-        });
-{{/js}}

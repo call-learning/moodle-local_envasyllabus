@@ -24,7 +24,7 @@ import * as repository from './repository';
 import {exception as displayException} from 'core/notification';
 import Templates from "core/templates";
 import Config from 'core/config';
-
+import $ from 'jquery';
 /**
  * Initialise catalog
  *
@@ -70,6 +70,17 @@ export const init = (catalogTagId) => {
         catalogCourseTag.dataset.modus = event.target.checked ? 'extended' : 'normal';
         updateUrl('modus', event.target.checked ? 'extended' : 'normal');
         refreshCoursesList(catalogTagId);
+    });
+    document.addEventListener('click', async(event) => {
+        const popOvers = document.querySelectorAll('[data-toggle="popover"]');
+        const currentPopover = event.target.closest('[data-toggle="popover"]');
+        if (popOvers.length > 0) {
+            popOvers.forEach((popover) => {
+                if (popover !== currentPopover) {
+                    $(popover).popover('hide');
+                }
+            });
+        }
     });
 };
 
