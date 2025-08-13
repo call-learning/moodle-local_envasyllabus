@@ -165,7 +165,7 @@
 
 .local-envasyllabus-ccat .table-hover th.hashelp {
     text-decoration: underline;
-    cursor: pointer;
+    cursor: help;
 }
 
 .local-envasyllabus-ccat .table-hover tbody tr td {
