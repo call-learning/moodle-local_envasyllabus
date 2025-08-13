@@ -97,3 +97,6 @@ $string['th:ects'] = 'ECTS';
 $string['th:responsible'] = 'Responsible';
 $string['th:uc'] = 'UC';
 $string['viewcourse'] = 'View course';
+$string['perso_help'] = 'Minimum estimated personal work time required to acquire the skills targeted by this UC';
+$string['active_help'] = 'Percentage of active teaching methods implemented within the UC';
+$string['total_help'] = 'Total time allocated to the UC, including the estimation of personal work';

@@ -264,16 +264,19 @@ class get_filtered_courses extends external_api {
             'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
             'column' => 'perso',
             'label' => 'Perso',
+            'help' => get_string('perso_help', 'local_envasyllabus'),
         ];
         $activecolumn = [
             'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
             'column' => 'active',
             'label' => '%Actif',
+            'help' => get_string('active_help', 'local_envasyllabus'),
         ];
         $totalcolumn = [
             'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
             'column' => 'total',
             'label' => 'Total',
+            'help' => get_string('total_help', 'local_envasyllabus'),
         ];
 
         $programmecolumns[] = $persocolumn;
