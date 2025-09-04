@@ -189,19 +189,20 @@ class get_filtered_courses extends external_api {
      * @throws \moodle_exception
      */
     protected static function get_courses(int $rootcategoryid): array {
-        $cache = cache::make('local_envasyllabus', 'filteredcourses');
-        if ($courses = $cache->get($rootcategoryid)) {
-            //return $courses;
-        }
         $category = \core_course_category::get($rootcategoryid);
-        // Get all courses from this category.
+        // First we get all courses id in this category. Normally this is cached by core.
         $categorycourses = $category->get_courses(['recursive' => true, 'coursecontacts' => true]);
         // Filter out course ID = 1.
         if (!empty($categorycourses[SITEID])) {
             unset($categorycourses[SITEID]);
         }
         $courses = [];
+        $cache = cache::make('local_envasyllabus', 'courseinfo');
         foreach ($categorycourses as $cid => $courselistelement) {
+            if ($cache->get($cid)) {
+                $courses[$cid] = $cache->get($cid);
+                continue;
+            }
             $course = (object) iterator_to_array($courselistelement->getIterator(), true);
             $course->contextid = $courselistelement->get_context()->id;
             $course->categoryid = $course->category;
@@ -238,10 +239,24 @@ class get_filtered_courses extends external_api {
             } else {
                 $course->responsible = [];
             }
+            // Now get the custom fields for this course.
+            $coursecfs = \core_course\customfield\course_handler::create()->get_instance_data($cid, true);
+            $course->customfields = [];
+            foreach ($coursecfs as $cfdatacontroller) {
+                $fieldshortname = $cfdatacontroller->get_field()->get('shortname');
+                $ispublicfield = visibility::is_syllabus_public_field($fieldshortname);
+                if ($ispublicfield) {
+                    $course->customfields[$fieldshortname] = [
+                        'type' => $cfdatacontroller->get_field()->get('type'),
+                        'value' => $cfdatacontroller->export_value(),
+                        'name' => $cfdatacontroller->get_field()->get('name'),
+                        'shortname' => $fieldshortname,
+                    ];
+                }
+            }
+            $cache->set($cid, $course);
             $courses[$cid] = $course;
         }
-        self::map_customfiedls($courses);
-        $cache->set($rootcategoryid, $courses);
         return $courses;
     }
 
