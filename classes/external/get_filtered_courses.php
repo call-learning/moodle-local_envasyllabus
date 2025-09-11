@@ -19,6 +19,7 @@ namespace local_envasyllabus\external;
 use cache;
 use context_course;
 use context_system;
+use core_course\customfield\course_handler;
 use core_course_category;
 use core_external\external_api;
 use core_external\external_description;
@@ -28,6 +29,7 @@ use core_external\external_single_structure;
 use core_external\external_value;
 use customfield_sprogramme\local\api\programme;
 use Exception;
+use local_envasyllabus\utils;
 use local_envasyllabus\visibility;
 use moodle_url;
 
@@ -207,9 +209,15 @@ class get_filtered_courses extends external_api {
             $course->contextid = $courselistelement->get_context()->id;
             $course->categoryid = $course->category;
             unset($course->category);
-            $programmesums = programme::get_sums($course->id);
+            // Now get the custom fields for this course.
+            $coursecfs = course_handler::create()->get_instance_data($cid, true);
+            $sprogrammefield = utils::get_programme_customfield($coursecfs);
+            $programmesums = [];
+            if ($sprogrammefield) {
+                $programmesums = $sprogrammefield->get_sum(); // Specific to this custom field.
+            }
             $course->programmevalues = self::process_programme_values($programmesums);
-            $course->categoryname = static::get_category_name_for_id($course->categoryid);
+            $course->categoryname = self::get_category_name_for_id($course->categoryid);
             $course->courseimageurl = (new moodle_url('/local/envasyllabus/pix/nocourseimage.jpg'))->out();
             $course->responsible = self::get_roleusers_for_course($course->id, ['responsablecourse']);
             $overviewfiles = $courselistelement->get_course_overviewfiles();
@@ -239,8 +247,6 @@ class get_filtered_courses extends external_api {
             } else {
                 $course->responsible = [];
             }
-            // Now get the custom fields for this course.
-            $coursecfs = \core_course\customfield\course_handler::create()->get_instance_data($cid, true);
             $course->customfields = [];
             foreach ($coursecfs as $cfdatacontroller) {
                 $fieldshortname = $cfdatacontroller->get_field()->get('shortname');
@@ -396,7 +402,7 @@ class get_filtered_courses extends external_api {
      * @return void
      */
     protected static function map_customfiedls(array &$courses): void {
-        $allcustomfields = \core_course\customfield\course_handler::create()->get_instances_data(array_keys($courses), true);
+        $allcustomfields = course_handler::create()->get_instances_data(array_keys($courses), true);
         foreach ($courses as $cid => &$course) {
             $coursecfs = $allcustomfields[$cid] ?? [];
             $course->customfields = [];

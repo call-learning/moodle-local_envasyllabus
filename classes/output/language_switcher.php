@@ -46,6 +46,11 @@ class language_switcher implements renderable, templatable {
     private $currentlang;
 
     /**
+     * @var string $previouslang
+     */
+    private $previouslang;
+
+    /**
      * Constructor
      */
     public function __construct() {
@@ -73,7 +78,6 @@ class language_switcher implements renderable, templatable {
         ], $this->currentlang, null
         );
         $singleselect->set_label($pixiconout);
-        $singleselect->id = 'langswitcher';
         return $singleselect->export_for_template($output);
     }
 

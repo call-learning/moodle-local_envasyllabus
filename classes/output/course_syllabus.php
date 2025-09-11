@@ -17,11 +17,9 @@
 namespace local_envasyllabus\output;
 
 use core_course\external\course_summary_exporter;
-use customfield_sprogramme\output\formfield;
 use local_competvetsuivi\matrix\matrix;
 use local_envasyllabus\utils;
 use local_envasyllabus\visibility;
-use customfield_sprogramme\local\api\programme;
 use moodle_exception;
 use renderable;
 use renderer_base;
@@ -98,7 +96,7 @@ class course_syllabus implements renderable, templatable {
     /**
      * @var array $programmetotals programme total
      */
-    private array $programmetotals;
+    private array $programmetotals = [];
 
     /**
      * Constructor
@@ -109,16 +107,6 @@ class course_syllabus implements renderable, templatable {
     public function __construct(int $courseid, string $lang = '') {
         $this->courseid = $courseid;
         $this->lang = $lang;
-        $this->programmetotals = [];
-        $this->hasnewprogramme = programme::has_data($this->courseid);
-        $this->programmetotals = [];
-        if (utils::is_new_programme_enabled($this->courseid)) {
-            $data = programme::get_data($this->courseid);
-            $columnstructure = programme::get_column_structure($this->courseid);
-            $this->programmetotals = programme::get_column_totals($data, $columnstructure);
-        } else {
-            $this->hasnewprogramme = false;
-        }
     }
 
     /**
@@ -128,7 +116,7 @@ class course_syllabus implements renderable, templatable {
      * @return array|stdClass|void
      */
     public function export_for_template(renderer_base $output) {
-        global $DB, $CFG, $PAGE;
+        global $DB, $CFG;
         $currentlang = current_language();
         $contextdata = new stdClass();
         $course = $DB->get_record('course', ['id' => $this->courseid]);
@@ -143,9 +131,16 @@ class course_syllabus implements renderable, templatable {
             $shortname = $cfdatacontroller->get_field()->get('shortname');
             $customfields[$shortname] = $cfdatacontroller->export_value();
         }
+        // Check for the first sprogramme field.
+        $sprogrammefield = utils::get_programme_customfield($cfdata);
+        $this->hasnewprogramme = $sprogrammefield
+            && $sprogrammefield->get_value() // Ensure the programme is enabled on this course.
+            && utils::is_new_programme_enabled($this->courseid);
+        if ($this->hasnewprogramme) {
+            $this->programmetotals = $sprogrammefield->get_column_totals();
+        }
 
         // Fetch right title.
-
         $contextdata->coursedata->displayname = $contextdata->coursedata->fullname;
         if (!empty($customfields['uc_titre_' . $currentlang])) {
             if (!empty($customfields['uc_titre_' . $currentlang])) {
@@ -284,7 +279,7 @@ class course_syllabus implements renderable, templatable {
         if (empty($fieldname)) {
             return 0;
         }
-        if (empty($programmenames) || $this->hasnewprogramme === false) {
+        if (empty($programmenames) || !$this->hasnewprogramme) {
             return intval($customfields[$fieldname]) ?? 0;
         }
         $programmmenames = explode(',', $programmenames);
@@ -341,42 +336,6 @@ class course_syllabus implements renderable, templatable {
     }
 
     /**
-     * Get header data for course summary
-     *
-     * @param array $fieldinfolist
-     * @param array $customfields
-     * @param array $programmetotals
-     * @return int
-     */
-    protected function get_header_sum_with_new_programme(
-        array $fieldinfolist,
-        array $customfields,
-        array $programmetotals
-    ): int {
-        $total = 0;
-        foreach ($fieldinfolist as $fieldinfo) {
-            if (!empty($fieldinfo['type'])) {
-                switch ($fieldinfo['type']) {
-                    case 'cf':
-                        $fieldname = $fieldinfo['fieldname'];
-                        if (isset($fieldinfo['programmenames'])) {
-                            $total += $this->get_programme_sum($fieldinfo['programmenames'], $programmetotals);
-                        } else {
-                            $total += empty($customfields[$fieldname]) ? 0 : $customfields[$fieldname];
-                        }
-                        break;
-                    case 'categorysum':
-                        $total += $this->get_header_sum($fieldinfo['fields'], $customfields);
-                        break;
-                }
-
-            }
-        }
-        return $total;
-    }
-
-
-    /**
      * Get graph for course
      *
      * @param string $uename
@@ -423,19 +382,16 @@ class course_syllabus implements renderable, templatable {
         if (!visibility::is_syllabus_public_field($cfname)) {
             return '';
         }
-        if ($cfname == 'uc_programme' && utils::is_new_programme_enabled($this->courseid)) {
-            $programme = new \customfield_sprogramme\output\programme($this->courseid);
-            $formfield = new formfield();
-            return $output->render($formfield) . $output->render($programme);
-        }
         if (!empty($this->lang)) {
             $cfname = "{$cfname}_{$this->lang}";
         }
         $cffieldvalue = '';
-
+        if ($cfname == 'uc_programme' && $this->hasnewprogramme) {
+            $cfname = 'programme';
+        }
         foreach ($cfdata as $cfdatacontroller) {
             if ($cfdatacontroller->get_field()->get('shortname') == $cfname) {
-                $cffieldvalue = $cfdatacontroller->export_value($output);
+                $cffieldvalue = $cfdatacontroller->export_value();
             }
         }
         if (html_to_text($cffieldvalue) == '') {

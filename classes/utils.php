@@ -44,4 +44,22 @@ class utils {
         $courselist = array_map('intval', $courselist);
         return in_array($courseid, $courselist, true);
     }
+
+    /**
+     * Get the custom field of type 'sprogramme' with shortname 'programme' from a list of course custom fields data.
+     *
+     * @param array $coursecustomfieldsdata An array of course custom fields data controllers.
+     * @return \customfield_sprogramme\data_controller|null The found custom field or null if not found.
+     */
+    public static function get_programme_customfield(array $coursecustomfieldsdata): ?\customfield_sprogramme\data_controller {
+        $filtered = array_filter($coursecustomfieldsdata, function($cfdatacontroller) {
+            $field = $cfdatacontroller->get_field();
+            return $field->get('type') == 'sprogramme'
+                && $field->get('shortname') == 'programme';
+        });
+        if (!empty($filtered)) {
+            return array_values($filtered)[0];
+        }
+        return null;
+    }
 }
