@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['active_help'] = 'Pourcentage de méthodes pédagogiques actives mises en place au sein de l\'UC';
 $string['catalog:filter_sort'] = 'Filtres et Tris';
 $string['catalog:index'] = 'Catalogue';
 $string['cf:uc_annee'] = 'Année';
@@ -45,10 +46,13 @@ $string['enablenewprogrammeforcourse'] = 'Active le nouveau programme pour des c
 $string['enablenewprogrammeforcourse_desc'] = 'Active le nouveau programme pour des cours spécifiques.
 Si aucun cours n\'est spécifié, l\'ancien champs est utilisé.';
 $string['enddate'] = 'Date de fin';
+$string['entity:programme_with_customfields'] = 'Programme avec champs personnalisés';
 $string['generalsettings'] = 'Enva Syllabus settings';
+$string['perso_help'] = 'Temps de travail personnel minimal estimé nécessaire pour acquérir les compétences visées par cette UC';
 $string['pluginname'] = 'ENVA Syllabus';
 $string['publicfields'] = 'Public fields';
 $string['publicfields_desc'] = 'Course field visible to guest users';
+$string['report:programme'] = 'Report sur les programmes Syllabus';
 $string['rootcategoryid'] = 'Root Category';
 $string['rootcategoryid_desc'] = 'Root Category Description';
 $string['sort'] = 'Tri';
@@ -85,9 +89,7 @@ $string['syllabuspage:uc_heures_td_etudiant'] = 'Travaux dirigés (TD)';
 $string['syllabuspage:uc_heures_tp_etudiant'] = 'Travaux pratiques (TP)';
 $string['syllabuspage:uc_heures_tpa_etudiant'] = 'TP sur animaux sains (TPa)';
 $string['syllabuspage:vaq'] = 'Validation des acquis';
-$string['viewcourse'] = 'Voir contenu du cours';
 $string['th:acronym'] = 'Acronyme';
 $string['th:responsible'] = 'Responsable';
-$string['perso_help'] = 'Temps de travail personnel minimal estimé nécessaire pour acquérir les compétences visées par cette UC';
-$string['active_help'] = 'Pourcentage de méthodes pédagogiques actives mises en place au sein de l\'UC';
 $string['total_help'] = 'Total du volume horaire consacré à l\'UC, incluant l\'estimation du travail personnel';
+$string['viewcourse'] = 'Voir contenu du cours';

@@ -27,16 +27,11 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-use customfield_sprogramme\local\api\programme;
+use customfield_sprogramme\local\programme_manager;
 use Exception;
 use local_envasyllabus\utils;
 use local_envasyllabus\visibility;
 use moodle_url;
-
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/course/externallib.php');
 
 /**
  * External services
@@ -68,7 +63,6 @@ class get_filtered_courses extends external_api {
      * @param array $sort sort criteria
      * @return array
      * @throws \invalid_parameter_exception
-     * @throws \restricted_context_exception
      */
     public static function execute($rootcategoryid, $currentlang = 'fr', $filters = null, $sort = []) {
         $paramstocheck = [
@@ -134,7 +128,7 @@ class get_filtered_courses extends external_api {
         }
 
         self::sort_courses($filteredcourse, $sort);
-        $columns = programme::get_numeric_columns();
+        $columns = programme_manager::get_numeric_columns();
         return [
             'courses' => $filteredcourse,
             'programmecolumns' => self::process_programme_header($columns),
@@ -213,7 +207,7 @@ class get_filtered_courses extends external_api {
             $coursecfs = course_handler::create()->get_instance_data($cid, true);
             $sprogrammefield = utils::get_programme_customfield($coursecfs);
             $programmesums = [];
-            if ($sprogrammefield) {
+            if ($sprogrammefield && $sprogrammefield->get('id')) {
                 $programmesums = $sprogrammefield->get_sum(); // Specific to this custom field.
             }
             $course->programmevalues = self::process_programme_values($programmesums);
@@ -223,12 +217,17 @@ class get_filtered_courses extends external_api {
             $overviewfiles = $courselistelement->get_course_overviewfiles();
             if ($overviewfiles) {
                 $file = array_shift($overviewfiles);
-                $course->courseimageurl = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(),
-                    $file->get_filearea(), null, $file->get_filepath(),
-                    $file->get_filename())->out(false);
+                $course->courseimageurl = moodle_url::make_pluginfile_url(
+                    $file->get_contextid(),
+                    $file->get_component(),
+                    $file->get_filearea(),
+                    null,
+                    $file->get_filepath(),
+                    $file->get_filename()
+                )->out(false);
             }
             if (!empty($course->managers)) {
-                $course->managers = array_map(function($manager) {
+                $course->managers = array_map(function ($manager) {
                     return [
                         'id' => $manager->id,
                         'fullname' => fullname($manager),
@@ -238,7 +237,7 @@ class get_filtered_courses extends external_api {
                 $course->managers = [];
             }
             if (!empty($course->responsible)) {
-                $course->responsible = array_map(function($manager) {
+                $course->responsible = array_map(function ($manager) {
                     return [
                         'id' => $manager->id,
                         'fullname' => fullname($manager),
@@ -273,7 +272,7 @@ class get_filtered_courses extends external_api {
      * @return array
      */
     public static function process_programme_header(array $columns): array {
-        //return $columns;
+        // return $columns;
         $programmecolumns = [];
         foreach ($columns as $column) {
             if ($column['column'] == 'perso_av' || $column['column'] == 'perso_ap') {
@@ -319,11 +318,11 @@ class get_filtered_courses extends external_api {
         $totalvalue = 0;
         foreach ($programmesums as $column) {
             if ($column['column'] == 'perso_av' || $column['column'] == 'perso_ap') {
-                $persosum += floatVal($column['sum']);
+                $persosum += floatval($column['sum']);
             } else {
                 $programmevalues[] = $column;
             }
-            $totalvalue += floatVal($column['sum']);
+            $totalvalue += floatval($column['sum']);
         }
         $perso = [
             'columnid' => 0,
@@ -368,7 +367,7 @@ class get_filtered_courses extends external_api {
         $keys = ['cm', 'td', 'tp', 'tpa', 'aas', 'tc', 'fmp'];
 
         foreach ($keys as $key) {
-            $$key = floatVal($sumarray[$key]['sum'] ?? 0);
+            $$key = floatval($sumarray[$key]['sum'] ?? 0);
         }
         $active = $td + $tp + $tpa + $aas + $tc + $fmp;
         $total = $cm + $td + $tp + $tpa + $aas + $tc + $fmp;
@@ -473,7 +472,7 @@ class get_filtered_courses extends external_api {
      */
     protected static function sort_courses(&$courses, $sort): void {
         if (!empty($sort)) {
-            uasort($courses, function($c1, $c2) use ($sort) {
+            uasort($courses, function ($c1, $c2) use ($sort) {
                 if (strpos($sort['field'], 'customfield_') === 0) {
                     $sortfieldname = str_replace('customfield_', '', $sort['field']);
                     $c1value = $c1->customfields[$sortfieldname]["value"] ?? '';
@@ -548,22 +547,30 @@ class get_filtered_courses extends external_api {
                                     'columnid' => new external_value(PARAM_INT, 'The id of the custom field'),
                                     'column' => new external_value(PARAM_RAW, 'The name of the custom field'),
                                     'label' => new external_value(PARAM_RAW, 'The shortname of the custom field'),
-                                    'sum' => new external_value(PARAM_INT, 'The value of the custom field'),
+                                    'sum' => new external_value(PARAM_FLOAT, 'The value of the custom field'),
                                 ]
                             ),
-                            'Custom fields', VALUE_OPTIONAL),
+                            'Custom fields',
+                            VALUE_OPTIONAL
+                        ),
                         'customfields' => new external_multiple_structure(
                             new external_single_structure(
                                 [
                                     'name' => new external_value(PARAM_RAW, 'The name of the custom field'),
-                                    'shortname' => new external_value(PARAM_RAW,
-                                        'The shortname of the custom field - to be able to build the field class in the code'),
-                                    'type' => new external_value(PARAM_ALPHANUMEXT,
-                                        'The type of the custom field - text field, checkbox...'),
+                                    'shortname' => new external_value(
+                                        PARAM_RAW,
+                                        'The shortname of the custom field - to be able to build the field class in the code'
+                                    ),
+                                    'type' => new external_value(
+                                        PARAM_ALPHANUMEXT,
+                                        'The type of the custom field - text field, checkbox...'
+                                    ),
                                     'value' => new external_value(PARAM_RAW, 'The value of the custom field'),
                                 ]
                             ),
-                            'Custom fields', VALUE_OPTIONAL),
+                            'Custom fields',
+                            VALUE_OPTIONAL
+                        ),
                         'courseimageurl' => new external_value(PARAM_URL, 'image url', VALUE_OPTIONAL),
                     ]
                 )
@@ -580,5 +587,4 @@ class get_filtered_courses extends external_api {
             ),
         ]);
     }
-
 }

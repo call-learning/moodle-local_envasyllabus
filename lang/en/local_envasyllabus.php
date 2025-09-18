@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['active_help'] = 'Percentage of active teaching methods implemented within the UC';
 $string['aria:courseimage'] = 'Course image';
 $string['cachedef_filteredcourses'] = 'Filtered courses cache';
 $string['catalog:filter_sort'] = 'Filters and Sorts';
@@ -48,14 +49,17 @@ $string['enablenewprogrammeforcourse'] = 'Activate new programme for specific co
 $string['enablenewprogrammeforcourse_desc'] = 'Activate new programme for specific courses.
 If no course selected, the old programme field will be used.';
 $string['enddate'] = 'Date de fin';
+$string['entity:programme_with_customfields'] = 'Programme with custom fields';
 $string['extendedmode'] = 'Extended mode';
 $string['generalsettings'] = 'Enva Syllabus settings';
 $string['gridview'] = 'Grid view';
 $string['listview'] = 'List view';
+$string['perso_help'] = 'Minimum estimated personal work time required to acquire the skills targeted by this UC';
 $string['pluginname'] = 'ENVA Syllabus';
 $string['programme'] = 'See programme';
 $string['publicfields'] = 'Public fields';
 $string['publicfields_desc'] = 'Course field visible to guest users';
+$string['report:programme'] = 'Syllabus Programme report';
 $string['rootcategoryid'] = 'Root Category';
 $string['rootcategoryid_desc'] = 'Root Category Description';
 $string['sort'] = 'Tri';
@@ -96,7 +100,5 @@ $string['th:acronym'] = 'Acronym';
 $string['th:ects'] = 'ECTS';
 $string['th:responsible'] = 'Responsible';
 $string['th:uc'] = 'UC';
-$string['viewcourse'] = 'View course';
-$string['perso_help'] = 'Minimum estimated personal work time required to acquire the skills targeted by this UC';
-$string['active_help'] = 'Percentage of active teaching methods implemented within the UC';
 $string['total_help'] = 'Total time allocated to the UC, including the estimation of personal work';
+$string['viewcourse'] = 'View course';

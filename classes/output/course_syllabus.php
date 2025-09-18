@@ -131,14 +131,9 @@ class course_syllabus implements renderable, templatable {
             $shortname = $cfdatacontroller->get_field()->get('shortname');
             $customfields[$shortname] = $cfdatacontroller->export_value();
         }
-        // Check for the first sprogramme field.
-        $sprogrammefield = utils::get_programme_customfield($cfdata);
-        $this->hasnewprogramme = $sprogrammefield
-            && $sprogrammefield->get_value() // Ensure the programme is enabled on this course.
-            && utils::is_new_programme_enabled($this->courseid);
-        if ($this->hasnewprogramme) {
-            $this->programmetotals = $sprogrammefield->get_column_totals();
-        }
+
+        // Check for the first sprogramme field and set the total for further use.
+        $this->set_programme_and_totals($cfdata);
 
         // Fetch right title.
         $contextdata->coursedata->displayname = $contextdata->coursedata->fullname;
@@ -186,19 +181,20 @@ class course_syllabus implements renderable, templatable {
             }
             $contextdata->teachers[] = $teacher;
         }
+
         $contextdata->summary = $customfields['uc_summary_' . $currentlang] ?? '';
         $matrixid = $customfields['uc_matrix'] ?? get_config('local_envasyllabus', 'defaultmatrixid');
         $contextdata->competencies = (object) [
             'graph' => empty($customfields['uc_nombre']) ? '' :
                 $this->get_graph_for_course($customfields['uc_nombre'], $matrixid, $output),
-            'description' => $this->get_cf_displayable_info('uc_competences', $cfdata, $output),
+            'description' => $this->get_cf_displayable_info('uc_competences', $customfields, $output),
         ];
-        $contextdata->prerequisites = $this->get_cf_displayable_info('uc_prerequis', $cfdata, $output);
+        $contextdata->prerequisites = $this->get_cf_displayable_info('uc_prerequis', $customfields, $output);
 
-        $contextdata->programme = $this->get_cf_displayable_info('uc_programme', $cfdata, $output);
+        $contextdata->programme = $this->get_cf_displayable_info('uc_programme', $customfields, $output);
 
-        $contextdata->vaq = $this->get_cf_displayable_info('uc_validation', $cfdata, $output);
-        $contextdata->additionalinfos = $this->get_cf_displayable_info('uc_infos_compl', $cfdata, $output);
+        $contextdata->vaq = $this->get_cf_displayable_info('uc_validation', $customfields, $output);
+        $contextdata->additionalinfos = $this->get_cf_displayable_info('uc_infos_compl', $customfields, $output);
         return $contextdata;
     }
 
@@ -292,6 +288,23 @@ class course_syllabus implements renderable, templatable {
         return $sum;
     }
 
+
+    /**
+     * Set programme and totals
+     *
+     * @param array $cfdata
+     * @return void
+     */
+    protected function set_programme_and_totals(array $cfdata): void {
+        $sprogrammefield = utils::get_programme_customfield($cfdata);
+        $this->hasnewprogramme = $sprogrammefield
+            && $sprogrammefield->get_value() // Ensure the programme is enabled on this course.
+            && utils::is_new_programme_enabled($this->courseid);
+        if ($this->hasnewprogramme) {
+            $this->programmetotals = $sprogrammefield->get_column_totals();
+        }
+    }
+
     /**
      * Create a header data object
      *
@@ -378,22 +391,17 @@ class course_syllabus implements renderable, templatable {
      * @param \renderer_base $output
      * @return mixed
      */
-    protected function get_cf_displayable_info(string $cfname, array $cfdata, \renderer_base $output) {
+    protected function get_cf_displayable_info(string $cfname, array $customfields, \renderer_base $output) {
         if (!visibility::is_syllabus_public_field($cfname)) {
             return '';
         }
         if (!empty($this->lang)) {
             $cfname = "{$cfname}_{$this->lang}";
         }
-        $cffieldvalue = '';
         if ($cfname == 'uc_programme' && $this->hasnewprogramme) {
             $cfname = 'programme';
         }
-        foreach ($cfdata as $cfdatacontroller) {
-            if ($cfdatacontroller->get_field()->get('shortname') == $cfname) {
-                $cffieldvalue = $cfdatacontroller->export_value();
-            }
-        }
+        $cffieldvalue = $customfields[$cfname] ?? '';
         if (html_to_text($cffieldvalue) == '') {
             return '';
         }

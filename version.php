@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_envasyllabus';
 $plugin->release = '2.2.0';
-$plugin->version = 2025090403;
+$plugin->version = 2025090404;
 $plugin->requires = 2020061500;
 $plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
