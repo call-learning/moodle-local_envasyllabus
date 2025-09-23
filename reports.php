@@ -41,7 +41,22 @@ $returnto = optional_param('returnurl', null, PARAM_URL);
 if ($returnto) {
     $PAGE->set_button($OUTPUT->single_button(new moodle_url($returnto), get_string('back')));
 }
-
+$singlebutton = new single_select(
+    new moodle_url('/local/envasyllabus/reports.php', ['userid' => $userid]),
+    'reportname',
+    [
+        'competencies' => get_string('report:competencies', 'customfield_sprogramme'),
+        'disciplines' => get_string('report:disciplines', 'customfield_sprogramme'),
+        'programme' => get_string('report:programme', 'local_envasyllabus'),
+        'historyrfc' => get_string('report:historyrfc', 'local_envasyllabus'),
+        'historyrfctotals' => get_string('report:historyrfctotals', 'local_envasyllabus'),
+    ],
+    $reportname,
+    null,
+    'selectreport'
+);
+$singlebutton->set_label(get_string('select') . ': ');
+$PAGE->set_button($PAGE->button . $OUTPUT->render($singlebutton));
 echo $OUTPUT->header();
 echo $OUTPUT->heading($pagetitle);
 $report = null;
@@ -64,20 +79,23 @@ switch ($reportname) {
             $context,
         );
         break;
-    case 'history_rfc':
+    case 'historyrfc':
         $report = \core_reportbuilder\system_report_factory::create(
             \local_envasyllabus\reportbuilder\local\systemreports\syllabus_history_rfc::class,
+            $context,
+        );
+        break;
+    case 'historyrfctotals':
+        $report = \core_reportbuilder\system_report_factory::create(
+            \local_envasyllabus\reportbuilder\local\systemreports\syllabus_history_rfcs_totals::class,
             $context,
         );
         break;
     default:
         break;
 }
-if ($report === null) {
-    throw new \moodle_exception('invalidreportid', 'local_envasyllabus', $currenturl);
-}
-$report->require_can_view();
 if (!empty($report)) {
+    $report->require_can_view();
     echo $report->output();
 }
 echo $OUTPUT->footer();
