@@ -64,6 +64,12 @@ switch ($reportname) {
             $context,
         );
         break;
+    case 'history_rfc':
+        $report = \core_reportbuilder\system_report_factory::create(
+            \local_envasyllabus\reportbuilder\local\systemreports\syllabus_history_rfc::class,
+            $context,
+        );
+        break;
     default:
         break;
 }
