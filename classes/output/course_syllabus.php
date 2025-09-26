@@ -327,10 +327,10 @@ class course_syllabus implements renderable, templatable {
      *
      * @param array $fieldinfolist
      * @param array $customfields
-     * @return int
+     * @return float
      * @throws \coding_exception
      */
-    protected function get_header_sum(array $fieldinfolist, array $customfields): int {
+    protected function get_header_sum(array $fieldinfolist, array $customfields): float {
         $total = 0;
         foreach ($fieldinfolist as $fieldinfo) {
             if (!empty($fieldinfo['type'])) {
