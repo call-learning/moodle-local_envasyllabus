@@ -267,9 +267,9 @@ class course_syllabus implements renderable, templatable {
      *
      * @param array $fieldinfo
      * @param array $customfields
-     * @return int
+     * @return float
      */
-    protected function get_programme_sum(array $fieldinfo,  array $customfields): int {
+    protected function get_programme_sum(array $fieldinfo,  array $customfields): float {
         $fieldname = $fieldinfo['fieldname'];
         $programmenames = $fieldinfo['programmenames'] ?? '';
         if (empty($fieldname)) {
