@@ -15,12 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 declare(strict_types=1);
+
 namespace local_envasyllabus\reportbuilder\local\systemreports;
 
 use core_reportbuilder\local\entities\course;
 use core_reportbuilder\local\entities\user;
 use core_reportbuilder\local\helpers\database;
+use core_reportbuilder\local\report\column;
 use core_reportbuilder\system_report;
+use customfield_sprogramme\local\persistent\sprogramme_comp;
+use customfield_sprogramme\local\persistent\sprogramme_disc;
 use customfield_sprogramme\reportbuilder\local\entities\competency;
 use customfield_sprogramme\reportbuilder\local\entities\competency_assignment;
 use customfield_sprogramme\reportbuilder\local\entities\discipline;
@@ -73,7 +77,7 @@ class syllabus_programme extends system_report {
         $competency->add_joins($competencyassignment->get_joins());
         $this->add_entity($competency
             ->add_join(
-                "LEFT JOIN {customfield_sprogramme_complist} {$competencyalias} ON {$competencyalias}.id = {$competencyassignmentalias}.cid"
+                "LEFT JOIN {customfield_sprogramme_complist} {$competencyalias} ON {$competencyalias}.uniqueid = {$competencyassignmentalias}.cid"
             ));
 
         $disciplineassignment = new discipline_assignment();
@@ -87,7 +91,7 @@ class syllabus_programme extends system_report {
         $discipline->add_joins($disciplineassignment->get_joins());
         $this->add_entity($discipline
             ->add_join(
-                "LEFT JOIN {customfield_sprogramme_disclist} {$disciplinealias} ON {$disciplinealias}.id = {$disciplineassignmentalias}.did"
+                "LEFT JOIN {customfield_sprogramme_disclist} {$disciplinealias} ON {$disciplinealias}.uniqueid = {$disciplineassignmentalias}.did"
             ));
 
         $module = new module();
@@ -105,7 +109,8 @@ class syllabus_programme extends system_report {
         $insql = "(SELECT {$useralias}.id
                   FROM {user} {$useralias}
                    JOIN {role_assignments} {$rolassignmentalias} ON {$rolassignmentalias}.userid = {$useralias}.id
-                   JOIN {context} {$contextalias} ON {$contextalias}.id = {$rolassignmentalias}.contextid AND {$contextalias}.contextlevel = ".CONTEXT_COURSE."
+                   JOIN {context} {$contextalias} ON {$contextalias}.id = {$rolassignmentalias}.contextid AND {$contextalias}.contextlevel = " .
+            CONTEXT_COURSE . "
                    WHERE {$rolassignmentalias}.roleid IN (SELECT r.id FROM {role} r WHERE r.shortname IN ('responsablecourse'))
                    AND {$contextalias}.instanceid = {$coursealias}.id)";
         $this->add_entity($responsible
@@ -113,6 +118,55 @@ class syllabus_programme extends system_report {
         // Now we can call our helper methods to add the content we want to include in the report.
         $this->add_columns();
         $this->add_filters();
+        // Fix titles for some columns.
+        $this->get_column('responsible:fullnamewithlink')->set_title(
+            new \lang_string('syllabuspage:manager', 'local_envasyllabus')
+        );
+        $this->get_column('course:coursefullnamewithlink')->set_title(
+            new \lang_string('course')
+        );
+
+        $displayentityname = function($entityclass, $value, $index) {
+            $records = $entityclass::get_records(['pid' => $value], 'id');
+            if (array_key_exists($index - 1, $records)) {
+                return $records[$index - 1]->get_name();
+            }
+            return '';
+        };
+        $displayentitypercent = function($entityclass, $value, $index) {
+            $records = $entityclass::get_records(['pid' => $value], 'id');
+            if (array_key_exists($index - 1, $records)) {
+                return $records[$index - 1]->get('percentage');
+            }
+            return '';
+        };
+        // Add repeated columns for competencies (max 3).
+        $this->add_repeated_columns(
+            'competency',
+            'name',
+            3,
+            fn($value, $record, $index) => $displayentityname(sprogramme_comp::class, $value, $index)
+        );
+        $this->add_repeated_columns(
+            'competency',
+            'percent',
+            3,
+            fn($value, $record, $index) => $displayentitypercent(sprogramme_comp::class, $value, $index)
+        );
+
+        $this->add_repeated_columns(
+            'discipline',
+            'name',
+            3,
+            fn($value, $record, $index) => $displayentityname(sprogramme_disc::class, $value, $index)
+        );
+        $this->add_repeated_columns(
+            'discipline',
+            'percent',
+            3,
+            fn($value, $record, $index) => $displayentitypercent(sprogramme_disc::class, $value, $index)
+        );
+
         // Here we do this intentionally as any button inserted in the page results in a javascript error.
         // This is due to fact that if we insert it in an existing form this will nest the form and this is not allowed.
         $isdownloadable = $this->get_parameter('downloadable', true, PARAM_BOOL);
@@ -124,11 +178,11 @@ class syllabus_programme extends system_report {
     #[\Override]
     protected function add_columns(): void {
         $columns = [
-            'responsible:fullnamewithlink',
-            'programmefull:uc_nombre',
             'programmefull:uc_annee',
             'programmefull:uc_semestre',
+            'programmefull:uc_nombre',
             'course:coursefullnamewithlink',
+            'responsible:fullnamewithlink',
             'programmefull:cct_ept',
             'programmefull:dd_rse',
             'programmefull:type_ae',
@@ -187,6 +241,34 @@ class syllabus_programme extends system_report {
 
     #[\Override]
     protected function can_view(): bool {
-        return has_capability('moodle/site:config', \context_system::instance());
+        return has_capability('moodle/reportbuilder:edit', \context_system::instance());
+    }
+
+    /**
+     * Add a number of repeated columns to the report, based on the maximum number of linked records.
+     *
+     * @param string $linkingtablename The name of the table linking the main entity to the repeated entity.
+     * @param string $entityname The name of the repeated entity.
+     * @param int $maxrepeats The maximum number of repeats to add.
+     */
+    protected function add_repeated_columns(
+        string $columtype,
+        string $fieldtype,
+        int $repeats,
+        callable $displaycallback = null,
+    ): void {
+        $programmeentity = $this->get_entity('programmefull');
+        $programmealias = $programmeentity->get_table_alias('customfield_sprogramme');
+        for ($index = 1; $index <= $repeats; $index++) {
+            $newcolumn = new column(
+                "{$columtype}_{$fieldtype}_{$index}",
+                new \lang_string("{$columtype}:rep:{$fieldtype}", 'local_envasyllabus', $index),
+                $programmeentity->get_entity_name()
+            );
+            $newcolumn->add_joins($programmeentity->get_joins());
+            $newcolumn->add_field("{$programmealias}.id");
+            $newcolumn->set_callback($displaycallback, $index);
+            $this->add_column($newcolumn);
+        }
     }
 }

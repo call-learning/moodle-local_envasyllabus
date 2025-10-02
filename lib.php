@@ -60,9 +60,52 @@ function local_envasyllabus_extend_navigation(global_navigation $navigation) {
             ]
         );
         $navigation->add_node($newnode);
+        if (has_capability('moodle/reportbuilder:edit', \context_system::instance())) {
+            // Add the reports link.
+            $url = new moodle_url('/local/envasyllabus/reports.php');
+            $newnode = new navigation_node(
+                [
+                    'text' => get_string('syllabusreports', 'local_envasyllabus'),
+                    'action' => $url,
+                    'type' => navigation_node::TYPE_CUSTOM,
+                    'icon' => new pix_icon('t/reports', ''),
+                    'key' => 'envasyllabusreports',
+                ]
+            );
+            $navigation->add_node($newnode);
+        }
     }
 }
 
+/**
+ * Add navigation for user
+ *
+ * @param global_navigation $navigation
+ * @throws coding_exception
+ * @throws moodle_exception
+ */
+function local_envasyllabus_extend_navigation_user(
+    navigation_node $parentnode,
+    stdClass $user,
+    context_user $context,
+    stdClass $course,
+    context_course $coursecontext
+) {
+    if (has_capability('moodle/reportbuilder:edit', \context_system::instance(), $user)) {
+        // Add the reports link.
+        $url = new moodle_url('/local/envasyllabus/reports.php');
+        $newnode = new navigation_node(
+            [
+                'text' => get_string('reports', 'local_envasyllabus'),
+                'action' => $url,
+                'type' => navigation_node::TYPE_CUSTOM,
+                'icon' => new pix_icon('t/reports', ''),
+                'key' => 'envasyllabusreports',
+            ]
+        );
+        $parentnode->add_node($newnode);
+    }
+}
 /**
  * Insert "View Syllabus" Button in course header
  *

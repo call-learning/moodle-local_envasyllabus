@@ -149,6 +149,5 @@ class programmefull extends programme {
         ))->add_joins($this->get_joins())
         ->set_field_sql($sql, [$fieldparam => $fieldid]);
         return $filter;
-
     }
 }

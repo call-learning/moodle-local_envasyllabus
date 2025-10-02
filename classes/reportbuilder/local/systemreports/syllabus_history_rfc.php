@@ -144,6 +144,6 @@ class syllabus_history_rfc extends system_report {
 
     #[\Override]
     protected function can_view(): bool {
-        return has_capability('moodle/site:config', \context_system::instance());
+        return has_capability('moodle/reportbuilder:edit', \context_system::instance());
     }
 }
