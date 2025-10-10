@@ -65,7 +65,12 @@
     {{<local_envasyllabus/course_syllabus_collapsible}}
         {{$id}}competencies-{{uniqid}}{{/id}}
         {{$type}}competencies{{/type}}
-        {{$title}}{{#str}}syllabuspage:competencies, local_envasyllabus{{/str}}{{/title}}
+        {{$title}}
+            {{#str}}syllabuspage:competencies, local_envasyllabus{{/str}}
+        {{/title}}
+        {{$editbutton}}
+            {{{competencies.description.editbutton}}}
+        {{/editbutton}}
         {{$content}}
             {{#competencies}}
                 <div class="d-flex competency-inner-container">
@@ -73,7 +78,12 @@
                         {{{graph}}}
                     </div>
                     <div>
-                        {{{description}}}
+                        {{#description.haseditoption}}
+                            {{{description.content}}}
+                        {{/description.haseditoption}}
+                        {{^description.haseditoption}}
+                            {{{description}}}
+                        {{/description.haseditoption}}
                     </div>
                 </div>
             {{/competencies}}
@@ -83,9 +93,19 @@
         {{<local_envasyllabus/course_syllabus_collapsible}}
             {{$id}}prerequisites-{{uniqid}}{{/id}}
             {{$type}}prerequisites{{/type}}
-            {{$title}}{{#str}}syllabuspage:prerequisites, local_envasyllabus{{/str}}{{/title}}
+            {{$title}}
+                {{#str}}syllabuspage:prerequisites, local_envasyllabus{{/str}}
+            {{/title}}
+            {{$editbutton}}
+                {{{competencies.description.editbutton}}}
+            {{/editbutton}}
             {{$content}}
-                {{{prerequisites}}}
+                {{#prerequisites.haseditoption}}
+                    {{{prerequisites.content}}}
+                {{/prerequisites.haseditoption}}
+                {{^prerequisites.haseditoption}}
+                    {{{prerequisites}}}
+                {{/prerequisites.haseditoption}}
             {{/content}}
         {{/local_envasyllabus/course_syllabus_collapsible}}
     {{/prerequisites}}
@@ -103,9 +123,19 @@
         {{<local_envasyllabus/course_syllabus_collapsible}}
             {{$id}}vaq-{{uniqid}}{{/id}}
             {{$type}}vaq{{/type}}
-            {{$title}}{{#str}}syllabuspage:vaq, local_envasyllabus{{/str}}{{/title}}
+            {{$title}}
+                {{#str}}syllabuspage:vaq, local_envasyllabus{{/str}}
+            {{/title}}
+            {{$editbutton}}
+                {{{vaq.editbutton}}}
+            {{/editbutton}}
             {{$content}}
-                {{{vaq}}}
+                {{#vaq.haseditoption}}
+                    {{{vaq.content}}}
+                {{/vaq.haseditoption}}
+                {{^vaq.haseditoption}}
+                    {{{vaq}}}
+                {{/vaq.haseditoption}}
             {{/content}}
         {{/local_envasyllabus/course_syllabus_collapsible}}
     {{/vaq}}
@@ -113,9 +143,19 @@
         {{<local_envasyllabus/course_syllabus_collapsible}}
             {{$id}}additionalinfos-{{uniqid}}{{/id}}
             {{$type}}additionalinfos{{/type}}
-            {{$title}}{{#str}}syllabuspage:additionalinfos, local_envasyllabus{{/str}}{{/title}}
+            {{$title}}
+                {{#str}}syllabuspage:additionalinfos, local_envasyllabus{{/str}}
+            {{/title}}
+            {{$editbutton}}
+                {{{additionalinfos.editbutton}}}
+            {{/editbutton}}
             {{$content}}
-                {{{additionalinfos}}}
+                {{#additionalinfos.haseditoption}}
+                    {{{additionalinfos.content}}}
+                {{/additionalinfos.haseditoption}}
+                {{^additionalinfos.haseditoption}}
+                    {{{additionalinfos}}}
+                {{/additionalinfos.haseditoption}}
             {{/content}}
         {{/local_envasyllabus/course_syllabus_collapsible}}
     {{/additionalinfos}}

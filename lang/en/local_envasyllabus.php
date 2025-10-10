@@ -40,7 +40,6 @@ $string['course_no_semester'] = 'Année {$a}';
 $string['course_semester'] = 'Année {$a->year}, {$a->semester}';
 $string['coursecard:credits'] = '{$a} crédits ECTS';
 $string['coursecard:hours'] = '{$a} heures';
-$string['courses:index'] = 'Course Index';
 $string['courses:index'] = 'Le cursus à l\'ENVA';
 $string['defaultmatrixid'] = 'Default Matrix ID';
 $string['defaultmatrixid_desc'] = 'Default Matrix ID';
@@ -112,3 +111,10 @@ $string['th:responsible'] = 'Responsible';
 $string['th:uc'] = 'UC';
 $string['total_help'] = 'Total time allocated to the UC, including the estimation of personal work';
 $string['viewcourse'] = 'View course';
+
+// Custom field editing strings
+$string['editfield'] = 'Edit field';
+$string['fieldnotfound'] = 'Custom field not found';
+$string['fieldnotvisible'] = 'Custom field is not visible';
+$string['fieldupdated'] = 'Field "{$a}" has been updated successfully';
+$string['invalidcourse'] = 'Invalid course';

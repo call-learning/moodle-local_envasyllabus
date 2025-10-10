@@ -397,9 +397,14 @@ class course_syllabus implements renderable, templatable {
      * @return mixed
      */
     protected function get_cf_displayable_info(string $cfname, array $customfields, \renderer_base $output) {
+        global $PAGE;
         if (!visibility::is_syllabus_public_field($cfname)) {
             return '';
         }
+
+        // Store original field name for edit button
+        $originalfieldname = $cfname;
+
         if (!empty($this->lang)) {
             $cfname = "{$cfname}_{$this->lang}";
         }
@@ -410,6 +415,66 @@ class course_syllabus implements renderable, templatable {
         if (html_to_text($cffieldvalue) == '') {
             return '';
         }
+
+        // Check if we should add edit button (exclude uc_programme as mentioned)
+        if ($originalfieldname !== 'uc_programme') {
+            $editbutton = $this->get_edit_button_for_field($originalfieldname, $output);
+            if (!empty($editbutton) && $PAGE->user_is_editing()) {
+                // Return both content and edit button
+                return (object) [
+                    'content' => $cffieldvalue,
+                    'editbutton' => $editbutton,
+                    'haseditoption' => true
+                ];
+            }
+        }
+
         return $cffieldvalue;
+    }
+
+    /**
+     * Get edit button for a custom field if user has permission
+     * @param string $fieldname
+     * @param \renderer_base $output
+     * @return string
+     */
+    protected function get_edit_button_for_field(string $fieldname, \renderer_base $output): string {
+        global $PAGE;
+
+        // Check if user can edit course
+        $context = \context_course::instance($this->courseid);
+        if (!has_capability('moodle/course:update', $context)) {
+            return '';
+        }
+
+        // Get the custom field handler and find the field
+        $handler = \core_customfield\handler::get_handler('core_course', 'course');
+        $fields = $handler->get_fields();
+
+        $fieldid = null;
+        foreach ($fields as $field) {
+            if ($field->get('shortname') === $fieldname) {
+                $fieldid = $field->get('id');
+                break;
+            }
+        }
+
+        if (!$fieldid) {
+            return '';
+        }
+
+        // Create edit URL
+        $editurl = new \moodle_url('/local/envasyllabus/editfield.php', [
+            'courseid' => $this->courseid,
+            'fieldid' => $fieldid,
+            'returnurl' => $PAGE->url->out(false)
+        ]);
+
+        // Create edit button
+        $editicon = $output->pix_icon('t/edit', get_string('edit'));
+        return \html_writer::link($editurl, $editicon . get_string('editfield', 'local_envasyllabus'), [
+            'class' => 'd-flex align-items-center text-nowrap ml-2',
+            'title' => get_string('editfield', 'local_envasyllabus')
+        ]);
     }
 }
