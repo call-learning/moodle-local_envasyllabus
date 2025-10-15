@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace local_envasyllabus;
 
 /**
@@ -23,8 +24,7 @@ namespace local_envasyllabus;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @coversDefaultClass \local_envasyllabus\utils
  */
-class utils_test extends \advanced_testcase {
-
+final class utils_test extends \advanced_testcase {
     /**
      * Test the is_new_programme_enabled function.
      *

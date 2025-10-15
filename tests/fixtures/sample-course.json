@@ -1,0 +1,224 @@
+{
+  "visible": 1,
+  "category": "CAT1",
+  "fullname": "UC0101 - Fundamentals of Veterinary Medicine",
+  "shortname": "UC0101",
+  "customfields": {
+    "uc_nombre": "UC0101",
+    "uc_titre_en": "Basics of Veterinary Medicine",
+    "uc_acronyme": "BVM",
+    "uc_annee": "1",
+    "uc_semestre": "1"
+  },
+  "programmedata": [
+    {
+      "moduleid": -1,
+      "modulesortorder": 0,
+      "modulename": "Test Module 1",
+      "deleted": false,
+      "rows": [
+        {
+          "id": -1,
+          "deleted": false,
+          "sortorder": 1,
+          "cells": [
+            {
+              "column": "dd_rse",
+              "value": null,
+              "type": "select",
+              "group": "",
+              "oldvalue": null
+            },
+            {
+              "column": "intitule_seance",
+              "value": "Seance 1",
+              "type": "text",
+              "group": "",
+              "oldvalue": "Seance 1 old title"
+            },
+            {
+              "column": "cm",
+              "value": 8,
+              "type": "float",
+              "group": "unique",
+              "oldvalue": "15"
+            },
+            {
+              "column": "td",
+              "value": 10,
+              "type": "float",
+              "group": "unique",
+              "oldvalue": null
+            },
+            {
+              "column": "tp",
+              "value": 2,
+              "type": "float",
+              "group": "unique",
+              "oldvalue": null
+            },
+            {
+              "column": "tpa",
+              "value": 20,
+              "type": "float",
+              "group": "unique",
+              "oldvalue": null
+            },
+            {
+              "column": "tc",
+              "value": null,
+              "type": "float",
+              "group": "unique",
+              "oldvalue": null
+            },
+            {
+              "column": "aas",
+              "value": 11,
+              "type": "float",
+              "group": "unique",
+              "oldvalue": null
+            },
+            {
+              "column": "fmp",
+              "value": null,
+              "type": "float",
+              "group": "unique",
+              "oldvalue": null
+            },
+            {
+              "column": "perso_av",
+              "value": 23,
+              "type": "float",
+              "group": "",
+              "oldvalue": null
+            },
+            {
+              "column": "perso_ap",
+              "value": 72.5,
+              "type": "float",
+              "group": "",
+              "oldvalue": null
+            },
+            {
+              "column": "consignes",
+              "value": null,
+              "type": "text",
+              "group": "",
+              "oldvalue": null
+            },
+            {
+              "column": "supports",
+              "value": null,
+              "type": "text",
+              "group": "",
+              "oldvalue": null
+            }
+          ],
+          "disciplines": [],
+          "competencies": []
+        },
+        {
+          "id": -1,
+          "deleted": false,
+          "sortorder": 2,
+          "cells": [
+            {
+              "column": "dd_rse",
+              "value": "Sans lien avec DD/RSE",
+              "type": "select",
+              "group": ""
+            },
+            {
+              "column": "intitule_seance",
+              "value": "Seance 2",
+              "type": "text",
+              "group": ""
+            },
+            {
+              "column": "cm",
+              "value": 10,
+              "type": "float",
+              "group": "unique"
+            },
+            {
+              "column": "td",
+              "value": 16,
+              "type": "float",
+              "group": "unique"
+            },
+            {
+              "column": "tp",
+              "value": null,
+              "type": "float",
+              "group": "unique"
+            },
+            {
+              "column": "tpa",
+              "value": null,
+              "type": "float",
+              "group": "unique"
+            },
+            {
+              "column": "tc",
+              "value": null,
+              "type": "float",
+              "group": "unique"
+            },
+            {
+              "column": "aas",
+              "value": null,
+              "type": "float",
+              "group": "unique"
+            },
+            {
+              "column": "fmp",
+              "value": null,
+              "type": "float",
+              "group": "unique"
+            },
+            {
+              "column": "perso_av",
+              "value": null,
+              "type": "float",
+              "group": ""
+            },
+            {
+              "column": "perso_ap",
+              "value": null,
+              "type": "float",
+              "group": ""
+            },
+            {
+              "column": "consignes",
+              "value": null,
+              "type": "text",
+              "group": ""
+            },
+            {
+              "column": "supports",
+              "value": null,
+              "type": "text",
+              "group": ""
+            }
+          ],
+          "disciplines": [
+            {
+              "id": 1,
+              "percentage": 50.0
+            },
+            {
+              "id": 2,
+              "percentage": 50.0
+            }
+          ],
+          "competencies": [
+            {
+              "id": 1,
+              "percentage": 100.0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

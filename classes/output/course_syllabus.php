@@ -184,9 +184,13 @@ class course_syllabus implements renderable, templatable {
 
         $contextdata->summary = $customfields['uc_summary_' . $currentlang] ?? '';
         $matrixid = $customfields['uc_matrix'] ?? get_config('local_envasyllabus', 'defaultmatrixid');
+
+        $graphhtml = '';
+        if (!empty($matrixid)) {
+            $graphhtml = $this->get_graph_for_course($course->shortname, $matrixid, $output);
+        }
         $contextdata->competencies = (object) [
-            'graph' => empty($customfields['uc_nombre']) ? '' :
-                $this->get_graph_for_course($customfields['uc_nombre'], $matrixid, $output),
+            'graph' => empty($customfields['uc_nombre']) ? '' : $graphhtml,
             'description' => $this->get_cf_displayable_info('uc_competences', $customfields, $output),
         ];
         $contextdata->prerequisites = $this->get_cf_displayable_info('uc_prerequis', $customfields, $output);
@@ -269,7 +273,7 @@ class course_syllabus implements renderable, templatable {
      * @param array $customfields
      * @return float
      */
-    protected function get_programme_sum(array $fieldinfo,  array $customfields): float {
+    protected function get_programme_sum(array $fieldinfo, array $customfields): float {
         $fieldname = $fieldinfo['fieldname'];
         $programmenames = $fieldinfo['programmenames'] ?? '';
         if (empty($fieldname)) {
@@ -279,11 +283,13 @@ class course_syllabus implements renderable, templatable {
             return intval($customfields[$fieldname]) ?? 0;
         }
         $programmmenames = explode(',', $programmenames);
+        $programmmenames = array_map('trim', $programmmenames);
         $sum = 0;
+        $totalswithkeys = array_column($this->programmetotals, 'sum', 'column');
         foreach ($programmmenames as $programmename) {
-            $sum += array_reduce($this->programmetotals, function ($carry, $item) use ($programmename) {
-                return $item['column'] == $programmename ? $item['sum'] : $carry;
-            }, 0);
+            if (isset($totalswithkeys[$programmename])) {
+                $sum += $totalswithkeys[$programmename];
+            }
         }
         return $sum;
     }
@@ -342,7 +348,6 @@ class course_syllabus implements renderable, templatable {
                         $total += $this->get_header_sum($fieldinfo['fields'], $customfields);
                         break;
                 }
-
             }
         }
         return $total;
