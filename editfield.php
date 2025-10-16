@@ -100,17 +100,50 @@ if ($mform->is_cancelled()) {
     // Ensure the course ID is set for the handler
     $formdata->id = $courseid;
 
+    // Check if this is a multilingual field
+    $fieldshortname = $field->get('shortname');
+    $multilingual_pairs = [
+        'uc_competences' => 'uc_competences_en',
+        'uc_prerequis' => 'uc_prerequis_en',
+        'uc_programme' => 'uc_programme_en',
+        'uc_validation' => 'uc_validation_en',
+        'uc_infos_compl' => 'uc_infos_compl_en'
+    ];
+
+    $is_multilingual = isset($multilingual_pairs[$fieldshortname]) || in_array($fieldshortname, $multilingual_pairs);
+
     // Save the field data
     $handler->instance_form_save($formdata, false);
 
     // Redirect back to syllabus page
-    $message = get_string('fieldupdated', 'local_envasyllabus', $field->get_formatted_name());
+    if ($is_multilingual) {
+        $message = get_string('fieldupdated', 'local_envasyllabus', get_string('multilanguagefields', 'local_envasyllabus'));
+    } else {
+        $message = get_string('fieldupdated', 'local_envasyllabus', $field->get_formatted_name());
+    }
     redirect($returnurl, $message, null, \core\output\notification::NOTIFY_SUCCESS);
 }
 
 // Output the page
 echo $OUTPUT->header();
-echo $OUTPUT->heading(get_string('editfield', 'local_envasyllabus') . ': ' . $field->get_formatted_name());
+
+// Check if this is a multilingual field for the heading
+$fieldshortname = $field->get('shortname');
+$multilingual_pairs = [
+    'uc_competences' => 'uc_competences_en',
+    'uc_prerequis' => 'uc_prerequis_en',
+    'uc_programme' => 'uc_programme_en',
+    'uc_validation' => 'uc_validation_en',
+    'uc_infos_compl' => 'uc_infos_compl_en'
+];
+
+$is_multilingual = isset($multilingual_pairs[$fieldshortname]) || in_array($fieldshortname, $multilingual_pairs);
+
+if ($is_multilingual) {
+    echo $OUTPUT->heading(get_string('editsyllabusfields', 'local_envasyllabus'));
+} else {
+    echo $OUTPUT->heading(get_string('editfield', 'local_envasyllabus') . ': ' . $field->get_formatted_name());
+}
 
 $mform->display();
 

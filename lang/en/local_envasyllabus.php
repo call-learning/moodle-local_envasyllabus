@@ -118,3 +118,7 @@ $string['fieldnotfound'] = 'Custom field not found';
 $string['fieldnotvisible'] = 'Custom field is not visible';
 $string['fieldupdated'] = 'Field "{$a}" has been updated successfully';
 $string['invalidcourse'] = 'Invalid course';
+$string['multilanguagefields'] = 'Multilingual Fields';
+$string['editsyllabusfields'] = 'Edit Syllabus fields';
+$string['frenchversion'] = 'French Version: {$a}';
+$string['englishversion'] = 'English Version: {$a}';
