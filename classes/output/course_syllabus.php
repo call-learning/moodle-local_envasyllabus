@@ -116,7 +116,11 @@ class course_syllabus implements renderable, templatable {
      * @return array|stdClass|void
      */
     public function export_for_template(renderer_base $output) {
-        global $DB, $CFG;
+        global $DB, $CFG, $PAGE;
+
+        // Initialize the edit field modal JavaScript once
+        $PAGE->requires->js_call_amd('local_envasyllabus/edit_field_modal', 'init');
+
         $currentlang = current_language();
         $contextdata = new stdClass();
         $course = $DB->get_record('course', ['id' => $this->courseid]);
@@ -452,9 +456,11 @@ class course_syllabus implements renderable, templatable {
         $fields = $handler->get_fields();
 
         $fieldid = null;
-        foreach ($fields as $field) {
-            if ($field->get('shortname') === $fieldname) {
-                $fieldid = $field->get('id');
+        $field = null;
+        foreach ($fields as $f) {
+            if ($f->get('shortname') === $fieldname) {
+                $fieldid = $f->get('id');
+                $field = $f;
                 break;
             }
         }
@@ -463,18 +469,16 @@ class course_syllabus implements renderable, templatable {
             return '';
         }
 
-        // Create edit URL
-        $editurl = new \moodle_url('/local/envasyllabus/editfield.php', [
-            'courseid' => $this->courseid,
-            'fieldid' => $fieldid,
-            'returnurl' => $PAGE->url->out(false)
-        ]);
-
-        // Create edit button
+        // Create modal button with data attributes
         $editicon = $output->pix_icon('t/edit', get_string('edit'));
-        return \html_writer::link($editurl, $editicon . get_string('editfield', 'local_envasyllabus'), [
-            'class' => 'd-flex align-items-center text-nowrap ml-2',
-            'title' => get_string('editfield', 'local_envasyllabus')
+        return \html_writer::tag('button', $editicon . get_string('editfield', 'local_envasyllabus'), [
+            'class' => 'btn btn-primary',
+            'data-action' => 'edit-field',
+            'data-courseid' => $this->courseid,
+            'data-fieldid' => $fieldid,
+            'data-fieldname' => $fieldname,
+            'title' => get_string('editfield', 'local_envasyllabus'),
+            'type' => 'button'
         ]);
     }
 }
