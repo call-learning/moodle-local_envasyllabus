@@ -85,11 +85,11 @@ function local_envasyllabus_extend_navigation(global_navigation $navigation) {
  * @throws moodle_exception
  */
 function local_envasyllabus_extend_navigation_user(
-    navigation_node $parentnode,
+    navigation_node $usernode,
     stdClass $user,
-    context_user $context,
+    \core\context\user $usercontext,
     stdClass $course,
-    context_course $coursecontext
+    \core\context $coursecontext,
 ) {
     if (has_capability('moodle/reportbuilder:edit', \context_system::instance(), $user)) {
         // Add the reports link.
@@ -103,7 +103,7 @@ function local_envasyllabus_extend_navigation_user(
                 'key' => 'envasyllabusreports',
             ]
         );
-        $parentnode->add_node($newnode);
+        $usernode->add_node($newnode);
     }
 }
 /**
