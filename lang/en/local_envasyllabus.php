@@ -122,3 +122,4 @@ $string['multilanguagefields'] = 'Multilingual Fields';
 $string['editsyllabusfields'] = 'Edit Syllabus fields';
 $string['frenchversion'] = 'French Version: {$a}';
 $string['englishversion'] = 'English Version: {$a}';
+$string['reports'] = 'Reports';
