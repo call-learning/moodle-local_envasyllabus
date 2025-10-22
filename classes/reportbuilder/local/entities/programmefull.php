@@ -34,7 +34,6 @@ use lang_string;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class programmefull extends programme {
-
     /**
      * The default title for this entity
      *
@@ -95,7 +94,7 @@ class programmefull extends programme {
             ->set_type(column::TYPE_TEXT)
             ->add_field($sql, $customfieldshortname, [$fieldparam => $fieldid])
             ->set_is_sortable(true)
-            ->set_callback(function($value) {
+            ->set_callback(function ($value) {
                 if (empty($value)) {
                     return '';
                 }

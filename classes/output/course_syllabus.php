@@ -34,7 +34,6 @@ use templatable;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class course_syllabus implements renderable, templatable {
-
     /**
      * @var array TEACHER_ROLES_NAME
      */
@@ -246,11 +245,13 @@ class course_syllabus implements renderable, templatable {
                 $headerinfo = $this->create_header_data(
                     $fieldinfo['class'] ?? '',
                     $fielddesc,
-                    $fieldinfo['icon'] ?? '');
+                    $fieldinfo['icon'] ?? ''
+                );
                 switch ($fieldinfo['type']) {
                     case 'cf':
                         $sum = $this->get_programme_sum($fieldinfo, $customfields);
-                        $headerinfo->value = $sum > 0 ? (string)$sum : '-';;
+                        $headerinfo->value = $sum > 0 ? (string)$sum : '-';
+                        ;
                         $headerdata[] = $headerinfo;
                         break;
                     case 'categorysum':
@@ -264,7 +265,6 @@ class course_syllabus implements renderable, templatable {
                             array_push($headerdata, ...$subheaders);
                         }
                 }
-
             }
         }
         return $headerdata;

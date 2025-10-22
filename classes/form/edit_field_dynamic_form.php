@@ -34,7 +34,6 @@ use moodle_url;
  * Dynamic form for editing custom fields with multilingual support
  */
 class edit_field_dynamic_form extends dynamic_form {
-
     /**
      * Get context for dynamic submission
      */
@@ -275,8 +274,12 @@ class edit_field_dynamic_form extends dynamic_form {
 
         // Add French version.
         if ($basefield) {
-            $mform->addElement('static', 'french_label', '',
-                '<h4>' . get_string('frenchversion', 'local_envasyllabus', $basefield->get_formatted_name()) . '</h4>');
+            $mform->addElement(
+                'static',
+                'french_label',
+                '',
+                '<h4>' . get_string('frenchversion', 'local_envasyllabus', $basefield->get_formatted_name()) . '</h4>'
+            );
 
             $datacontroller = null;
             foreach ($instancedata as $fielddata) {
@@ -295,8 +298,12 @@ class edit_field_dynamic_form extends dynamic_form {
 
         // Add English version.
         if ($englishfield) {
-            $mform->addElement('static', 'english_label', '',
-                '<h4>' . get_string('englishversion', 'local_envasyllabus', $englishfield->get_formatted_name()) . '</h4>');
+            $mform->addElement(
+                'static',
+                'english_label',
+                '',
+                '<h4>' . get_string('englishversion', 'local_envasyllabus', $englishfield->get_formatted_name()) . '</h4>'
+            );
 
             $datacontrolleren = null;
             foreach ($instancedata as $fielddata) {

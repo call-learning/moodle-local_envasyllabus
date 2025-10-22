@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace local_envasyllabus;
 
 use core\context;
@@ -54,7 +55,7 @@ class utils {
      * @return \customfield_sprogramme\data_controller|null The found custom field or null if not found.
      */
     public static function get_programme_customfield(array $coursecustomfieldsdata): ?\customfield_sprogramme\data_controller {
-        $filtered = array_filter($coursecustomfieldsdata, function($cfdatacontroller) {
+        $filtered = array_filter($coursecustomfieldsdata, function ($cfdatacontroller) {
             $field = $cfdatacontroller->get_field();
             return $field->get('type') == 'sprogramme'
                 && $field->get('shortname') == 'programme';

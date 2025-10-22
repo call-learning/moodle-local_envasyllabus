@@ -30,7 +30,6 @@ use Behat\Mink\Exception\ExpectationException;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_local_envasyllabus extends behat_base {
-
     /**
      * Checks if edit button exists for a specific field.
      *
@@ -120,7 +119,8 @@ class behat_local_envasyllabus extends behat_base {
     /**
      * Open the course syllabus page with editing mode set to either on, or off.
      *
-     * @Given /^I am on "(?P<coursefullname_string>(?:[^"]|\\")*)" course syllabus page with editing mode "(?P<onoroff_string>on|off)"$/
+     * @Given /^I am on "(?P<coursefullname_string>(?:[^"]|\\")*)" course syllabus page with editing mode
+     *        "(?P<onoroff_string>on|off)"$/
      * @param string $coursefullname The course full name of the course.
      * @param string $onoroff Whether to switch editing on, or off.
      * @throws coding_exception

@@ -32,7 +32,6 @@ require_once($CFG->libdir . '/formslib.php');
  * Form for editing a single custom field
  */
 class edit_field_form extends \moodleform {
-
     /**
      * Define form elements
      */
@@ -180,8 +179,12 @@ class edit_field_form extends \moodleform {
 
         // Add French version.
         if ($basefield) {
-            $mform->addElement('static', 'french_label', '',
-                '<h4>' . get_string('frenchversion', 'local_envasyllabus', $basefield->get_formatted_name()) . '</h4>');
+            $mform->addElement(
+                'static',
+                'french_label',
+                '',
+                '<h4>' . get_string('frenchversion', 'local_envasyllabus', $basefield->get_formatted_name()) . '</h4>'
+            );
 
             $datacontroller = null;
             foreach ($instancedata as $fielddata) {
@@ -200,8 +203,12 @@ class edit_field_form extends \moodleform {
 
         // Add English version.
         if ($englishfield) {
-            $mform->addElement('static', 'english_label', '',
-                '<h4>' . get_string('englishversion', 'local_envasyllabus', $englishfield->get_formatted_name()) . '</h4>');
+            $mform->addElement(
+                'static',
+                'english_label',
+                '',
+                '<h4>' . get_string('englishversion', 'local_envasyllabus', $englishfield->get_formatted_name()) . '</h4>'
+            );
 
             $datacontrolleren = null;
             foreach ($instancedata as $fielddata) {
@@ -238,7 +245,10 @@ class edit_field_form extends \moodleform {
 
         if ($multilingual) {
             // Validate both language versions.
-            $errors = array_merge($errors, $this->validate_multilingual_fields($data, $files, $handler, $courseid, $fieldshortname));
+            $errors = array_merge(
+                $errors,
+                $this->validate_multilingual_fields($data, $files, $handler, $courseid, $fieldshortname)
+            );
         } else {
             // Get actual field data for this course instance.
             $instancedata = $handler->get_instance_data($courseid, true);

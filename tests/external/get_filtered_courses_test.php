@@ -16,6 +16,8 @@
 
 namespace local_envasyllabus\external;
 
+defined('MOODLE_INTERNAL') || die();
+
 global $CFG;
 
 use core_course\customfield\course_handler;

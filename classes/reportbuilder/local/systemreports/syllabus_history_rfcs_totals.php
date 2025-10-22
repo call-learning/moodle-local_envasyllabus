@@ -26,7 +26,7 @@ use customfield_sprogramme\reportbuilder\local\entities\rfc_totals;
 /**
  * RFCs datasource
  *
- * @package   customfield_sprogramme
+ * @package   local_envasyllabus
  * @copyright 2025 - CALL Learning - Laurent David <laurent@call-learning.fr>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -1,17 +1,17 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - https://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// Moodle is free software: you can redistribute it and/or modify.
+// it under the terms of the GNU General Public License as published by.
+// the Free Software Foundation, either version 3 of the License, or.
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// Moodle is distributed in the hope that it will be useful,.
+// but WITHOUT ANY WARRANTY; without even the implied warranty of.
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
+// You should have received a copy of the GNU General Public License.
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
@@ -52,6 +52,8 @@ $string['enablenewprogrammeforcourse_desc'] = 'Active le nouveau programme pour 
 Si aucun cours n\'est spécifié, l\'ancien champs est utilisé.';
 $string['enddate'] = 'Date de fin';
 $string['entity:programme_with_customfields'] = 'Programme avec champs personnalisés';
+$string['exportexcel'] = 'Export Excel';
+$string['exportexcel_help'] = 'Exporter les données du catalogue au format Excel';
 $string['generalsettings'] = 'Enva Syllabus settings';
 $string['perso_help'] = 'Temps de travail personnel minimal estimé nécessaire pour acquérir les compétences visées par cette UC';
 $string['pluginname'] = 'ENVA Syllabus';
@@ -103,3 +105,44 @@ $string['th:acronym'] = 'Acronyme';
 $string['th:responsible'] = 'Responsable';
 $string['total_help'] = 'Total du volume horaire consacré à l\'UC, incluant l\'estimation du travail personnel';
 $string['viewcourse'] = 'Voir contenu du cours';
+
+
+// Spreadsheet email settings.
+$string['spreadsheet_email_settings'] = 'Rapports Excel par email';
+$string['spreadsheet_email_settings_desc'] = 'Configurer les rapports Excel automatiques par email';
+$string['spreadsheet_email_enabled'] = 'Activer les emails Excel';
+$string['spreadsheet_email_enabled_desc'] = 'Envoyer des rapports Excel hebdomadaires par email';
+$string['spreadsheet_recipients'] = 'Destinataires des emails';
+$string['spreadsheet_recipients_desc'] = 'Adresses email pour l\'envoi des rapports (séparées par des virgules)';
+$string['spreadsheet_extended_mode'] = 'Mode étendu';
+$string['spreadsheet_extended_mode_desc'] = 'Inclure les colonnes de programme dans le tableur';
+$string['spreadsheet_lang'] = 'Langue du rapport';
+$string['spreadsheet_lang_desc'] = 'Langue pour le contenu du tableur';
+
+// Task and email strings.
+$string['task:send_spreadsheet'] = 'Envoyer les rapports Excel par email';
+$string['email:spreadsheet:subject'] = 'Rapport Syllabus - {$a}';
+$string['email:spreadsheet:body'] = 'Veuillez trouver en pièce jointe le rapport syllabus généré le {$a->date}.
+
+Nom du fichier: {$a->filename}
+Taille du fichier: {$a->filesize}
+
+Ceci est un message automatique.';
+
+// File management.
+$string['manage_spreadsheets'] = 'Gérer les fichiers Excel';
+$string['spreadsheet_files'] = 'Fichiers Excel';
+$string['no_files_found'] = 'Aucun fichier Excel trouvé';
+$string['download'] = 'Télécharger';
+$string['delete'] = 'Supprimer';
+$string['confirm_delete'] = 'Êtes-vous sûr de vouloir supprimer ce fichier ?';
+$string['filedeleted'] = 'Fichier supprimé avec succès';
+$string['filename'] = 'Nom du fichier';
+$string['filesize'] = 'Taille du fichier';
+$string['actions'] = 'Actions';
+$string['table_filename'] = 'Nom du fichier';
+$string['table_filesize'] = 'Taille du fichier';
+$string['confirm_delete_title'] = 'Confirmer la suppression du fichier';
+$string['confirm_delete_message'] = 'Êtes-vous sûr de vouloir supprimer le fichier "{$a}" ? Cette action ne peut pas être annulée.';
+$string['filedeleted_success'] = 'Le fichier "{$a}" a été supprimé avec succès.';
+$string['file_not_found'] = 'Le fichier demandé n\'a pas pu être trouvé.';

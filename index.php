@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * A list of all syllabus
+ * Plugin index page
  *
  * @package     local_envasyllabus
  * @copyright   2022 CALL Learning - Laurent David <laurent@call-learning>

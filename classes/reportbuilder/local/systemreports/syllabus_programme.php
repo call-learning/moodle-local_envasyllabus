@@ -69,7 +69,7 @@ class syllabus_programme extends system_report {
         $competencyassignment = new competency_assignment();
         $competencyassignmentalias = $competencyassignment->get_table_alias('customfield_sprogramme_competencies');
         $this->add_entity($competencyassignment->add_join(
-            "LEFT JOIN {customfield_sprogramme_competencies} {$competencyassignmentalias} ON ".
+            "LEFT JOIN {customfield_sprogramme_competencies} {$competencyassignmentalias} ON " .
             "{$competencyassignmentalias}.pid = {$programmealias}.id"
         ));
 
@@ -78,14 +78,14 @@ class syllabus_programme extends system_report {
         $competency->add_joins($competencyassignment->get_joins());
         $this->add_entity($competency
             ->add_join(
-                "LEFT JOIN {customfield_sprogramme_complist} {$competencyalias} ON ".
+                "LEFT JOIN {customfield_sprogramme_complist} {$competencyalias} ON " .
                 "{$competencyalias}.uniqueid = {$competencyassignmentalias}.cid"
             ));
 
         $disciplineassignment = new discipline_assignment();
         $disciplineassignmentalias = $disciplineassignment->get_table_alias('customfield_sprogramme_disc');
         $this->add_entity($disciplineassignment->add_join(
-            "LEFT JOIN {customfield_sprogramme_disc} {$disciplineassignmentalias} ON ".
+            "LEFT JOIN {customfield_sprogramme_disc} {$disciplineassignmentalias} ON " .
             "{$disciplineassignmentalias}.pid = {$programmealias}.id"
         ));
 
@@ -94,14 +94,14 @@ class syllabus_programme extends system_report {
         $discipline->add_joins($disciplineassignment->get_joins());
         $this->add_entity($discipline
             ->add_join(
-                "LEFT JOIN {customfield_sprogramme_disclist} {$disciplinealias} ON ".
+                "LEFT JOIN {customfield_sprogramme_disclist} {$disciplinealias} ON " .
                 "{$disciplinealias}.uniqueid = {$disciplineassignmentalias}.did"
             ));
 
         $module = new module();
         $modulealias = $module->get_table_alias('customfield_sprogramme_module');
         $this->add_entity($module
-            ->add_join("LEFT JOIN {customfield_sprogramme_module} {$modulealias} ON ".
+            ->add_join("LEFT JOIN {customfield_sprogramme_module} {$modulealias} ON " .
             "{$modulealias}.id = {$programmealias}.moduleid"));
 
         $responsible = new user();
@@ -132,14 +132,14 @@ class syllabus_programme extends system_report {
             new \lang_string('course')
         );
 
-        $displayentityname = function($entityclass, $value, $index) {
+        $displayentityname = function ($entityclass, $value, $index) {
             $records = $entityclass::get_records(['pid' => $value], 'id');
             if (array_key_exists($index - 1, $records)) {
                 return $records[$index - 1]->get_name();
             }
             return '';
         };
-        $displayentitypercent = function($entityclass, $value, $index) {
+        $displayentitypercent = function ($entityclass, $value, $index) {
             $records = $entityclass::get_records(['pid' => $value], 'id');
             if (array_key_exists($index - 1, $records)) {
                 return $records[$index - 1]->get('percentage');
@@ -261,7 +261,7 @@ class syllabus_programme extends system_report {
         string $columtype,
         string $fieldtype,
         int $repeats,
-        callable $displaycallback = null,
+        ?callable $displaycallback = null,
     ): void {
         $programmeentity = $this->get_entity('programmefull');
         $programmealias = $programmeentity->get_table_alias('customfield_sprogramme');

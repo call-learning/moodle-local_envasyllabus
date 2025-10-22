@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace local_envasyllabus;
 
 use core_customfield\category;
@@ -37,7 +38,7 @@ class setup {
      * @param string $fielddefpath
      * @return bool
      */
-    public static function install_update(string $fielddefpath):bool {
+    public static function install_update(string $fielddefpath): bool {
         if (file_exists($fielddefpath)) {
             $filecontent = file_get_contents($fielddefpath);
             self::create_customfields_fromdef($filecontent);
@@ -62,9 +63,9 @@ class setup {
      */
     public static function create_customfields_fromdef($configtext): void {
         $configs = explode(PHP_EOL, $configtext);
-        $csvheader = str_getcsv(array_shift($configs), ';');
+        $csvheader = str_getcsv(array_shift($configs), ';', '"', '');
         foreach ($configs as $csvrow) {
-            $csvrowarray = str_getcsv($csvrow, ';', '"', "");
+            $csvrowarray = str_getcsv($csvrow, ';', '"', '');
             if (count($csvrowarray) != count($csvheader)) {
                 debugging("Error: the array should have the same number of columns than the row" . $csvrow);
                 continue;
@@ -106,15 +107,18 @@ class setup {
             $rfield->set('categoryid', $category->get('id'));
             $rfield->save();
         } else {
-            $rfield = \core_customfield\field_controller::create(0, (object) [
+            $rfield = \core_customfield\field_controller::create(
+                0,
+                (object) [
                 'name' => $fielddef->name,
                 'shortname' => $fielddef->shortname,
                 'type' => $fielddef->type,
                 'description' => $fielddef->description,
                 'sortorder' => $fielddef->sortorder,
                 'configdata' => $fielddef->configdata,
-            ],
-                $categorycontroller);
+                ],
+                $categorycontroller
+            );
             $rfield->save();
         }
     }

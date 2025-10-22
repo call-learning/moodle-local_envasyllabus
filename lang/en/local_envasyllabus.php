@@ -123,3 +123,45 @@ $string['editsyllabusfields'] = 'Edit Syllabus fields';
 $string['frenchversion'] = 'French Version: {$a}';
 $string['englishversion'] = 'English Version: {$a}';
 $string['reports'] = 'Reports';
+$string['exportexcel'] = 'Export Excel';
+$string['exportexcel_help'] = 'Export catalog data to Excel format';
+
+// Spreadsheet email settings.
+$string['spreadsheet_email_settings'] = 'Spreadsheet Email Reports';
+$string['spreadsheet_email_settings_desc'] = 'Configure automatic spreadsheet email reports';
+$string['spreadsheet_email_enabled'] = 'Enable spreadsheet emails';
+$string['spreadsheet_email_enabled_desc'] = 'Send weekly spreadsheet reports via email';
+$string['spreadsheet_recipients'] = 'Email recipients';
+$string['spreadsheet_recipients_desc'] = 'Email addresses to send reports to (comma separated)';
+$string['spreadsheet_extended_mode'] = 'Extended mode';
+$string['spreadsheet_extended_mode_desc'] = 'Include programme columns in spreadsheet';
+$string['spreadsheet_lang'] = 'Report language';
+$string['spreadsheet_lang_desc'] = 'Language for spreadsheet content';
+
+// Task and email strings.
+$string['task:send_spreadsheet'] = 'Send spreadsheet email reports';
+$string['email:spreadsheet:subject'] = 'Syllabus Report - {$a}';
+$string['email:spreadsheet:body'] = 'Please find attached the syllabus report generated on {$a->date}.
+
+Filename: {$a->filename}
+File size: {$a->filesize}
+
+This is an automated message.';
+
+// File management.
+$string['manage_spreadsheets'] = 'Manage Spreadsheet Files';
+$string['spreadsheet_files'] = 'Spreadsheet Files';
+$string['no_files_found'] = 'No spreadsheet files found';
+$string['download'] = 'Download';
+$string['delete'] = 'Delete';
+$string['confirm_delete'] = 'Are you sure you want to delete this file?';
+$string['filedeleted'] = 'File deleted successfully';
+$string['filename'] = 'File name';
+$string['filesize'] = 'File size';
+$string['actions'] = 'Actions';
+$string['table_filename'] = 'File name';
+$string['table_filesize'] = 'File size';
+$string['confirm_delete_title'] = 'Confirm File Deletion';
+$string['confirm_delete_message'] = 'Are you sure you want to delete the file "{$a}"? This action cannot be undone.';
+$string['filedeleted_success'] = 'File "{$a}" has been deleted successfully.';
+$string['file_not_found'] = 'The requested file could not be found.';

@@ -30,7 +30,6 @@ use local_envasyllabus\output\language_switcher;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catalog implements renderable, templatable {
-
     /**
      * Default course category
      */
