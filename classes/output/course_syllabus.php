@@ -1,17 +1,17 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - https://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// Moodle is free software: you can redistribute it and/or modify.
+// it under the terms of the GNU General Public License as published by.
+// the Free Software Foundation, either version 3 of the License, or.
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// Moodle is distributed in the hope that it will be useful,.
+// but WITHOUT ANY WARRANTY; without even the implied warranty of.
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
+// You should have received a copy of the GNU General Public License.
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 namespace local_envasyllabus\output;
@@ -118,7 +118,7 @@ class course_syllabus implements renderable, templatable {
     public function export_for_template(renderer_base $output) {
         global $DB, $CFG, $PAGE;
 
-        // Initialize the edit field modal JavaScript once
+        // Initialize the edit field modal JavaScript once.
         $PAGE->requires->js_call_amd('local_envasyllabus/edit_field_modal', 'init');
 
         $currentlang = current_language();
@@ -406,7 +406,7 @@ class course_syllabus implements renderable, templatable {
             return '';
         }
 
-        // Store original field name for edit button
+        // Store original field name for edit button.
         $originalfieldname = $cfname;
 
         if (!empty($this->lang)) {
@@ -420,15 +420,15 @@ class course_syllabus implements renderable, templatable {
             return '';
         }
 
-        // Check if we should add edit button (exclude uc_programme as mentioned)
+        // Check if we should add edit button (exclude uc_programme as mentioned).
         if ($originalfieldname !== 'uc_programme') {
             $editbutton = $this->get_edit_button_for_field($originalfieldname, $output);
             if (!empty($editbutton) && $PAGE->user_is_editing()) {
-                // Return both content and edit button
+                // Return both content and edit button.
                 return (object) [
                     'content' => $cffieldvalue,
                     'editbutton' => $editbutton,
-                    'haseditoption' => true
+                    'haseditoption' => true,
                 ];
             }
         }
@@ -445,13 +445,13 @@ class course_syllabus implements renderable, templatable {
     protected function get_edit_button_for_field(string $fieldname, \renderer_base $output): string {
         global $PAGE;
 
-        // Check if user can edit course
+        // Check if user can edit course.
         $context = \context_course::instance($this->courseid);
         if (!has_capability('moodle/course:update', $context)) {
             return '';
         }
 
-        // Get the custom field handler and find the field
+        // Get the custom field handler and find the field.
         $handler = \core_customfield\handler::get_handler('core_course', 'course');
         $fields = $handler->get_fields();
 
@@ -469,7 +469,7 @@ class course_syllabus implements renderable, templatable {
             return '';
         }
 
-        // Create modal button with data attributes
+        // Create modal button with data attributes.
         $editicon = $output->pix_icon('t/edit', get_string('edit'));
         return \html_writer::tag('button', $editicon . get_string('editfield', 'local_envasyllabus'), [
             'class' => 'btn btn-primary',
@@ -478,7 +478,7 @@ class course_syllabus implements renderable, templatable {
             'data-fieldid' => $fieldid,
             'data-fieldname' => $fieldname,
             'title' => get_string('editfield', 'local_envasyllabus'),
-            'type' => 'button'
+            'type' => 'button',
         ]);
     }
 }

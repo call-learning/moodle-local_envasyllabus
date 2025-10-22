@@ -1,17 +1,17 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// Moodle is free software: you can redistribute it and/or modify.
+// it under the terms of the GNU General Public License as published by.
+// the Free Software Foundation, either version 3 of the License, or.
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// Moodle is distributed in the hope that it will be useful,.
+// but WITHOUT ANY WARRANTY; without even the implied warranty of.
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
+// You should have received a copy of the GNU General Public License.
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
@@ -45,29 +45,29 @@ class edit_field_form extends \moodleform {
         $field = $data['field'];
         $handler = $data['handler'];
 
-        // Check if this is a multilingual field
+        // Check if this is a multilingual field.
         $fieldshortname = $field->get('shortname');
         $multilingual = $this->is_multilingual_field($fieldshortname, $handler);
 
         if ($multilingual) {
-            // Add form heading for multilingual
-            // Add both language versions
+            // Add form heading for multilingual.
+            // Add both language versions.
             $this->add_multilingual_fields($mform, $handler, $courseid, $fieldshortname);
         } else {
-            // Add form heading for single field
+            // Add form heading for single field.
             $mform->addElement('header', 'editfield', get_string('editfield', 'local_envasyllabus'));
 
-            // Add field description if available
+            // Add field description if available.
             $description = $field->get('description');
             if (!empty($description)) {
                 $mform->addElement('static', 'description', '', format_text($description));
             }
 
-            // Get actual field data for this course instance
+            // Get actual field data for this course instance.
             $instancedata = $handler->get_instance_data($courseid, true);
             $datacontroller = null;
 
-            // Find the data controller for this specific field
+            // Find the data controller for this specific field.
             foreach ($instancedata as $fielddata) {
                 if ($fielddata->get_field()->get('id') == $fieldid) {
                     $datacontroller = $fielddata;
@@ -75,7 +75,7 @@ class edit_field_form extends \moodleform {
                 }
             }
 
-            // If no data found, create a new one
+            // If no data found, create a new one.
             if (!$datacontroller) {
                 $datacontroller = \core_customfield\data_controller::create(0, null, $field);
             }
@@ -83,7 +83,7 @@ class edit_field_form extends \moodleform {
             $datacontroller->instance_form_definition($mform);
         }
 
-        // Hidden fields
+        // Hidden fields.
         $mform->addElement('hidden', 'courseid', $courseid);
         $mform->setType('courseid', PARAM_INT);
 
@@ -93,7 +93,7 @@ class edit_field_form extends \moodleform {
         $mform->addElement('hidden', 'returnurl', $data['returnurl']);
         $mform->setType('returnurl', PARAM_URL);
 
-        // Action buttons
+        // Action buttons.
         $this->add_action_buttons(true, get_string('savechanges'));
     }
 
@@ -106,7 +106,7 @@ class edit_field_form extends \moodleform {
             'uc_prerequis' => 'uc_prerequis_en',
             'uc_programme' => 'uc_programme_en',
             'uc_validation' => 'uc_validation_en',
-            'uc_infos_compl' => 'uc_infos_compl_en'
+            'uc_infos_compl' => 'uc_infos_compl_en',
         ];
     }
 
@@ -116,9 +116,9 @@ class edit_field_form extends \moodleform {
     private function is_multilingual_field($fieldshortname, $handler) {
         $pairs = $this->get_multilingual_field_pairs();
 
-        // Check if it's a base field that has an _en counterpart
+        // Check if it's a base field that has an _en counterpart.
         if (isset($pairs[$fieldshortname])) {
-            // Check if the english version actually exists
+            // Check if the english version actually exists.
             $fields = $handler->get_fields();
             foreach ($fields as $f) {
                 if ($f->get('shortname') === $pairs[$fieldshortname]) {
@@ -127,13 +127,13 @@ class edit_field_form extends \moodleform {
             }
         }
 
-        // Check if it's an _en field that has a base counterpart
-        $baseField = array_search($fieldshortname, $pairs);
-        if ($baseField !== false) {
-            // Check if the base version actually exists
+        // Check if it's an _en field that has a base counterpart.
+        $basefield = array_search($fieldshortname, $pairs);
+        if ($basefield !== false) {
+            // Check if the base version actually exists.
             $fields = $handler->get_fields();
             foreach ($fields as $f) {
-                if ($f->get('shortname') === $baseField) {
+                if ($f->get('shortname') === $basefield) {
                     return true;
                 }
             }
@@ -148,74 +148,74 @@ class edit_field_form extends \moodleform {
     private function add_multilingual_fields($mform, $handler, $courseid, $triggerfieldname) {
         $pairs = $this->get_multilingual_field_pairs();
 
-        // Determine which fields to show
-        $baseFieldName = null;
-        $englishFieldName = null;
+        // Determine which fields to show.
+        $basefieldname = null;
+        $englishfieldname = null;
 
         if (isset($pairs[$triggerfieldname])) {
-            // Triggered by base field
-            $baseFieldName = $triggerfieldname;
-            $englishFieldName = $pairs[$triggerfieldname];
+            // Triggered by base field.
+            $basefieldname = $triggerfieldname;
+            $englishfieldname = $pairs[$triggerfieldname];
         } else {
-            // Triggered by _en field, find the base
-            $baseFieldName = array_search($triggerfieldname, $pairs);
-            $englishFieldName = $triggerfieldname;
+            // Triggered by _en field, find the base.
+            $basefieldname = array_search($triggerfieldname, $pairs);
+            $englishfieldname = $triggerfieldname;
         }
 
-        // Get all fields
+        // Get all fields.
         $fields = $handler->get_fields();
-        $baseField = null;
-        $englishField = null;
+        $basefield = null;
+        $englishfield = null;
 
         foreach ($fields as $f) {
-            if ($f->get('shortname') === $baseFieldName) {
-                $baseField = $f;
-            } elseif ($f->get('shortname') === $englishFieldName) {
-                $englishField = $f;
+            if ($f->get('shortname') === $basefieldname) {
+                $basefield = $f;
+            } else if ($f->get('shortname') === $englishfieldname) {
+                $englishfield = $f;
             }
         }
 
-        // Get instance data
+        // Get instance data.
         $instancedata = $handler->get_instance_data($courseid, true);
 
-        // Add French version
-        if ($baseField) {
+        // Add French version.
+        if ($basefield) {
             $mform->addElement('static', 'french_label', '',
-                '<h4>' . get_string('frenchversion', 'local_envasyllabus', $baseField->get_formatted_name()) . '</h4>');
+                '<h4>' . get_string('frenchversion', 'local_envasyllabus', $basefield->get_formatted_name()) . '</h4>');
 
             $datacontroller = null;
             foreach ($instancedata as $fielddata) {
-                if ($fielddata->get_field()->get('id') == $baseField->get('id')) {
+                if ($fielddata->get_field()->get('id') == $basefield->get('id')) {
                     $datacontroller = $fielddata;
                     break;
                 }
             }
 
             if (!$datacontroller) {
-                $datacontroller = \core_customfield\data_controller::create(0, null, $baseField);
+                $datacontroller = \core_customfield\data_controller::create(0, null, $basefield);
             }
 
             $datacontroller->instance_form_definition($mform);
         }
 
-        // Add English version
-        if ($englishField) {
+        // Add English version.
+        if ($englishfield) {
             $mform->addElement('static', 'english_label', '',
-                '<h4>' . get_string('englishversion', 'local_envasyllabus', $englishField->get_formatted_name()) . '</h4>');
+                '<h4>' . get_string('englishversion', 'local_envasyllabus', $englishfield->get_formatted_name()) . '</h4>');
 
-            $datacontroller_en = null;
+            $datacontrolleren = null;
             foreach ($instancedata as $fielddata) {
-                if ($fielddata->get_field()->get('id') == $englishField->get('id')) {
-                    $datacontroller_en = $fielddata;
+                if ($fielddata->get_field()->get('id') == $englishfield->get('id')) {
+                    $datacontrolleren = $fielddata;
                     break;
                 }
             }
 
-            if (!$datacontroller_en) {
-                $datacontroller_en = \core_customfield\data_controller::create(0, null, $englishField);
+            if (!$datacontrolleren) {
+                $datacontrolleren = \core_customfield\data_controller::create(0, null, $englishfield);
             }
 
-            $datacontroller_en->instance_form_definition($mform);
+            $datacontrolleren->instance_form_definition($mform);
         }
     }
 
@@ -225,26 +225,26 @@ class edit_field_form extends \moodleform {
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
-        // Get field and handler from custom data
+        // Get field and handler from custom data.
         $customdata = $this->_customdata;
         $field = $customdata['field'];
         $handler = $customdata['handler'];
         $courseid = $customdata['courseid'];
         $fieldid = $customdata['fieldid'];
 
-        // Check if this is a multilingual field
+        // Check if this is a multilingual field.
         $fieldshortname = $field->get('shortname');
         $multilingual = $this->is_multilingual_field($fieldshortname, $handler);
 
         if ($multilingual) {
-            // Validate both language versions
+            // Validate both language versions.
             $errors = array_merge($errors, $this->validate_multilingual_fields($data, $files, $handler, $courseid, $fieldshortname));
         } else {
-            // Get actual field data for this course instance
+            // Get actual field data for this course instance.
             $instancedata = $handler->get_instance_data($courseid, true);
             $datacontroller = null;
 
-            // Find the data controller for this specific field
+            // Find the data controller for this specific field.
             foreach ($instancedata as $datainstance) {
                 if ($datainstance->get_field()->get('id') == $fieldid) {
                     $datacontroller = $datainstance;
@@ -252,12 +252,12 @@ class edit_field_form extends \moodleform {
                 }
             }
 
-            // If no data found, create a new one
+            // If no data found, create a new one.
             if (!$datacontroller) {
                 $datacontroller = \core_customfield\data_controller::create(0, null, $field);
             }
 
-            // Validate the field data
+            // Validate the field data.
             $fielderrors = $datacontroller->instance_form_validation($data, $files);
             $errors = array_merge($errors, $fielderrors);
         }
@@ -272,25 +272,25 @@ class edit_field_form extends \moodleform {
         $errors = [];
         $pairs = $this->get_multilingual_field_pairs();
 
-        // Determine which fields to validate
-        $baseFieldName = null;
-        $englishFieldName = null;
+        // Determine which fields to validate.
+        $basefieldname = null;
+        $englishfieldname = null;
 
         if (isset($pairs[$triggerfieldname])) {
-            $baseFieldName = $triggerfieldname;
-            $englishFieldName = $pairs[$triggerfieldname];
+            $basefieldname = $triggerfieldname;
+            $englishfieldname = $pairs[$triggerfieldname];
         } else {
-            $baseFieldName = array_search($triggerfieldname, $pairs);
-            $englishFieldName = $triggerfieldname;
+            $basefieldname = array_search($triggerfieldname, $pairs);
+            $englishfieldname = $triggerfieldname;
         }
 
-        // Get fields and instance data
+        // Get fields and instance data.
         $fields = $handler->get_fields();
         $instancedata = $handler->get_instance_data($courseid, true);
 
-        // Validate both fields
+        // Validate both fields.
         foreach ($fields as $f) {
-            if ($f->get('shortname') === $baseFieldName || $f->get('shortname') === $englishFieldName) {
+            if ($f->get('shortname') === $basefieldname || $f->get('shortname') === $englishfieldname) {
                 $datacontroller = null;
                 foreach ($instancedata as $fielddata) {
                     if ($fielddata->get_field()->get('id') == $f->get('id')) {

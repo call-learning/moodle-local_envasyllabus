@@ -34,7 +34,6 @@ class hook_callbacks {
     public static function before_standard_top_of_body_html_generation(before_standard_top_of_body_html_generation $hook): void {
         global $PAGE;
 
-
         if (!isguestuser() && !isloggedin()) {
             return;
         }

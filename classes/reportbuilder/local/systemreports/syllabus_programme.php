@@ -69,7 +69,8 @@ class syllabus_programme extends system_report {
         $competencyassignment = new competency_assignment();
         $competencyassignmentalias = $competencyassignment->get_table_alias('customfield_sprogramme_competencies');
         $this->add_entity($competencyassignment->add_join(
-            "LEFT JOIN {customfield_sprogramme_competencies} {$competencyassignmentalias} ON {$competencyassignmentalias}.pid = {$programmealias}.id"
+            "LEFT JOIN {customfield_sprogramme_competencies} {$competencyassignmentalias} ON ".
+            "{$competencyassignmentalias}.pid = {$programmealias}.id"
         ));
 
         $competency = new competency();
@@ -77,13 +78,15 @@ class syllabus_programme extends system_report {
         $competency->add_joins($competencyassignment->get_joins());
         $this->add_entity($competency
             ->add_join(
-                "LEFT JOIN {customfield_sprogramme_complist} {$competencyalias} ON {$competencyalias}.uniqueid = {$competencyassignmentalias}.cid"
+                "LEFT JOIN {customfield_sprogramme_complist} {$competencyalias} ON ".
+                "{$competencyalias}.uniqueid = {$competencyassignmentalias}.cid"
             ));
 
         $disciplineassignment = new discipline_assignment();
         $disciplineassignmentalias = $disciplineassignment->get_table_alias('customfield_sprogramme_disc');
         $this->add_entity($disciplineassignment->add_join(
-            "LEFT JOIN {customfield_sprogramme_disc} {$disciplineassignmentalias} ON {$disciplineassignmentalias}.pid = {$programmealias}.id"
+            "LEFT JOIN {customfield_sprogramme_disc} {$disciplineassignmentalias} ON ".
+            "{$disciplineassignmentalias}.pid = {$programmealias}.id"
         ));
 
         $discipline = new discipline();
@@ -91,13 +94,15 @@ class syllabus_programme extends system_report {
         $discipline->add_joins($disciplineassignment->get_joins());
         $this->add_entity($discipline
             ->add_join(
-                "LEFT JOIN {customfield_sprogramme_disclist} {$disciplinealias} ON {$disciplinealias}.uniqueid = {$disciplineassignmentalias}.did"
+                "LEFT JOIN {customfield_sprogramme_disclist} {$disciplinealias} ON ".
+                "{$disciplinealias}.uniqueid = {$disciplineassignmentalias}.did"
             ));
 
         $module = new module();
         $modulealias = $module->get_table_alias('customfield_sprogramme_module');
         $this->add_entity($module
-            ->add_join("LEFT JOIN {customfield_sprogramme_module} {$modulealias} ON {$modulealias}.id = {$programmealias}.moduleid"));
+            ->add_join("LEFT JOIN {customfield_sprogramme_module} {$modulealias} ON ".
+            "{$modulealias}.id = {$programmealias}.moduleid"));
 
         $responsible = new user();
         $responsible->set_entity_name('responsible');
@@ -109,7 +114,8 @@ class syllabus_programme extends system_report {
         $insql = "(SELECT {$useralias}.id
                   FROM {user} {$useralias}
                    JOIN {role_assignments} {$rolassignmentalias} ON {$rolassignmentalias}.userid = {$useralias}.id
-                   JOIN {context} {$contextalias} ON {$contextalias}.id = {$rolassignmentalias}.contextid AND {$contextalias}.contextlevel = " .
+                   JOIN {context} {$contextalias} ON {$contextalias}.id = {$rolassignmentalias}.contextid AND
+                   {$contextalias}.contextlevel = " .
             CONTEXT_COURSE . "
                    WHERE {$rolassignmentalias}.roleid IN (SELECT r.id FROM {role} r WHERE r.shortname IN ('responsablecourse'))
                    AND {$contextalias}.instanceid = {$coursealias}.id)";

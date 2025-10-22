@@ -1,17 +1,17 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
+// Moodle is free software: you can redistribute it and/or modify.
+// it under the terms of the GNU General Public License as published by.
+// the Free Software Foundation, either version 3 of the License, or.
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// Moodle is distributed in the hope that it will be useful,.
+// but WITHOUT ANY WARRANTY; without even the implied warranty of.
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
+// You should have received a copy of the GNU General Public License.
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 // NOTE: no MOODLE_INTERNAL test here, this file may be required by behat before including /config.php.
@@ -39,7 +39,7 @@ class behat_local_envasyllabus extends behat_base {
      * @throws ExpectationException
      */
     public function i_should_see_edit_button_for_field($fieldname) {
-        // Look for button with data-action="edit-field" and data-fieldname matching
+        // Look for button with data-action="edit-field" and data-fieldname matching.
         $selector = "button[data-action='edit-field'][data-fieldname='{$fieldname}']";
         $editbutton = $this->find('css', $selector);
         if (!$editbutton || !$editbutton->isVisible()) {
@@ -58,7 +58,7 @@ class behat_local_envasyllabus extends behat_base {
      * @throws ExpectationException
      */
     public function i_should_not_see_edit_button_for_field($fieldname) {
-        // Look for button with data-action="edit-field" and data-fieldname matching
+        // Look for button with data-action="edit-field" and data-fieldname matching.
         $selector = "button[data-action='edit-field'][data-fieldname='{$fieldname}']";
         try {
             $editbutton = $this->find('css', $selector);
@@ -69,7 +69,8 @@ class behat_local_envasyllabus extends behat_base {
                 );
             }
         } catch (ElementNotFoundException $e) {
-            // This is expected - the button should not be found
+            // This is expected - the button should not be found.
+            return;
         }
     }
 
@@ -92,7 +93,7 @@ class behat_local_envasyllabus extends behat_base {
             );
         }
         $editbutton->click();
-        // Wait for modal to appear
+        // Wait for modal to appear.
         $this->getSession()->wait(1000);
     }
 
@@ -131,15 +132,15 @@ class behat_local_envasyllabus extends behat_base {
             throw new coding_exception("Unknown editing mode '{$onoroff}'. Accepted values are 'on' and 'off'");
         }
 
-        // Get course ID from course full name
+        // Get course ID from course full name.
         $course = $DB->get_record('course', ['fullname' => $coursefullname], '*', MUST_EXIST);
         $courseid = $course->id;
         $context = context_course::instance($courseid);
 
-        // Build syllabus page URL
+        // Build syllabus page URL.
         $syllabusurl = new moodle_url('/local/envasyllabus/syllabuspage.php', ['id' => $courseid]);
 
-        // Build edit mode URL that redirects to syllabus page
+        // Build edit mode URL that redirects to syllabus page.
         $editmodeurl = new moodle_url('/editmode.php', [
             'context' => $context->id,
             'pageurl' => $syllabusurl->out(false),
@@ -156,10 +157,10 @@ class behat_local_envasyllabus extends behat_base {
      * @throws ExpectationException
      */
     public function the_edit_field_modal_should_be_open() {
-        // Wait for modal to appear
+        // Wait for modal to appear.
         $this->getSession()->wait(2000);
 
-        // Check for modal-form-dialogue class
+        // Check for modal-form-dialogue class.
         $modal = $this->find('css', '.modal-form-dialogue');
         if (!$modal) {
             throw new ExpectationException(
@@ -187,7 +188,7 @@ class behat_local_envasyllabus extends behat_base {
         }
 
         $select->selectOption($language);
-        // Wait for language switch to complete
+        // Wait for language switch to complete.
         $this->getSession()->wait(1000);
     }
 }
