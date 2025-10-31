@@ -20,6 +20,8 @@ use renderable;
 use renderer_base;
 use stdClass;
 use templatable;
+use context_system;
+use moodle_url;
 use local_envasyllabus\output\language_switcher;
 
 /**
@@ -88,6 +90,10 @@ class catalog implements renderable, templatable {
         $context->normalmodus = $this->modus === 'normal';
         $context->listview = $this->listview;
         $context->gridview = $this->gridview;
+        $context->canexport = has_capability(
+            'local/envasyllabus:exportcatalog',
+            context_system::instance()
+        );
         $languageswitcher = new language_switcher();
         $context->languageswitcher = $languageswitcher->export_for_template($output);
         return $context;

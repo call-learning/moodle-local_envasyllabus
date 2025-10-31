@@ -26,11 +26,16 @@
         "lang": "en"
     }
 }}
-<div class="export-excel-container mt-2">
-    <a href="{{wwwroot}}/local/envasyllabus/export.php?categoryid={{categoryid}}&extendedmode={{extendedmode}}&lang={{lang}}"
+<div class="export-excel-container">
+    <button data-action="exportexcel"
        class="btn btn-secondary"
        title="{{#str}}exportexcel_help, local_envasyllabus{{/str}}">
         <i class="fa fa-download" aria-hidden="true"></i>
-        {{#str}}exportexcel, local_envasyllabus{{/str}}
-    </a>
+        <span class="sr-only">{{#str}}exportexcel, local_envasyllabus{{/str}}</span>
+    </button>
 </div>
+{{#js}}
+require(['local_envasyllabus/excel_export'], function(ExcelExport) {
+    ExcelExport.init();
+});
+{{/js}}

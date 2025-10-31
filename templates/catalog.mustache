@@ -48,6 +48,9 @@
             </button>
         </div>
     </div>
+    {{#canexport}}
+        {{>local_envasyllabus/export_button}}
+    {{/canexport}}
     <div class="local-envasyllabus-language-switcher ml-3">
         {{#languageswitcher}}
             {{>core/single_select}}
@@ -79,4 +82,3 @@ require(['local_envasyllabus/catalog'], function(Catalog) {
     Catalog.init('catalog-content-{{uniqid}}');
 });
 {{/js}}
-

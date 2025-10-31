@@ -54,6 +54,7 @@ $string['enablenewprogrammeforcourse_desc'] = 'Activate new programme for specif
 If no course selected, the old programme field will be used.';
 $string['enddate'] = 'Date de fin';
 $string['entity:programme_with_customfields'] = 'Programme with custom fields';
+$string['envasyllabus:exportcatalog'] = 'Export catalog';
 $string['extendedmode'] = 'Extended mode';
 $string['generalsettings'] = 'Enva Syllabus settings';
 $string['gridview'] = 'Grid view';

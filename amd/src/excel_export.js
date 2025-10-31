@@ -16,88 +16,106 @@
 /**
  * Excel export functionality for envasyllabus catalog
  *
+ * @module     local_envasyllabus/excel_export
  * @copyright  2025 Bas Brands
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import Config from 'core/config';
+import Ajax from 'core/ajax';
+import Notification from 'core/notification';
 
-/**
- * Initialize excel export functionality
- *
- * @param {int} catalogTagId
- */
-export const init = (catalogTagId) => {
-    // Add export button to the catalog
-    addExportButton(catalogTagId);
+const SELECTORS = {
+    EXPORT_BUTTON: '[data-action="exportexcel"]',
+    ICON: 'i.fa',
 };
 
 /**
- * Add export button to catalog
- *
- * @param {int} catalogTagId
+ * Initialize excel export functionality
  */
-const addExportButton = (catalogTagId) => {
-    // Find the catalog container
-    const catalogContainer = document.querySelector('[data-catalog-tag-id="' + catalogTagId + '"]');
-    if (!catalogContainer) {
+export const init = () => {
+    initExportButton();
+};
+
+/**
+ * Initialize export button event handler
+ */
+const initExportButton = () => {
+    const exportBtn = document.querySelector(SELECTORS.EXPORT_BUTTON);
+
+    if (!exportBtn) {
         return;
     }
 
-    // Find the filter container or create one
-    let filterContainer = catalogContainer.querySelector('[data-region="catalog-filter"]');
-    if (!filterContainer) {
-        filterContainer = catalogContainer.querySelector('.catalog-filters');
-    }
+    exportBtn.addEventListener('click', (e) => {
+        e.preventDefault();
 
-    if (filterContainer) {
-        // Create export button
-        const exportBtn = document.createElement('button');
-        exportBtn.className = 'btn btn-secondary ml-2';
-        exportBtn.type = 'button';
-        exportBtn.innerHTML = '<i class="fa fa-download" aria-hidden="true"></i> Export Excel';
+        // Don't allow clicking if already locked.
+        if (exportBtn.getAttribute('data-locked') === 'true') {
+            return;
+        }
 
-        // Add click handler
-        exportBtn.addEventListener('click', () => {
-            handleExportClick(catalogTagId);
-        });
-
-        // Append button to filter container
-        filterContainer.appendChild(exportBtn);
-    }
+        handleExportClick(exportBtn);
+    });
 };
 
 /**
  * Handle export button click
  *
- * @param {int} catalogTagId
+ * @param {HTMLElement} button The export button element
  */
-const handleExportClick = (catalogTagId) => {
-    const catalogCourseTag = getCatalogCourseTag(catalogTagId);
-    if (!catalogCourseTag) {
-        return;
+const handleExportClick = async(button) => {
+    const icon = button.querySelector(SELECTORS.ICON);
+    const originalClasses = icon.className;
+
+    // Lock the button.
+    button.setAttribute('data-locked', 'true');
+    button.disabled = true;
+    icon.className = 'fa fa-spinner fa-spin';
+
+    // Get export parameters.
+    const urlParams = new URLSearchParams(window.location.search);
+    const lang = urlParams.get('lang') || 'en';
+    const extended = urlParams.get('modus') === 'extended';
+
+    try {
+        // Call the external service.
+        const response = await Ajax.call([{
+            methodname: 'local_envasyllabus_export_catalog',
+            args: {
+                lang: lang,
+                extended: extended
+            }
+        }])[0];
+
+        if (response.success) {
+            // Trigger download using hidden iframe.
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = response.downloadurl;
+            document.body.appendChild(iframe);
+
+            // Remove iframe after download starts.
+            setTimeout(() => {
+                if (iframe.parentNode) {
+                    iframe.parentNode.removeChild(iframe);
+                }
+            }, 5000);
+
+            // Reset button after short delay.
+            setTimeout(() => {
+                button.setAttribute('data-locked', 'false');
+                button.disabled = false;
+                icon.className = originalClasses;
+            }, 2000);
+        } else {
+            throw new Error('Export failed');
+        }
+    } catch (error) {
+        // Reset button on error.
+        button.setAttribute('data-locked', 'false');
+        button.disabled = false;
+        icon.className = originalClasses;
+
+        Notification.exception(error);
     }
-
-    // Get parameters from catalog
-    const categoryId = catalogCourseTag.dataset.categoryRootId || 0;
-    const extendedMode = catalogCourseTag.dataset.modus === 'extended' ? 1 : 0;
-    const currentLang = catalogCourseTag.dataset.currentLang || 'en';
-
-    // Build export URL
-    const baseUrl = `${Config.wwwroot}/local/envasyllabus/export.php`;
-    const params = `?categoryid=${categoryId}&extendedmode=${extendedMode}&lang=${currentLang}`;
-    const exportUrl = baseUrl + params;
-
-    // Trigger download
-    window.location.href = exportUrl;
-};
-
-/**
- * Get catalog course tag element
- *
- * @param {int} catalogTagId
- * @returns {Element|null}
- */
-const getCatalogCourseTag = (catalogTagId) => {
-    return document.querySelector('[data-catalog-tag-id="' + catalogTagId + '"]');
 };

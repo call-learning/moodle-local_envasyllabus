@@ -30,4 +30,11 @@ $functions = [
         'type' => 'read',
         'ajax' => true,
     ],
+    'local_envasyllabus_export_catalog' => [
+        'classname' => 'local_envasyllabus\external\export_catalog',
+        'methodname' => 'execute',
+        'description' => 'Export catalog to Excel',
+        'type' => 'read',
+        'ajax' => true,
+    ],
 ];
