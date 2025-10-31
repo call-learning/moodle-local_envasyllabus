@@ -38,12 +38,17 @@
         </div>
     </div>
     {{>local_envasyllabus/course_syllabus_header}}
-    <h3>{{#str}}summary, local_envasyllabus{{/str}}</h3>
-    <div class="syllabus-summary">{{{summary}}}</div>
+    <div class="d-flex justify-content-between align-items-center">
+        <h3>{{#str}}summary, local_envasyllabus{{/str}}</h3> {{{summary.editbutton}}}
+    </div>
+    <div class="syllabus-summary">{{{summary.content}}}</div>
     {{<local_envasyllabus/course_syllabus_collapsible}}
         {{$id}}teachers-{{uniqid}}{{/id}}
         {{$type}}teachers{{/type}}
         {{$title}}{{#str}}syllabuspage:teachers, local_envasyllabus{{/str}}{{/title}}
+        {{$editbutton}}
+            {{{teachereditbutton}}}
+        {{/editbutton}}
         {{$content}}
             <div class="d-flex flex-wrap">
                 {{#teachers}}

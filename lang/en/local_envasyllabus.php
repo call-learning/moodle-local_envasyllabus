@@ -113,7 +113,7 @@ $string['total_help'] = 'Total time allocated to the UC, including the estimatio
 $string['viewcourse'] = 'View course';
 
 // Custom field editing strings.
-$string['editfield'] = 'Edit field';
+$string['editfield'] = 'Edit';
 $string['fieldnotfound'] = 'Custom field not found';
 $string['fieldnotvisible'] = 'Custom field is not visible';
 $string['fieldupdated'] = 'Field "{$a}" has been updated successfully';
@@ -165,3 +165,10 @@ $string['confirm_delete_title'] = 'Confirm File Deletion';
 $string['confirm_delete_message'] = 'Are you sure you want to delete the file "{$a}"? This action cannot be undone.';
 $string['filedeleted_success'] = 'File "{$a}" has been deleted successfully.';
 $string['file_not_found'] = 'The requested file could not be found.';
+
+// Teaching team modal strings.
+$string['edit_teachers'] = 'Edit Teaching Team';
+$string['edit_teachers_explanation'] = 'To display instructors in the teaching team, assign them the "Teacher" role in the participants list.
+
+Click below to manage roles.';
+$string['manage_participants'] = 'Manage Participants';

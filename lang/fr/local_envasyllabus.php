@@ -106,6 +106,19 @@ $string['th:responsible'] = 'Responsable';
 $string['total_help'] = 'Total du volume horaire consacré à l\'UC, incluant l\'estimation du travail personnel';
 $string['viewcourse'] = 'Voir contenu du cours';
 
+// Custom field editing strings.
+$string['editfield'] = 'Modifier';
+$string['fieldnotfound'] = 'Champ personnalisé introuvable';
+$string['fieldnotvisible'] = 'Le champ personnalisé n\'est pas visible';
+$string['fieldupdated'] = 'Le champ "{$a}" a été mis à jour avec succès';
+$string['invalidcourse'] = 'Cours invalide';
+$string['multilanguagefields'] = 'Champs multilingues';
+$string['editsyllabusfields'] = 'Modifier les champs du syllabus';
+$string['frenchversion'] = 'Version française : {$a}';
+$string['englishversion'] = 'Version anglaise : {$a}';
+$string['reports'] = 'Rapports';
+$string['exportexcel'] = 'Export Excel';
+$string['exportexcel_help'] = 'Exporter les données du catalogue au format Excel';
 
 // Spreadsheet email settings.
 $string['spreadsheet_email_settings'] = 'Rapports Excel par email';
@@ -146,3 +159,10 @@ $string['confirm_delete_title'] = 'Confirmer la suppression du fichier';
 $string['confirm_delete_message'] = 'Êtes-vous sûr de vouloir supprimer le fichier "{$a}" ? Cette action ne peut pas être annulée.';
 $string['filedeleted_success'] = 'Le fichier "{$a}" a été supprimé avec succès.';
 $string['file_not_found'] = 'Le fichier demandé n\'a pas pu être trouvé.';
+
+// Teaching team modal strings.
+$string['edit_teachers'] = 'Modifier l\'équipe pédagogique';
+$string['edit_teachers_explanation'] = 'Pour afficher des intervenants dans l\'équipe pédagogique, attribuez-leur le rôle « Enseignant » dans la liste des participants.
+
+Cliquez ci-dessous pour gérer les rôles.';
+$string['manage_participants'] = 'Gérer les participants';

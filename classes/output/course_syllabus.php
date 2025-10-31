@@ -119,6 +119,7 @@ class course_syllabus implements renderable, templatable {
 
         // Initialize the edit field modal JavaScript once.
         $PAGE->requires->js_call_amd('local_envasyllabus/edit_field_modal', 'init');
+        $PAGE->requires->js_call_amd('local_envasyllabus/edit_teachers_modal', 'init');
 
         $currentlang = current_language();
         $contextdata = new stdClass();
@@ -184,8 +185,10 @@ class course_syllabus implements renderable, templatable {
             }
             $contextdata->teachers[] = $teacher;
         }
+        $contextdata->teachereditbutton = $this->get_teacher_edit_button($context, $output);
 
-        $contextdata->summary = $customfields['uc_summary_' . $currentlang] ?? '';
+        $contextdata->summary = $this->get_cf_displayable_info('uc_summary', $customfields, $output);
+
         $matrixid = $customfields['uc_matrix'] ?? get_config('local_envasyllabus', 'defaultmatrixid');
 
         $graphhtml = '';
@@ -409,12 +412,24 @@ class course_syllabus implements renderable, templatable {
         // Store original field name for edit button.
         $originalfieldname = $cfname;
 
+        if ($cfname == 'uc_summary_en') {
+            // Summary field is handled differently.
+            $cfname = 'uc_summary';
+            $originalfieldname = 'uc_summary_fr';
+        }
+        if ($cfname == 'uc_summary') {
+            // Summary field is handled differently.
+            $cfname = 'uc_summary_fr';
+            $originalfieldname = 'uc_summary_fr';
+        }
+
         if (!empty($this->lang)) {
             $cfname = "{$cfname}_{$this->lang}";
         }
         if ($cfname == 'uc_programme' && $this->hasnewprogramme) {
             $cfname = 'programme';
         }
+
         $cffieldvalue = $customfields[$cfname] ?? '';
         if (html_to_text($cffieldvalue) == '') {
             return '';
@@ -477,6 +492,35 @@ class course_syllabus implements renderable, templatable {
             'data-courseid' => $this->courseid,
             'data-fieldid' => $fieldid,
             'data-fieldname' => $fieldname,
+            'title' => get_string('editfield', 'local_envasyllabus'),
+            'type' => 'button',
+        ]);
+    }
+
+    /**
+     * Get teacher edit button
+     *
+     * @param \context_course $context
+     * @param \renderer_base $output
+     * @return string
+     */
+    protected function get_teacher_edit_button(\context_course $context, \renderer_base $output): string {
+        global $PAGE;
+        // Check if user can edit course.
+        if (!has_capability('moodle/course:update', $context)) {
+            return '';
+        }
+
+        if (!$PAGE->user_is_editing()) {
+            return '';
+        }
+
+        // Create modal button with data attributes.
+        $editicon = $output->pix_icon('t/edit', get_string('edit'));
+        return \html_writer::tag('button', $editicon . get_string('editfield', 'local_envasyllabus'), [
+            'class' => 'btn btn-primary',
+            'data-action' => 'edit-teachers',
+            'data-courseid' => $this->courseid,
             'title' => get_string('editfield', 'local_envasyllabus'),
             'type' => 'button',
         ]);

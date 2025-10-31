@@ -196,6 +196,7 @@ class edit_field_dynamic_form extends dynamic_form {
      */
     private function get_multilingual_field_pairs() {
         return [
+            'uc_summary_fr' => 'uc_summary_en',
             'uc_competences' => 'uc_competences_en',
             'uc_prerequis' => 'uc_prerequis_en',
             'uc_programme' => 'uc_programme_en',
