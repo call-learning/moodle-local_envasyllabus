@@ -26,6 +26,7 @@ namespace local_envasyllabus\form;
 
 use context;
 use context_course;
+use core_customfield\handler;
 use core_form\dynamic_form;
 use moodle_exception;
 use moodle_url;
@@ -34,6 +35,8 @@ use moodle_url;
  * Dynamic form for editing custom fields with multilingual support
  */
 class edit_field_dynamic_form extends dynamic_form {
+    use form_trait;
+
     /**
      * Get context for dynamic submission
      */
@@ -66,7 +69,7 @@ class edit_field_dynamic_form extends dynamic_form {
         $fieldid = $data->fieldid;
 
         // Get the custom field handler.
-        $handler = \core_customfield\handler::get_handler('core_course', 'course');
+        $handler = handler::get_handler('core_course', 'course');
 
         // Ensure the course ID is set for the handler.
         $data->id = $courseid;
@@ -107,7 +110,7 @@ class edit_field_dynamic_form extends dynamic_form {
         $fieldid = $this->optional_param('fieldid', 0, PARAM_INT);
 
         // Get the custom field handler.
-        $handler = \core_customfield\handler::get_handler('core_course', 'course');
+        $handler = handler::get_handler('core_course', 'course');
 
         // Prepare form data using the handler's method.
         $currentdata = new \stdClass();
@@ -121,9 +124,7 @@ class edit_field_dynamic_form extends dynamic_form {
         $this->set_data($currentdata);
     }
 
-    /**
-     * Form definition
-     */
+    #[\Override]
     protected function definition() {
         $mform = $this->_form;
 
@@ -134,7 +135,7 @@ class edit_field_dynamic_form extends dynamic_form {
         $fieldid = $this->optional_param('fieldid', 0, PARAM_INT);
 
         // Get the custom field handler and field.
-        $handler = \core_customfield\handler::get_handler('core_course', 'course');
+        $handler = handler::get_handler('core_course', 'course');
         $fields = $handler->get_fields();
 
         $field = null;
@@ -190,57 +191,21 @@ class edit_field_dynamic_form extends dynamic_form {
         $mform->addElement('hidden', 'fieldid', $fieldid);
         $mform->setType('fieldid', PARAM_INT);
     }
-
-    /**
-     * List of multilingual field pairs (base field => english field)
-     */
-    private function get_multilingual_field_pairs() {
-        return [
-            'uc_summary_fr' => 'uc_summary_en',
-            'uc_competences' => 'uc_competences_en',
-            'uc_prerequis' => 'uc_prerequis_en',
-            'uc_programme' => 'uc_programme_en',
-            'uc_validation' => 'uc_validation_en',
-            'uc_infos_compl' => 'uc_infos_compl_en',
-        ];
-    }
-
-    /**
-     * Check if a field is part of a multilingual pair
-     */
-    private function is_multilingual_field($fieldshortname, $handler) {
-        $pairs = $this->get_multilingual_field_pairs();
-
-        // Check if it's a base field that has an _en counterpart.
-        if (isset($pairs[$fieldshortname])) {
-            // Check if the english version actually exists.
-            $fields = $handler->get_fields();
-            foreach ($fields as $f) {
-                if ($f->get('shortname') === $pairs[$fieldshortname]) {
-                    return true;
-                }
-            }
-        }
-
-        // Check if it's an _en field that has a base counterpart.
-        $basefield = array_search($fieldshortname, $pairs);
-        if ($basefield !== false) {
-            // Check if the base version actually exists.
-            $fields = $handler->get_fields();
-            foreach ($fields as $f) {
-                if ($f->get('shortname') === $basefield) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     /**
      * Add both language versions of a multilingual field to the form
+     *
+     * @param \MoodleQuickForm $mform
+     * @param handler $handler
+     * @param int $courseid
+     * @param string $triggerfieldname
+     * @return void
      */
-    private function add_multilingual_fields($mform, $handler, $courseid, $triggerfieldname) {
+    private function add_multilingual_fields(
+        \MoodleQuickForm $mform,
+        handler $handler,
+        int $courseid,
+        string $triggerfieldname
+    ): void {
         $pairs = $this->get_multilingual_field_pairs();
 
         // Determine which fields to show.

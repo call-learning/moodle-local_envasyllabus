@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['actions'] = 'Actions';
 $string['active_help'] = 'Percentage of active teaching methods implemented within the UC';
 $string['aria:courseimage'] = 'Course image';
 $string['cachedef_filteredcourses'] = 'Filtered courses cache';
@@ -35,16 +36,34 @@ $string['cf:uc_nombre'] = 'Numéro UC';
 $string['cf:uc_semestre'] = 'Semester';
 $string['competency:rep:name'] = 'Competency ({$a})';
 $string['competency:rep:percent'] = 'Competency percentage ({$a})';
+$string['confirm_delete'] = 'Are you sure you want to delete this file?';
+$string['confirm_delete_message'] = 'Are you sure you want to delete the file "{$a}"? This action cannot be undone.';
+$string['confirm_delete_title'] = 'Confirm File Deletion';
 $string['course:summary'] = 'Summary';
-$string['course_no_semester'] = 'Année {$a}';
-$string['course_semester'] = 'Année {$a->year}, {$a->semester}';
-$string['coursecard:credits'] = '{$a} crédits ECTS';
-$string['coursecard:hours'] = '{$a} heures';
-$string['courses:index'] = 'Le cursus à l\'ENVA';
+$string['course_no_semester'] = 'Year {$a}';
+$string['course_semester'] = 'Year {$a->year}, {$a->semester}';
+$string['coursecard:credits'] = '{$a} ECTS credits';
+$string['coursecard:hours'] = '{$a} hours';
+$string['courses:index'] = 'Cursus at ENVA';
 $string['defaultmatrixid'] = 'Default Matrix ID';
 $string['defaultmatrixid_desc'] = 'Default Matrix ID';
+$string['delete'] = 'Delete';
 $string['discipline:rep:name'] = 'Disciplin ({$a})';
 $string['discipline:rep:percent'] = 'Discipline percentage ({$a})';
+$string['download'] = 'Download';
+$string['edit_teachers'] = 'Edit Teaching Team';
+$string['edit_teachers_explanation'] = 'To display instructors in the teaching team, assign them the "Teacher" role in the participants list.
+
+Click below to manage roles.';
+$string['editfield'] = 'Edit';
+$string['editsyllabusfields'] = 'Edit Syllabus fields';
+$string['email:spreadsheet:body'] = 'Please find attached the syllabus report generated on {$a->date}.
+
+Filename: {$a->filename}
+File size: {$a->filesize}
+
+This is an automated message.';
+$string['email:spreadsheet:subject'] = 'Syllabus Report - {$a}';
 $string['enableenvasyllabus'] = 'Activate ENVA Syllabus functionalities';
 $string['enableenvasyllabus_help'] = 'Activate ENVA Syllabus functionalities (additional menus in course)';
 $string['enablenewprogramme'] = 'Activate new programme';
@@ -53,12 +72,29 @@ $string['enablenewprogrammeforcourse'] = 'Activate new programme for specific co
 $string['enablenewprogrammeforcourse_desc'] = 'Activate new programme for specific courses.
 If no course selected, the old programme field will be used.';
 $string['enddate'] = 'Date de fin';
+$string['englishversion'] = 'English Version: {$a}';
 $string['entity:programme_with_customfields'] = 'Programme with custom fields';
 $string['envasyllabus:exportcatalog'] = 'Export catalog';
+$string['exportexcel'] = 'Export Excel';
+$string['exportexcel_help'] = 'Export catalog data to Excel format';
 $string['extendedmode'] = 'Extended mode';
+$string['fieldnotfound'] = 'Custom field not found';
+$string['fieldnotvisible'] = 'Custom field is not visible';
+$string['fieldupdated'] = 'Field "{$a}" has been updated successfully';
+$string['file_not_found'] = 'The requested file could not be found.';
+$string['filedeleted'] = 'File deleted successfully';
+$string['filedeleted_success'] = 'File "{$a}" has been deleted successfully.';
+$string['filename'] = 'File name';
+$string['filesize'] = 'File size';
+$string['frenchversion'] = 'French Version: {$a}';
 $string['generalsettings'] = 'Enva Syllabus settings';
 $string['gridview'] = 'Grid view';
+$string['invalidcourse'] = 'Invalid course';
 $string['listview'] = 'List view';
+$string['manage_participants'] = 'Manage Participants';
+$string['manage_spreadsheets'] = 'Manage Spreadsheet Files';
+$string['multilanguagefields'] = 'Multilingual Fields';
+$string['no_files_found'] = 'No spreadsheet files found';
 $string['perso_help'] = 'Minimum estimated personal work time required to acquire the skills targeted by this UC';
 $string['pluginname'] = 'ENVA Syllabus';
 $string['programme'] = 'See programme';
@@ -69,6 +105,7 @@ $string['report:disciplines'] = 'Syllabus Disciplines Report';
 $string['report:historyrfc'] = 'History RFC report';
 $string['report:historyrfctotals'] = 'History RFC totals report';
 $string['report:programme'] = 'Syllabus Programme report';
+$string['reports'] = 'Reports';
 $string['rootcategoryid'] = 'Root Category';
 $string['rootcategoryid_desc'] = 'Root Category Description';
 $string['sort'] = 'Tri';
@@ -76,6 +113,17 @@ $string['sort:customfield_uc_annee'] = 'Year';
 $string['sort:fullname'] = 'Title';
 $string['sortorderasc'] = 'Ascendant';
 $string['sortorderdesc'] = 'Descendant';
+$string['spreadsheet_email_enabled'] = 'Enable spreadsheet emails';
+$string['spreadsheet_email_enabled_desc'] = 'Send weekly spreadsheet reports via email';
+$string['spreadsheet_email_settings'] = 'Spreadsheet Email Reports';
+$string['spreadsheet_email_settings_desc'] = 'Configure automatic spreadsheet email reports';
+$string['spreadsheet_extended_mode'] = 'Extended mode';
+$string['spreadsheet_extended_mode_desc'] = 'Include programme columns in spreadsheet';
+$string['spreadsheet_files'] = 'Spreadsheet Files';
+$string['spreadsheet_lang'] = 'Report language';
+$string['spreadsheet_lang_desc'] = 'Language for spreadsheet content';
+$string['spreadsheet_recipients'] = 'Email recipients';
+$string['spreadsheet_recipients_desc'] = 'Email addresses to send reports to (comma separated)';
 $string['startdate'] = 'Date de début';
 $string['summary'] = 'Summary';
 $string['syllabus:lang:english'] = 'English';
@@ -106,70 +154,12 @@ $string['syllabuspage:uc_heures_tp_etudiant'] = 'Practical work (TP)';
 $string['syllabuspage:uc_heures_tpa_etudiant'] = 'Practical work on healthy animals (TPa)';
 $string['syllabuspage:vaq'] = 'Validation of prior learning';
 $string['syllabusreports'] = 'Syllabus Reports';
+$string['table_filename'] = 'File name';
+$string['table_filesize'] = 'File size';
+$string['task:send_spreadsheet'] = 'Send spreadsheet email reports';
 $string['th:acronym'] = 'Acronym';
 $string['th:ects'] = 'ECTS';
 $string['th:responsible'] = 'Responsible';
 $string['th:uc'] = 'UC';
 $string['total_help'] = 'Total time allocated to the UC, including the estimation of personal work';
 $string['viewcourse'] = 'View course';
-
-// Custom field editing strings.
-$string['editfield'] = 'Edit';
-$string['fieldnotfound'] = 'Custom field not found';
-$string['fieldnotvisible'] = 'Custom field is not visible';
-$string['fieldupdated'] = 'Field "{$a}" has been updated successfully';
-$string['invalidcourse'] = 'Invalid course';
-$string['multilanguagefields'] = 'Multilingual Fields';
-$string['editsyllabusfields'] = 'Edit Syllabus fields';
-$string['frenchversion'] = 'French Version: {$a}';
-$string['englishversion'] = 'English Version: {$a}';
-$string['reports'] = 'Reports';
-$string['exportexcel'] = 'Export Excel';
-$string['exportexcel_help'] = 'Export catalog data to Excel format';
-
-// Spreadsheet email settings.
-$string['spreadsheet_email_settings'] = 'Spreadsheet Email Reports';
-$string['spreadsheet_email_settings_desc'] = 'Configure automatic spreadsheet email reports';
-$string['spreadsheet_email_enabled'] = 'Enable spreadsheet emails';
-$string['spreadsheet_email_enabled_desc'] = 'Send weekly spreadsheet reports via email';
-$string['spreadsheet_recipients'] = 'Email recipients';
-$string['spreadsheet_recipients_desc'] = 'Email addresses to send reports to (comma separated)';
-$string['spreadsheet_extended_mode'] = 'Extended mode';
-$string['spreadsheet_extended_mode_desc'] = 'Include programme columns in spreadsheet';
-$string['spreadsheet_lang'] = 'Report language';
-$string['spreadsheet_lang_desc'] = 'Language for spreadsheet content';
-
-// Task and email strings.
-$string['task:send_spreadsheet'] = 'Send spreadsheet email reports';
-$string['email:spreadsheet:subject'] = 'Syllabus Report - {$a}';
-$string['email:spreadsheet:body'] = 'Please find attached the syllabus report generated on {$a->date}.
-
-Filename: {$a->filename}
-File size: {$a->filesize}
-
-This is an automated message.';
-
-// File management.
-$string['manage_spreadsheets'] = 'Manage Spreadsheet Files';
-$string['spreadsheet_files'] = 'Spreadsheet Files';
-$string['no_files_found'] = 'No spreadsheet files found';
-$string['download'] = 'Download';
-$string['delete'] = 'Delete';
-$string['confirm_delete'] = 'Are you sure you want to delete this file?';
-$string['filedeleted'] = 'File deleted successfully';
-$string['filename'] = 'File name';
-$string['filesize'] = 'File size';
-$string['actions'] = 'Actions';
-$string['table_filename'] = 'File name';
-$string['table_filesize'] = 'File size';
-$string['confirm_delete_title'] = 'Confirm File Deletion';
-$string['confirm_delete_message'] = 'Are you sure you want to delete the file "{$a}"? This action cannot be undone.';
-$string['filedeleted_success'] = 'File "{$a}" has been deleted successfully.';
-$string['file_not_found'] = 'The requested file could not be found.';
-
-// Teaching team modal strings.
-$string['edit_teachers'] = 'Edit Teaching Team';
-$string['edit_teachers_explanation'] = 'To display instructors in the teaching team, assign them the "Teacher" role in the participants list.
-
-Click below to manage roles.';
-$string['manage_participants'] = 'Manage Participants';

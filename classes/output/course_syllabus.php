@@ -399,7 +399,7 @@ class course_syllabus implements renderable, templatable {
      * Get field value
      *
      * @param string $cfname
-     * @param array $cfdata
+     * @param array $customfields
      * @param \renderer_base $output
      * @return mixed
      */

@@ -23,18 +23,19 @@
  */
 
 namespace local_envasyllabus\form;
+use core_customfield\handler;
 
 defined('MOODLE_INTERNAL') || die();
-
+global $CFG;
 require_once($CFG->libdir . '/formslib.php');
 
 /**
  * Form for editing a single custom field
  */
 class edit_field_form extends \moodleform {
-    /**
-     * Define form elements
-     */
+    use form_trait;
+
+    #[\Override]
     public function definition() {
         $mform = $this->_form;
         $data = $this->_customdata;
@@ -96,139 +97,7 @@ class edit_field_form extends \moodleform {
         $this->add_action_buttons(true, get_string('savechanges'));
     }
 
-    /**
-     * List of multilingual field pairs (base field => english field)
-     */
-    private function get_multilingual_field_pairs() {
-        return [
-            'uc_competences' => 'uc_competences_en',
-            'uc_prerequis' => 'uc_prerequis_en',
-            'uc_programme' => 'uc_programme_en',
-            'uc_validation' => 'uc_validation_en',
-            'uc_infos_compl' => 'uc_infos_compl_en',
-        ];
-    }
-
-    /**
-     * Check if a field is part of a multilingual pair
-     */
-    private function is_multilingual_field($fieldshortname, $handler) {
-        $pairs = $this->get_multilingual_field_pairs();
-
-        // Check if it's a base field that has an _en counterpart.
-        if (isset($pairs[$fieldshortname])) {
-            // Check if the english version actually exists.
-            $fields = $handler->get_fields();
-            foreach ($fields as $f) {
-                if ($f->get('shortname') === $pairs[$fieldshortname]) {
-                    return true;
-                }
-            }
-        }
-
-        // Check if it's an _en field that has a base counterpart.
-        $basefield = array_search($fieldshortname, $pairs);
-        if ($basefield !== false) {
-            // Check if the base version actually exists.
-            $fields = $handler->get_fields();
-            foreach ($fields as $f) {
-                if ($f->get('shortname') === $basefield) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Add both language versions of a multilingual field to the form
-     */
-    private function add_multilingual_fields($mform, $handler, $courseid, $triggerfieldname) {
-        $pairs = $this->get_multilingual_field_pairs();
-
-        // Determine which fields to show.
-        $basefieldname = null;
-        $englishfieldname = null;
-
-        if (isset($pairs[$triggerfieldname])) {
-            // Triggered by base field.
-            $basefieldname = $triggerfieldname;
-            $englishfieldname = $pairs[$triggerfieldname];
-        } else {
-            // Triggered by _en field, find the base.
-            $basefieldname = array_search($triggerfieldname, $pairs);
-            $englishfieldname = $triggerfieldname;
-        }
-
-        // Get all fields.
-        $fields = $handler->get_fields();
-        $basefield = null;
-        $englishfield = null;
-
-        foreach ($fields as $f) {
-            if ($f->get('shortname') === $basefieldname) {
-                $basefield = $f;
-            } else if ($f->get('shortname') === $englishfieldname) {
-                $englishfield = $f;
-            }
-        }
-
-        // Get instance data.
-        $instancedata = $handler->get_instance_data($courseid, true);
-
-        // Add French version.
-        if ($basefield) {
-            $mform->addElement(
-                'static',
-                'french_label',
-                '',
-                '<h4>' . get_string('frenchversion', 'local_envasyllabus', $basefield->get_formatted_name()) . '</h4>'
-            );
-
-            $datacontroller = null;
-            foreach ($instancedata as $fielddata) {
-                if ($fielddata->get_field()->get('id') == $basefield->get('id')) {
-                    $datacontroller = $fielddata;
-                    break;
-                }
-            }
-
-            if (!$datacontroller) {
-                $datacontroller = \core_customfield\data_controller::create(0, null, $basefield);
-            }
-
-            $datacontroller->instance_form_definition($mform);
-        }
-
-        // Add English version.
-        if ($englishfield) {
-            $mform->addElement(
-                'static',
-                'english_label',
-                '',
-                '<h4>' . get_string('englishversion', 'local_envasyllabus', $englishfield->get_formatted_name()) . '</h4>'
-            );
-
-            $datacontrolleren = null;
-            foreach ($instancedata as $fielddata) {
-                if ($fielddata->get_field()->get('id') == $englishfield->get('id')) {
-                    $datacontrolleren = $fielddata;
-                    break;
-                }
-            }
-
-            if (!$datacontrolleren) {
-                $datacontrolleren = \core_customfield\data_controller::create(0, null, $englishfield);
-            }
-
-            $datacontrolleren->instance_form_definition($mform);
-        }
-    }
-
-    /**
-     * Validate form data
-     */
+    #[\Override]
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
@@ -277,8 +146,21 @@ class edit_field_form extends \moodleform {
 
     /**
      * Validate multilingual field pairs
+     *
+     * @param mixed $data
+     * @param array $files
+     * @param handler $handler
+     * @param int $courseid
+     * @param string $triggerfieldname
+     * @return array
      */
-    private function validate_multilingual_fields($data, $files, $handler, $courseid, $triggerfieldname) {
+    private function validate_multilingual_fields(
+        mixed $data,
+        array $files,
+        handler $handler,
+        int $courseid,
+        string $triggerfieldname
+    ) {
         $errors = [];
         $pairs = $this->get_multilingual_field_pairs();
 

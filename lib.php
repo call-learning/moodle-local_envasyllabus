@@ -80,9 +80,13 @@ function local_envasyllabus_extend_navigation(global_navigation $navigation) {
 /**
  * Add navigation for user
  *
- * @param global_navigation $navigation
+ * @param navigation_node $usernode
+ * @param stdClass $user
+ * @param \core\context\user $usercontext
+ * @param stdClass $course
+ * @param \core\context $coursecontext
  * @throws coding_exception
- * @throws moodle_exception
+ * @throws dml_exception
  */
 function local_envasyllabus_extend_navigation_user(
     navigation_node $usernode,

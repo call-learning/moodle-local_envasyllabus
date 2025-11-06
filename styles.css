@@ -34,17 +34,17 @@
 .local-envasyllabus-course-syllabus .syllabus-data tr.highlighted-top td {
     font-size: large;
     font-weight: bolder;
-    padding: 0em 8px 1em;
+    padding: 0 8px 1em;
 }
 
 .local-envasyllabus-course-syllabus .syllabus-data tr.highlighted-bottom td {
     font-size: large;
     font-weight: bolder;
-    padding: 1em 8px 0em;
+    padding: 1em 8px 0;
 }
 
 .local-envasyllabus-course-syllabus .syllabus-resp {
-    padding: 0.5em 0em 2em;
+    padding: 0.5em 0 2em;
 }
 
 .local-envasyllabus-course-syllabus .syllabus-summary {
@@ -113,7 +113,7 @@
 
 .local-envasyllabus-ccat .course-card {
     min-height: 25em;
-    background: #ffffff;
+    background: #fff;
 }
 
 .local-envasyllabus-ccat .course-card .card-img-top {
@@ -185,7 +185,8 @@
     color: #1d2125;
 }
 
-.local-envasyllabus-ccat .table-hover tbody tr a:hover, .local-envasyllabus-ccat .table-hover tbody tr a:focus {
+.local-envasyllabus-ccat .table-hover tbody tr a:hover,
+.local-envasyllabus-ccat .table-hover tbody tr a:focus {
     color: #1d2125;
     text-decoration: none;
 }

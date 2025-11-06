@@ -167,8 +167,8 @@ final class excel_exporter_test extends \advanced_testcase {
             ['shortname' => 'uc_ects', 'value' => '6'],
         ];
         $course->managers = [
-            (object)['fullname' => 'John Doe'],
-            (object)['fullname' => 'Jane Smith'],
+            ['fullname' => 'John Doe'],
+            ['fullname' => 'Jane Smith'],
         ];
 
         $result = $exporter->process_course_data($course);
@@ -282,7 +282,7 @@ final class excel_exporter_test extends \advanced_testcase {
             ['shortname' => 'uc_ects', 'value' => '6'],
         ];
         $course->managers = [
-            (object)['fullname' => 'Test Manager'],
+            ['fullname' => 'Test Manager'],
         ];
 
         $result = $exporter->process_course_data($course);
@@ -347,7 +347,7 @@ final class excel_exporter_test extends \advanced_testcase {
                                             ['shortname' => 'uc_acronyme', 'value' => 'TC1'],
                                             ['shortname' => 'uc_ects', 'value' => '6'],
                                         ],
-                                        'managers' => [(object)['fullname' => 'Test Manager']],
+                                        'managers' => [['fullname' => 'Test Manager']],
                                     ],
                                 ],
                             ],
@@ -384,8 +384,13 @@ final class excel_exporter_test extends \advanced_testcase {
 
     /**
      * Helper method to create test course objects
+     *
+     * @param string $name
+     * @param string $year
+     * @param string $semester
+     * @return \stdClass
      */
-    private function create_test_course($name, $year, $semester) {
+    private function create_test_course(string $name, string $year, string $semester): \stdClass {
         $course = new \stdClass();
         $course->displayname = $name;
         $course->fullname = $name;

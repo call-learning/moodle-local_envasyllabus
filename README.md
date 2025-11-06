@@ -1,8 +1,7 @@
 # Enva Syllabus #
 
-TODO Describe the plugin shortly here.
-
-TODO Provide more detailed description here.
+[![PHP Unit and Behat tests](https://github.com/call-learning/moodle-local_envasyllabus/actions/workflows/code-test.yml/badge.svg)](https://github.com/call-learning/moodle-local_envasyllabus/actions/workflows/code-test.yml)
+[![Static code analysis tests](https://github.com/call-learning/moodle-local_envasyllabus/actions/workflows/static-ci.yml/badge.svg)](https://github.com/call-learning/moodle-local_envasyllabus/actions/workflows/static-ci.yml)
 
 ## Installing via uploaded ZIP file ##
 

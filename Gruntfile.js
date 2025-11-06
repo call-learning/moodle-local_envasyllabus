@@ -4,65 +4,49 @@
 
 module.exports = grunt => {
     const path = require('path');
-    const originalCwd = process.cwd();
-    const moodleRoot = path.resolve(__dirname, '../../../');
+    const moodleRoot = path.resolve(__dirname, '../../');
+    const componentPath = '/local/envasyllabus/';
+    // Always load the sass task before configuring/merging.
+    grunt.loadNpmTasks('grunt-sass');
 
+    // One place to keep Sass options consistent.
+    const sassOptions = {
+        implementation: require('sass'),
+        includePaths: [path.join(moodleRoot, componentPath, '/scss/')],
+        outputStyle: 'expanded', // Pretty output.
+
+    };
+    process.chdir(moodleRoot);
     try {
-        // Se déplacer vers la racine de Moodle
-        process.chdir(moodleRoot);
-
-        // Load grunt-sass manually since the root Gruntfile doesn't include it
-        grunt.loadNpmTasks('grunt-sass');
-
-        // Charger le Gruntfile racine depuis le contexte de la racine
         const rootGruntfile = path.join(moodleRoot, 'Gruntfile.js');
         if (grunt.file.exists(rootGruntfile)) {
             require(rootGruntfile)(grunt);
         }
-
-        // Étendre la configuration existante avec des chemins absolus
+        // Extend/override with your project-specific target using absolute paths.
         grunt.config.merge({
             sass: {
                 envasyllabus: {
                     files: {
-                        [path.join(originalCwd, "styles.css")]: path.join(originalCwd, "scss/styles.scss")
+                        [path.join(moodleRoot, componentPath, '/styles.css')]:
+                            path.join(moodleRoot, componentPath, '/styles.scss')
                     },
-                    options: {
-                        implementation: require('sass'),
-                        includePaths: [path.join(originalCwd, "scss/")],
-                        indentWidth: 4,
-                        outputStyle: 'expanded'
-                    }
+                    options: sassOptions
                 }
-            }
-        });
-
-        // Créer une tâche qui utilise directement la configuration sass
-        grunt.registerTask('build:envasyllabus', ['sass:envasyllabus']);
-
-    } catch (error) {
-        grunt.log.error('Erreur lors du chargement du Gruntfile racine:', error.message);
-
-        // Revenir au répertoire original pour la configuration de base
-        process.chdir(originalCwd);
-
-        grunt.loadNpmTasks('grunt-sass');
-        grunt.initConfig({
-            sass: {
+            },
+            stylelint: {
                 envasyllabus: {
-                    files: {
-                        "styles.css": "scss/styles.scss"
-                    },
                     options: {
-                        implementation: require('sass'),
-                        includePaths: ["scss/"],
-                        indentWidth: 4,
-                        outputStyle: 'expanded'
-                    }
+                        fix: true,
+                    },
+                    src: [path.join(moodleRoot, componentPath, '/styles.css')]
                 }
             }
         });
-
-        grunt.registerTask('default', ['sass:envasyllabus']);
+        // Default task available in both success/failure paths.
+        grunt.registerTask('envasyllabus_sass', ['sass:envasyllabus', 'stylelint:envasyllabus']);
+        grunt.registerTask('default', ['envasyllabus_sass']);
+    } finally {
+        // Always return to the original working directory.
+        process.env.PWD = moodleRoot; // Optional, helps code that prefers PWD.
     }
 };

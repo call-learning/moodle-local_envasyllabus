@@ -17,10 +17,11 @@
 /**
  * Plugin index page
  *
- * @package     local_envasyllabus
- * @copyright   2022 CALL Learning - Laurent David <laurent@call-learning>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local_envasyllabus
+ * @copyright  2025 Bas Brands
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(__DIR__ . '/../../config.php');
 global $CFG, $DB, $PAGE;
 

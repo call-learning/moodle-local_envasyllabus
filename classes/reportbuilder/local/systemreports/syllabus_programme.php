@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace local_envasyllabus\reportbuilder\local\systemreports;
 
+use core\exception\coding_exception;
 use core_reportbuilder\local\entities\course;
 use core_reportbuilder\local\entities\user;
 use core_reportbuilder\local\helpers\database;
@@ -253,9 +254,10 @@ class syllabus_programme extends system_report {
     /**
      * Add a number of repeated columns to the report, based on the maximum number of linked records.
      *
-     * @param string $linkingtablename The name of the table linking the main entity to the repeated entity.
-     * @param string $entityname The name of the repeated entity.
-     * @param int $maxrepeats The maximum number of repeats to add.
+     * @param string $columtype
+     * @param string $fieldtype
+     * @param int $repeats
+     * @param callable|null $displaycallback
      */
     protected function add_repeated_columns(
         string $columtype,
