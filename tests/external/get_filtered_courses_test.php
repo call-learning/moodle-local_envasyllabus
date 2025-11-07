@@ -169,12 +169,13 @@ final class get_filtered_courses_test extends \externallib_advanced_testcase {
 
     /**
      * Test execute API CALL to get filtered courses sorted by year
-     * @param string $cfname
-     * @param string $sortorder
+     *
+     * @param string $field
+     * @param string $order
      * @param array $expected
      * @dataProvider sort_dataprovider
      */
-    public function test_get_filtered_courses_sort(string $cfname, string $sortorder, array $expected): void {
+    public function test_get_filtered_courses_sort(string $field, string $order, array $expected): void {
         $this->resetAfterTest();
         $this->create_courses_and_categories();
         $this->setAdminUser();
@@ -182,13 +183,13 @@ final class get_filtered_courses_test extends \externallib_advanced_testcase {
             $this->categories['CAT1']->id,
             'fr',
             [],
-            ['field' => "customfield_" . $cfname, 'order' => $sortorder]
+            ['field' => "customfield_" . $field, 'order' => $order]
         );
         $courses = $filter['courses'];
         $this->assertCount(9, $courses);
-        $courseyears = array_map(function ($course) use ($cfname) {
+        $courseyears = array_map(function ($course) use ($field) {
             foreach ($course['customfields'] as $customfield) {
-                if ($customfield['shortname'] == $cfname) {
+                if ($customfield['shortname'] == $field) {
                     return $customfield['value'];
                 }
             }
