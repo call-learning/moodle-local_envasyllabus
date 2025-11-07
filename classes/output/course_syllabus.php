@@ -431,23 +431,19 @@ class course_syllabus implements renderable, templatable {
         }
 
         $cffieldvalue = $customfields[$cfname] ?? '';
+        // Check if we should add edit button (exclude uc_programme as mentioned).
+        $editbutton = $this->get_edit_button_for_field($originalfieldname, $output);
+        if (!empty($editbutton)) {
+            // Return both content and edit button.
+            return (object) [
+                'content' => $cffieldvalue,
+                'editbutton' => $editbutton,
+                'haseditoption' => true,
+            ];
+        }
         if (html_to_text($cffieldvalue) == '') {
             return '';
         }
-
-        // Check if we should add edit button (exclude uc_programme as mentioned).
-        if ($originalfieldname !== 'uc_programme') {
-            $editbutton = $this->get_edit_button_for_field($originalfieldname, $output);
-            if (!empty($editbutton) && $PAGE->user_is_editing()) {
-                // Return both content and edit button.
-                return (object) [
-                    'content' => $cffieldvalue,
-                    'editbutton' => $editbutton,
-                    'haseditoption' => true,
-                ];
-            }
-        }
-
         return $cffieldvalue;
     }
 
@@ -455,15 +451,18 @@ class course_syllabus implements renderable, templatable {
      * Get edit button for a custom field if user has permission
      * @param string $fieldname
      * @param \renderer_base $output
-     * @return string
+     * @return ?string
      */
-    protected function get_edit_button_for_field(string $fieldname, \renderer_base $output): string {
+    protected function get_edit_button_for_field(string $fieldname, \renderer_base $output): ?string {
         global $PAGE;
+        if ($fieldname === 'uc_programme' ||  !$PAGE->user_is_editing()) {
+            return null;
+        }
 
         // Check if user can edit course.
         $context = \context_course::instance($this->courseid);
         if (!has_capability('moodle/course:update', $context)) {
-            return '';
+            return null;
         }
 
         // Get the custom field handler and find the field.
@@ -481,7 +480,7 @@ class course_syllabus implements renderable, templatable {
         }
 
         if (!$fieldid) {
-            return '';
+            return null;
         }
 
         // Create modal button with data attributes.
