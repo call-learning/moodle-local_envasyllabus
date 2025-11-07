@@ -83,5 +83,4 @@ trait form_trait {
             'uc_infos_compl' => 'uc_infos_compl_en',
         ];
     }
-
 }

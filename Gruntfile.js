@@ -14,7 +14,6 @@ module.exports = grunt => {
         implementation: require('sass'),
         includePaths: [path.join(moodleRoot, componentPath, '/scss/')],
         outputStyle: 'expanded', // Pretty output.
-
     };
     process.chdir(moodleRoot);
     try {

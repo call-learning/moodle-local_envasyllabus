@@ -112,7 +112,7 @@ const renderCourses = (element, data) => {
         normalmodus: (element.dataset.modus == 'normal'),
         extendedmodus: (element.dataset.modus == 'extended'),
     }).then((html, js) => {
-        Templates.replaceNodeContents(element, html, js);
+        return Templates.replaceNodeContents(element, html, js);
     }).catch(displayException);
 };
 

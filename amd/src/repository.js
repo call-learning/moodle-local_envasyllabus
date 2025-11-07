@@ -30,14 +30,12 @@ import Ajax from 'core/ajax';
  * @returns {*}
  */
 export const getCoursesForCategoryId = function (rootCategoryId, filterParams = {}, currentLang = 'fr') {
-
     let request = {
         methodname: 'local_envasyllabus_get_filtered_courses',
         args: Object.assign({
             rootcategoryid: rootCategoryId,
-            currentlang : currentLang
+            currentlang: currentLang
         }, filterParams)
     };
-
     return Ajax.call([request])[0];
 };
