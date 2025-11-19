@@ -40,12 +40,10 @@ const buildSass = (grunt) => {
     const moodleRoot = findRoot(__dirname, 'config-dist.php');
     const MODULE_PATH = getModulePath(moodleRoot);
     const MODULE_NAME = getModuleName(MODULE_PATH, moodleRoot);
-    const currentDir = process.cwd();
-    grunt.loadNpmTasks('grunt-sass');
-    process.chdir(moodleRoot);
-    process.env.PWD = moodleRoot; // Optional, helps code that prefers PWD.
     const rootGruntfile = path.join(moodleRoot, 'Gruntfile.js');
     if (grunt.file.exists(rootGruntfile)) {
+        process.chdir(moodleRoot); // Change to moodle root before loading the main Gruntfile.
+        // But do not change the process.env.PWD
         require(rootGruntfile)(grunt);
     }
     const config = {
@@ -66,11 +64,21 @@ const buildSass = (grunt) => {
                 path.join(moodleRoot, MODULE_PATH, '/scss')
             ],
             sourceComments: true,
+            indentWidth: 4,
+            outputStyle: 'expanded',
         }
     };
     config.stylelint[MODULE_NAME] = {
         options: {
             fix: true,
+            cache: false,
+            failOnError: false,
+            config: {
+                rules: {
+                    "indentation": 4,
+                    "declaration-block-single-line-max-declarations": 1,
+                }
+            },
         },
         src: [path.join(moodleRoot, MODULE_PATH, '/styles.css')]
     };
