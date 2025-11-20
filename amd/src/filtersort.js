@@ -58,30 +58,29 @@ const getFilterData = (target, ignoresesskey) => {
     data.forEach((d) => {
             if (d.name === 'sesskey') {
                 sesskeyconfirmed = d.value === Config.sesskey;
-            } else {
-                if (d.value) {
-                    const filtername = d.name.match(/^filter_([^\[]+)[\[\]]*/);
-                    if (filtername) {
-                        // Specific case for multiselect.
-                        if (d.value !== "_qf__force_multiselect_submission") {
-                            let filtertype = 'customfield';
-                            if (filtername[1].includes('_ftext_')) {
-                                filtertype = 'fulltext';
-                            }
-                            filterarray.push({
-                                'type': filtertype,
-                                'search': {
-                                    'field': filtername[1],
-                                    'value': d.value
-                                }
-                            });
+                return;
+            }
+            if (d.value) {
+                const filtername = d.name.match(/^filter_([^[]+)[\][]*/);
+                if (filtername) {
+                    // Specific case for multiselect.
+                    if (d.value !== "_qf__force_multiselect_submission") {
+                        let filtertype = 'customfield';
+                        if (filtername[1].includes('_ftext_')) {
+                            filtertype = 'fulltext';
                         }
+                        filterarray.push({
+                            'type': filtertype,
+                            'search': {
+                                'field': filtername[1],
+                                'value': d.value
+                            }
+                        });
                     }
                 }
             }
         }
-    )
-    ;
+    );
     const sortfield = data.find((d) => d.name === 'sort');
     if (sortfield && sortfield.value) {
         const sortfieldspec = sortfield.value.match(/^(.+)-(.+)/);
