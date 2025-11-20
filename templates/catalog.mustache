@@ -32,6 +32,31 @@
         "filterform": "<form></form>"
     }
 }}
+<div class="d-flex align-items-center">
+    <div class="custom-control custom-switch ml-auto">
+        <input type="checkbox" class="custom-control-input" id="catalog-extendedmode" data-action="extendedmode" {{#extendedmodus}}checked{{/extendedmodus}}>
+        <label class="custom-control-label" for="catalog-extendedmode" data-action="extendedmode" {{#extendedmodus}}checked{{/extendedmodus}}>{{#str}}extendedmode, local_envasyllabus{{/str}}</label>
+    </div>
+
+    <div class="btn-toolbar ml-3" role="toolbar" aria-label="Toolbar with button groups" data-region="catalogueviewtoggle">
+        <div class="btn-group mr-2" role="group" aria-label="First group">
+            <button type="button" data-action="listview" class="btn btn-secondary icon-no-margin {{#listview}}active{{/listview}}" title="{{#str}}listview, local_envasyllabus{{/str}}">
+                <i class="icon fas fa fa-bars"></i>
+            </button>
+            <button type="button" data-action="gridview" class="btn btn-secondary icon-no-margin {{#gridview}}active{{/gridview}}" title="{{#str}}gridview, local_envasyllabus{{/str}}">
+                <i class="icon fas fa fa-th"></i>
+            </button>
+        </div>
+    </div>
+    {{#canexport}}
+        {{>local_envasyllabus/export_button}}
+    {{/canexport}}
+    <div class="local-envasyllabus-language-switcher ml-3">
+        {{#languageswitcher}}
+            {{>core/single_select}}
+        {{/languageswitcher}}
+    </div>
+</div>
 <div id="catalog-{{uniqid}}">
     <div data-region="catalog-filter" id="catalog-filter-{{uniqid}}">
         {{{filterform}}}
@@ -42,7 +67,7 @@
         {{/js}}
     </div>
     <div data-region="catalog-view-content" id="catalog-content-{{uniqid}}">
-        <div class="catalog-courses" data-category-root-id="{{categoryrootid}}" {{#currentlang}}data-current-lang="{{.}}"{{/currentlang}}>
+        <div class="catalog-courses" data-viewtype="{{viewtype}}" data-modus="{{modus}}" data-category-root-id="{{categoryrootid}}" {{#currentlang}}data-current-lang="{{.}}"{{/currentlang}}>
             <div class="card-deck dashboard-card-deck one-row overflow-hidden" style="height: 350px">
                 {{> core_course/placeholder-course }}
                 {{> core_course/placeholder-course }}
@@ -57,4 +82,3 @@ require(['local_envasyllabus/catalog'], function(Catalog) {
     Catalog.init('catalog-content-{{uniqid}}');
 });
 {{/js}}
-

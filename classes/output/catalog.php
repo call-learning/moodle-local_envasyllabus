@@ -20,6 +20,9 @@ use renderable;
 use renderer_base;
 use stdClass;
 use templatable;
+use context_system;
+use moodle_url;
+use local_envasyllabus\output\language_switcher;
 
 /**
  * Catalog page
@@ -29,7 +32,6 @@ use templatable;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catalog implements renderable, templatable {
-
     /**
      * Default course category
      */
@@ -41,11 +43,31 @@ class catalog implements renderable, templatable {
     private $currentlang;
 
     /**
+     * @var bool $listview
+     */
+    private $listview = false;
+
+    /**
+     * @var string $modus
+     */
+    private $modus = 'normal';
+
+    /**
+     * @var bool $gridview
+     */
+    private $gridview = true;
+
+    /**
      * Current lang
      *
      * @param string $currentlang
      */
     public function __construct($currentlang = '') {
+        $this->listview = optional_param('listview', false, PARAM_BOOL);
+        if ($this->listview) {
+            $this->gridview = false;
+        }
+        $this->modus = optional_param('modus', 'normal', PARAM_TEXT);
         $this->currentlang = $currentlang;
     }
     /**
@@ -58,9 +80,22 @@ class catalog implements renderable, templatable {
     public function export_for_template(renderer_base $output) {
         $context = new stdClass();
         $filterform = new \local_envasyllabus\form\catalog_filter_form();
+        $filterform->set_display_vertical();
         $context->filterform = $filterform->render();
         $context->categoryrootid = get_config('local_envasyllabus', 'rootcategoryid');
         $context->currentlang = $this->currentlang ?? '';
+        $context->viewtype = $this->listview ? 'list' : 'grid';
+        $context->modus = $this->modus;
+        $context->extendedmodus = $this->modus === 'extended';
+        $context->normalmodus = $this->modus === 'normal';
+        $context->listview = $this->listview;
+        $context->gridview = $this->gridview;
+        $context->canexport = has_capability(
+            'local/envasyllabus:exportcatalog',
+            context_system::instance()
+        );
+        $languageswitcher = new language_switcher();
+        $context->languageswitcher = $languageswitcher->export_for_template($output);
         return $context;
     }
 }

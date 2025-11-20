@@ -15,12 +15,13 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * A list of all syllabus
+ * Plugin index page
  *
- * @package     local_envasyllabus
- * @copyright   2022 CALL Learning - Laurent David <laurent@call-learning>
- * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    local_envasyllabus
+ * @copyright  2025 Bas Brands
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(__DIR__ . '/../../config.php');
 global $CFG, $DB, $PAGE;
 
@@ -32,13 +33,12 @@ global $OUTPUT;
 $PAGE->set_title($title);
 $PAGE->set_url(new moodle_url('/local/enva_syllabus/index.php'));
 $PAGE->set_heading($title);
-$languageswitcher = new \local_envasyllabus\output\language_switcher();
+$languageswitcher = new \local_envasyllabus\output\language_switcher(true);
 $catalog = new \local_envasyllabus\output\catalog($languageswitcher->get_current_langcode());
 $renderer = $PAGE->get_renderer('local_envasyllabus');
 
 $PAGE->set_secondary_navigation(false);
 echo $OUTPUT->header();
-echo $OUTPUT->box($renderer->render($languageswitcher), 'generalbox syllabus-additional-buttons');
 
 $languageswitcher->set_lang();
 echo $renderer->render($catalog);

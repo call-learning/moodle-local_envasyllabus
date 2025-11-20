@@ -24,7 +24,7 @@ import * as repository from './repository';
 import {exception as displayException} from 'core/notification';
 import Templates from "core/templates";
 import Config from 'core/config';
-
+import $ from 'jquery';
 /**
  * Initialise catalog
  *
@@ -43,6 +43,50 @@ export const init = (catalogTagId) => {
             refreshCoursesList(catalogTagId, eventData.detail);
         }
     });
+    const toggleButtonRegions = document.querySelector('[data-region="catalogueviewtoggle"]');
+    const listViewButton = toggleButtonRegions.querySelector('[data-action="listview"]');
+    const gridViewButton = toggleButtonRegions.querySelector('[data-action="gridview"]');
+    listViewButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        listViewButton.classList.add('active');
+        gridViewButton.classList.remove('active');
+        const catalogCourseTag = getCatalogCourseTag(catalogTagId);
+        catalogCourseTag.dataset.viewtype = 'list';
+        updateUrl('listview', '1');
+        refreshCoursesList(catalogTagId);
+    });
+    gridViewButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        listViewButton.classList.remove('active');
+        gridViewButton.classList.add('active');
+        const catalogCourseTag = getCatalogCourseTag(catalogTagId);
+        catalogCourseTag.dataset.viewtype = 'grid';
+        updateUrl('listview', '0');
+        refreshCoursesList(catalogTagId);
+    });
+    const extendedModeCheckbox = document.getElementById('catalog-extendedmode');
+    extendedModeCheckbox.addEventListener('change', (event) => {
+        const catalogCourseTag = getCatalogCourseTag(catalogTagId);
+        catalogCourseTag.dataset.modus = event.target.checked ? 'extended' : 'normal';
+        updateUrl('modus', event.target.checked ? 'extended' : 'normal');
+        refreshCoursesList(catalogTagId);
+    });
+    document.addEventListener('click', async(event) => {
+        const popOvers = document.querySelectorAll('[data-toggle="popover"]');
+        const currentPopover = event.target.closest('[data-toggle="popover"]');
+        if (popOvers.length > 0) {
+            popOvers.forEach((popover) => {
+                if (popover !== currentPopover) {
+                    $(popover).popover('hide');
+                }
+            });
+        }
+    });
+};
+
+const getCatalogCourseTag = (catalogTagId) => {
+    const catalogNode = document.getElementById(catalogTagId);
+    return catalogNode.querySelector('.catalog-courses');
 };
 
 const refreshCoursesList = (catalogTagId, filterParams = {}) => {
@@ -51,19 +95,24 @@ const refreshCoursesList = (catalogTagId, filterParams = {}) => {
     const rootCategoryId = JSON.parse(catalogCourseTag.dataset.categoryRootId);
     const currentLang = catalogCourseTag.dataset.currentLang;
     repository.getCoursesForCategoryId(rootCategoryId, filterParams, currentLang).then(
-        (courses) => renderCourses(catalogCourseTag, courses)).catch(displayException);
+        (data) => renderCourses(catalogCourseTag, data)).catch(displayException);
 };
 /**
  * Render all courses
  *
  * @param {Object} element element to render into
- * @param {Array} courses list of courses with data
+ * @param {Array} data list of courses with data
  */
-const renderCourses = (element, courses) => {
+const renderCourses = (element, data) => {
     Templates.render('local_envasyllabus/catalog_course_categories', {
-        sortedCourses: buildCourseList(courses)
+        sortedCourses: buildCourseList(data.courses),
+        programmecolumns: data.programmecolumns,
+        gridview: (element.dataset.viewtype == 'grid'),
+        listview: (element.dataset.viewtype == 'list'),
+        normalmodus: (element.dataset.modus == 'normal'),
+        extendedmodus: (element.dataset.modus == 'extended'),
     }).then((html, js) => {
-        Templates.replaceNodeContents(element, html, js);
+        return Templates.replaceNodeContents(element, html, js);
     }).catch(displayException);
 };
 
@@ -143,4 +192,20 @@ const findValueForCustomField = (course, cfsname, defaultValue = null) => {
         }
     }
     return defaultValue;
+};
+
+/**
+ * Update the current page URL with the selected query parameters
+ *
+ * @param {String} key
+ * @param {String} value
+ */
+const updateUrl = (key, value) => {
+    const url = new URL(window.location.href);
+    if (value) {
+        url.searchParams.set(key, value);
+    } else {
+        url.searchParams.delete(key);
+    }
+    window.history.pushState({}, '', url);
 };

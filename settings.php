@@ -33,19 +33,20 @@ if ($hassiteconfig) {
     // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
     // General settings.
     $pagedesc = get_string('generalsettings', 'local_envasyllabus');
-    $generalsettingspage = new admin_settingpage('envasyllabusgeneral',
+    $generalsettingspage = new admin_settingpage(
+        'envasyllabusgeneral',
         $pagedesc,
         'moodle/site:config',
-        empty($CFG->enableenvasyllabus));
+        empty($CFG->enableenvasyllabus)
+    );
 
     $ADMIN->add('localplugins', $generalsettingspage);
     if ($ADMIN->fulltree) {
         if (!during_initial_install()) {
-            $categories = array_map(function($cat) {
+            $categories = array_map(function ($cat) {
                 return $cat->get_formatted_name();
             },
-                core_course_category::get_all()
-            );
+                core_course_category::get_all());
             $settingname = get_string('rootcategoryid', 'local_envasyllabus');
             $settingdescription = get_string('rootcategoryid_desc', 'local_envasyllabus');
             $rootcategoryid = new admin_setting_configselect(
@@ -59,7 +60,10 @@ if ($hassiteconfig) {
             if (class_exists('\local_competvetsuivi\matrix\matrix')) {
                 global $DB;
                 $matrixall = $DB->get_records_menu(
-                    \local_competvetsuivi\matrix\matrix::CLASS_TABLE, null, 'timemodified ASC', 'id, fullname'
+                    \local_competvetsuivi\matrix\matrix::CLASS_TABLE,
+                    null,
+                    'timemodified ASC',
+                    'id, fullname'
                 );
                 $settingname = get_string('defaultmatrixid', 'local_envasyllabus');
                 $settingdescription = get_string('defaultmatrixid_desc', 'local_envasyllabus');
@@ -85,12 +89,80 @@ if ($hassiteconfig) {
                 join(',', visibility::PUBLIC_SYLLABUS_FIELDS)
             );
             $generalsettingspage->add($publicfields);
+
+            $settingname = get_string('enablenewprogramme', 'local_envasyllabus');
+            $settingdescription = get_string('enablenewprogramme_desc', 'local_envasyllabus');
+            $enablenewprogramme = new admin_setting_configcheckbox(
+                'local_envasyllabus/enablenewprogramme',
+                $settingname,
+                $settingdescription,
+                false
+            );
+            $generalsettingspage->add($enablenewprogramme);
+            $settingname = get_string('enablenewprogrammeforcourse', 'local_envasyllabus');
+            $settingdescription = get_string('enablenewprogrammeforcourse_desc', 'local_envasyllabus');
+            $newprogrammecourses = new admin_setting_configtext(
+                'local_envasyllabus/enablenewprogrammeforcourse',
+                $settingname,
+                $settingdescription,
+                ''
+            );
+            $generalsettingspage->add($newprogrammecourses);
+
+            // Spreadsheet email settings.
+            $generalsettingspage->add(new admin_setting_heading(
+                'spreadsheet_email_heading',
+                get_string('spreadsheet_email_settings', 'local_envasyllabus'),
+                get_string('spreadsheet_email_settings_desc', 'local_envasyllabus')
+            ));
+
+            $generalsettingspage->add(new admin_setting_configcheckbox(
+                'local_envasyllabus/spreadsheet_email_enabled',
+                get_string('spreadsheet_email_enabled', 'local_envasyllabus'),
+                get_string('spreadsheet_email_enabled_desc', 'local_envasyllabus'),
+                0
+            ));
+
+            $generalsettingspage->add(new admin_setting_configtextarea(
+                'local_envasyllabus/spreadsheet_recipients',
+                get_string('spreadsheet_recipients', 'local_envasyllabus'),
+                get_string('spreadsheet_recipients_desc', 'local_envasyllabus'),
+                ''
+            ));
+
+            $generalsettingspage->add(new admin_setting_configcheckbox(
+                'local_envasyllabus/spreadsheet_extended_mode',
+                get_string('spreadsheet_extended_mode', 'local_envasyllabus'),
+                get_string('spreadsheet_extended_mode_desc', 'local_envasyllabus'),
+                0
+            ));
+
+            $generalsettingspage->add(new admin_setting_configselect(
+                'local_envasyllabus/spreadsheet_lang',
+                get_string('spreadsheet_lang', 'local_envasyllabus'),
+                get_string('spreadsheet_lang_desc', 'local_envasyllabus'),
+                'fr',
+                ['en' => 'English', 'fr' => 'Français']
+            ));
+
+            // Link to file management page.
+            $manageurl = new moodle_url('/local/envasyllabus/manage_files.php');
+            $generalsettingspage->add(new admin_setting_description(
+                'manage_files_link',
+                get_string('manage_spreadsheets', 'local_envasyllabus'),
+                html_writer::link(
+                    $manageurl,
+                    get_string('manage_spreadsheets', 'local_envasyllabus'),
+                    ['class' => 'btn btn-primary mb-3']
+                )
+            ));
         }
     }
     $optionalsubsystems = $ADMIN->locate('optionalsubsystems');
-    $optionalsubsystems->add(new admin_setting_configcheckbox('enableenvasyllabus',
-            new lang_string('enableenvasyllabus', 'local_envasyllabus'),
-            new lang_string('enableenvasyllabus_help', 'local_envasyllabus'),
-            1)
-    );
+    $optionalsubsystems->add(new admin_setting_configcheckbox(
+        'enableenvasyllabus',
+        new lang_string('enableenvasyllabus', 'local_envasyllabus'),
+        new lang_string('enableenvasyllabus_help', 'local_envasyllabus'),
+        1
+    ));
 }

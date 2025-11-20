@@ -31,7 +31,7 @@ export const init = (courseId) => {
     const summaryTag = document.querySelector('.header-actions-container');
     const url = Config.wwwroot + '/local/envasyllabus/syllabuspage.php?id=' + courseId;
     Templates.render('local_envasyllabus/syllabus_button', {
-        url: url
+        url: url,
     }).then((html, js) => {
         Templates.appendNodeContents(summaryTag, html, js);
         return '';

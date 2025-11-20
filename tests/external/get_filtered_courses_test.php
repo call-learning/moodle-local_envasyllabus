@@ -13,11 +13,17 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace local_envasyllabus\external;
+
+defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
+use core_course\customfield\course_handler;
 use core_external\external_api;
+use local_envasyllabus\tests\test_helper;
+use local_envasyllabus\utils;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
 
@@ -29,146 +35,13 @@ require_once($CFG->dirroot . '/webservice/tests/helpers.php');
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers \local_envasyllabus\external\get_filtered_courses
  */
-class get_filtered_courses_test extends \externallib_advanced_testcase {
+final class get_filtered_courses_test extends \externallib_advanced_testcase {
+    use test_helper;
+
     /**
      * Max categories
      */
     const MAX_CAT = 5;
-    /**
-     * Course definition
-     */
-    const COURSES_DEF = [
-        [
-            'visible' => 1,
-            'category' => 'CAT1',
-            'fullname' => 'UC0211 - Anatomie de l\'encolure et du tronc',
-            'shortname' => 'UC0211',
-            'customfields' => [
-                'uc_nombre' => 'UC0211',
-                'uc_titre_en' => 'Neck and Trunk Anatomy',
-                'uc_acronyme' => 'ANAT ET',
-                'uc_annee' => '1',
-                'uc_semestre' => '1',
-            ],
-        ],
-        [
-            'visible' => 1,
-            'category' => 'CAT1',
-            'fullname' => 'UC0101 - Fundamentals of Veterinary Medicine',
-            'shortname' => 'UC0101',
-            'customfields' => [
-                'uc_nombre' => 'UC0101',
-                'uc_titre_en' => 'Basics of Veterinary Medicine',
-                'uc_acronyme' => 'BVM',
-                'uc_annee' => '1',
-                'uc_semestre' => '1',
-            ],
-        ],
-        [
-            'visible' => 1,
-            'category' => 'CAT1',
-            'fullname' => 'UC0102 - Animal Nutrition and Diet',
-            'shortname' => 'UC0102',
-            'customfields' => [
-                'uc_nombre' => 'UC0102',
-                'uc_titre_en' => 'Animal Nutrition and Diet',
-                'uc_acronyme' => 'AND',
-                'uc_annee' => '1',
-                'uc_semestre' => '2',
-            ],
-        ],
-        [
-            'visible' => 1,
-            'category' => 'CAT1',
-            'fullname' => 'UC0103 - Introduction to Veterinary Epidemiology',
-            'shortname' => 'UC0103',
-            'customfields' => [
-                'uc_nombre' => 'UC0103',
-                'uc_titre_en' => 'Introduction to Veterinary Epidemiology',
-                'uc_acronyme' => 'IVE',
-                'uc_annee' => '1',
-                'uc_semestre' => '1',
-            ],
-        ],
-        [
-            'visible' => 1,
-            'category' => 'CAT2',
-            'fullname' => 'UC0201 - Small Animal Surgery',
-            'shortname' => 'UC0201',
-            'customfields' => [
-                'uc_nombre' => 'UC0201',
-                'uc_titre_en' => 'Small Animal Surgery',
-                'uc_acronyme' => 'SAS',
-                'uc_annee' => '2',
-                'uc_semestre' => '1',
-            ],
-        ],
-        [
-            'visible' => 1,
-            'category' => 'CAT3',
-            'fullname' => 'UC0202 - Large Animal Medicine',
-            'shortname' => 'UC0202',
-            'customfields' => [
-                'uc_nombre' => 'UC0202',
-                'uc_titre_en' => 'Large Animal Medicine',
-                'uc_acronyme' => 'LAM',
-                'uc_annee' => '2',
-                'uc_semestre' => '2',
-            ],
-        ],
-        [
-            'visible' => 1,
-            'category' => 'CAT3',
-            'fullname' => 'UC0203 - Veterinary Pharmacology',
-            'shortname' => 'UC0203',
-            'customfields' => [
-                'uc_nombre' => 'UC0203',
-                'uc_titre_en' => 'Veterinary Pharmacology',
-                'uc_acronyme' => 'VPH',
-                'uc_annee' => '2',
-                'uc_semestre' => '1',
-            ],
-        ],
-        [
-            'visible' => 1,
-            'category' => 'CAT3',
-            'fullname' => 'UC0104 - Veterinary Microbiology',
-            'shortname' => 'UC0104',
-            'customfields' => [
-                'uc_nombre' => 'UC0104',
-                'uc_titre_en' => 'Veterinary Microbiology',
-                'uc_acronyme' => 'VMIC',
-                'uc_annee' => '1',
-                'uc_semestre' => '2',
-            ],
-        ],
-        [
-            'visible' => 1,
-            'category' => 'CAT1',
-            'fullname' => 'UC0105 - Animal Behavior and Welfare',
-            'shortname' => 'UC0105',
-            'customfields' => [
-                'uc_nombre' => 'UC0105',
-                'uc_titre_en' => 'Animal Behavior and Welfare',
-                'uc_acronyme' => 'ABW',
-                'uc_annee' => '1',
-                'uc_semestre' => '2',
-            ],
-        ],
-        [
-            'visible' => 0,
-            'category' => 'CAT3',
-            'fullname' => 'UC0204 - Veterinary Pathology',
-            'shortname' => 'UC0204',
-            'customfields' => [
-                'uc_nombre' => 'UC0204',
-                'uc_titre_en' => 'Veterinary Pathology',
-                'uc_acronyme' => 'VPATH',
-                'uc_annee' => '1',
-                'uc_semestre' => '1',
-            ],
-        ],
-    ];
     /**
      * @var array $categories all categories
      */
@@ -177,23 +50,12 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
      * @var array $courses course lst
      */
     protected $courses = [];
-
-    /**
-     * Setup for test
-     */
-    public function setUp(): void {
-        parent::setUp();
-        $this->resetAfterTest();
-        $this->create_courses_categories();
-    }
-
     /**
      * Create courses and categories
      *
      * @return void
      */
-    public function create_courses_categories() {
-        $generator = $this->getDataGenerator();
+    public function create_courses_and_categories(): void {
         for ($catindex = 1; $catindex < self::MAX_CAT; $catindex++) {
             $catdef = ['idnumber' => 'CAT' . $catindex];
             if ($catindex > 1 && ($catindex % 2)) {
@@ -203,19 +65,10 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
             $this->categories['CAT' . $catindex] = $category;
         }
         $this->courses = [];
-        foreach (self::COURSES_DEF as $cdef) {
-            $cdef['category'] = empty($cdef['category']) ? $this->categories['CAT1']->id : $this->categories[$cdef['category']]->id;
-            $customfields = $cdef['customfields'];
-            $cdef['customfields'] = [];
-            foreach ($customfields as $key => $value) {
-                $cdef['customfields'][] = [
-                    'shortname' => $key,
-                    'value' => $value,
-                ];
-            }
-            $course = $generator->create_course(
-                $cdef
-            );
+        $json = file_get_contents(self::get_fixture_path('local_envasyllabus', 'course-list.json'));
+        $coursesdef = json_decode($json, true);
+        foreach ($coursesdef as $cdef) {
+            $course = $this->create_course_from_def($cdef);
             $this->courses[] = $course;
         }
     }
@@ -223,7 +76,7 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
     /**
      * Test execute API CALL with no instance
      */
-    public function test_execute_no_courses() {
+    public function test_execute_no_courses(): void {
         $this->resetAfterTest();
         $this->expectException('require_login_exception');
         $courses = $this->get_filtered_courses(0);
@@ -244,15 +97,16 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
     /**
      * Test execute API CALL when login as admin and a simple user
      */
-    public function test_get_all_courses() {
+    public function test_get_all_courses(): void {
         $this->resetAfterTest();
+        $this->create_courses_and_categories();
         $this->setAdminUser();
-        $courses = $this->get_filtered_courses($this->categories['CAT1']->id);
-        $this->assertCount(9, $courses);
+        $filter = $this->get_filtered_courses($this->categories['CAT1']->id);
+        $this->assertCount(9, $filter['courses']);
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
-        $courses = $this->get_filtered_courses($this->categories['CAT1']->id);
-        $this->assertCount(8, $courses);
+        $filter = $this->get_filtered_courses($this->categories['CAT1']->id);
+        $this->assertCount(8, $filter['courses']);
     }
 
     /**
@@ -261,10 +115,11 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
      * @param array $expected
      * @dataProvider filter_dataprovider
      */
-    public function test_get_filtered_courses($filters, $expected) {
+    public function test_get_filtered_courses($filters, $expected): void {
         $this->resetAfterTest();
+        $this->create_courses_and_categories();
         foreach ($expected as $usertype => $expectedcount) {
-            switch($usertype) {
+            switch ($usertype) {
                 case 'admin':
                     $this->setAdminUser();
                     break;
@@ -276,8 +131,8 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
                     $this->setUser($user);
                     break;
             }
-            $courses = $this->get_filtered_courses($this->categories['CAT1']->id, 'fr', $filters);
-            $this->assertCount($expectedcount, $courses);
+            $filter = $this->get_filtered_courses($this->categories['CAT1']->id, 'fr', $filters);
+            $this->assertCount($expectedcount, $filter['courses']);
         }
     }
 
@@ -288,13 +143,14 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
      * @param array $expected
      * @dataProvider filter_dataprovider
      */
-    public function test_get_filtered_courses_for_user($filters, $expected) {
+    public function test_get_filtered_courses_for_user($filters, $expected): void {
         $this->resetAfterTest();
+        $this->create_courses_and_categories();
         $this->setAdminUser();
         // Search courses as admin first. This is to check if there are no side effect to the cache.
         $this->get_filtered_courses($this->categories['CAT1']->id, 'fr', $filters);
         foreach ($expected as $usertype => $expectedcount) {
-            switch($usertype) {
+            switch ($usertype) {
                 case 'admin':
                     $this->setAdminUser();
                     break;
@@ -306,31 +162,34 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
                     $this->setUser($user);
                     break;
             }
-            $courses = $this->get_filtered_courses($this->categories['CAT1']->id, 'fr', $filters);
-            $this->assertCount($expectedcount, $courses);
+            $filter = $this->get_filtered_courses($this->categories['CAT1']->id, 'fr', $filters);
+            $this->assertCount($expectedcount, $filter['courses']);
         }
     }
 
     /**
      * Test execute API CALL to get filtered courses sorted by year
-     * @param string $cfname
-     * @param string $sortorder
+     *
+     * @param string $field
+     * @param string $order
      * @param array $expected
      * @dataProvider sort_dataprovider
      */
-    public function test_get_filtered_courses_sort(string $cfname, string $sortorder, array $expected) {
+    public function test_get_filtered_courses_sort(string $field, string $order, array $expected): void {
         $this->resetAfterTest();
+        $this->create_courses_and_categories();
         $this->setAdminUser();
-        $courses = $this->get_filtered_courses(
+        $filter = $this->get_filtered_courses(
             $this->categories['CAT1']->id,
             'fr',
             [],
-            ['field' => "customfield_" . $cfname, 'order' => $sortorder]
+            ['field' => "customfield_" . $field, 'order' => $order]
         );
+        $courses = $filter['courses'];
         $this->assertCount(9, $courses);
-        $courseyears = array_map(function($course) use ($cfname) {
+        $courseyears = array_map(function ($course) use ($field) {
             foreach ($course['customfields'] as $customfield) {
-                if ($customfield['shortname'] == $cfname) {
+                if ($customfield['shortname'] == $field) {
                     return $customfield['value'];
                 }
             }
@@ -403,5 +262,48 @@ class get_filtered_courses_test extends \externallib_advanced_testcase {
                 ],
             ],
         ];
+    }
+
+    /**
+     * Test the programme sum calculation
+     */
+    public function test_programme_sum(): void {
+        $this->resetAfterTest();
+        $category = $this->getDataGenerator()->create_category();
+        $json = file_get_contents(self::get_fixture_path('local_envasyllabus', 'sample-course.json'));
+        $coursedef = json_decode($json, true);
+        $coursedef['category'] = $category->id;
+        $course = $this->create_course_from_def($coursedef);
+        $coursecfs = course_handler::create()->get_instance_data($course->id, true);
+        $sprogrammefield = utils::get_programme_customfield($coursecfs);
+        $programmesums = [];
+        if ($sprogrammefield && $sprogrammefield->get('id')) {
+            $programmesums = $sprogrammefield->get_sum();
+        }
+        $refgetfilter = new \ReflectionClass(get_filtered_courses::class);
+        $refmethod = $refgetfilter->getMethod('process_programme_values');
+        $refmethod->setAccessible(true);
+        $programmesumsforcourse = $refmethod->invoke(null, $programmesums);
+        // On ne garde que les colonnes et les sommes pour la comparaison.
+        $expected = [
+            'cm' => 18,
+            'td' => 26,
+            'tp' => 2,
+            'tpa' => 20,
+            'tc' => 0,
+            'aas' => 11,
+            'fmp' => 0,
+            'perso' => 95.5,
+            'active' => 76,
+            'total' => 172.5,
+        ];
+        $this->assertEquals(
+            $expected,
+            array_column(
+                $programmesumsforcourse,
+                'sum',
+                'column'
+            )
+        );
     }
 }

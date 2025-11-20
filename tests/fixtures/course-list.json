@@ -1,0 +1,132 @@
+[
+  {
+    "visible": 1,
+    "category": "CAT1",
+    "fullname": "UC0211 - Anatomie de l'encolure et du tronc",
+    "shortname": "UC0211",
+    "customfields": {
+      "uc_nombre": "UC0211",
+      "uc_titre_en": "Neck and Trunk Anatomy",
+      "uc_acronyme": "ANAT ET",
+      "uc_annee": "1",
+      "uc_semestre": "1"
+    }
+  },
+  {
+    "visible": 1,
+    "category": "CAT1",
+    "fullname": "UC0101 - Fundamentals of Veterinary Medicine",
+    "shortname": "UC0101",
+    "customfields": {
+      "uc_nombre": "UC0101",
+      "uc_titre_en": "Basics of Veterinary Medicine",
+      "uc_acronyme": "BVM",
+      "uc_annee": "1",
+      "uc_semestre": "1"
+    }
+  },
+  {
+    "visible": 1,
+    "category": "CAT1",
+    "fullname": "UC0102 - Animal Nutrition and Diet",
+    "shortname": "UC0102",
+    "customfields": {
+      "uc_nombre": "UC0102",
+      "uc_titre_en": "Animal Nutrition and Diet",
+      "uc_acronyme": "AND",
+      "uc_annee": "1",
+      "uc_semestre": "2"
+    }
+  },
+  {
+    "visible": 1,
+    "category": "CAT1",
+    "fullname": "UC0103 - Introduction to Veterinary Epidemiology",
+    "shortname": "UC0103",
+    "customfields": {
+      "uc_nombre": "UC0103",
+      "uc_titre_en": "Introduction to Veterinary Epidemiology",
+      "uc_acronyme": "IVE",
+      "uc_annee": "1",
+      "uc_semestre": "1"
+    }
+  },
+  {
+    "visible": 1,
+    "category": "CAT2",
+    "fullname": "UC0201 - Small Animal Surgery",
+    "shortname": "UC0201",
+    "customfields": {
+      "uc_nombre": "UC0201",
+      "uc_titre_en": "Small Animal Surgery",
+      "uc_acronyme": "SAS",
+      "uc_annee": "2",
+      "uc_semestre": "1"
+    }
+  },
+  {
+    "visible": 1,
+    "category": "CAT3",
+    "fullname": "UC0202 - Large Animal Medicine",
+    "shortname": "UC0202",
+    "customfields": {
+      "uc_nombre": "UC0202",
+      "uc_titre_en": "Large Animal Medicine",
+      "uc_acronyme": "LAM",
+      "uc_annee": "2",
+      "uc_semestre": "2"
+    }
+  },
+  {
+    "visible": 1,
+    "category": "CAT3",
+    "fullname": "UC0203 - Veterinary Pharmacology",
+    "shortname": "UC0203",
+    "customfields": {
+      "uc_nombre": "UC0203",
+      "uc_titre_en": "Veterinary Pharmacology",
+      "uc_acronyme": "VPH",
+      "uc_annee": "2",
+      "uc_semestre": "1"
+    }
+  },
+  {
+    "visible": 1,
+    "category": "CAT3",
+    "fullname": "UC0104 - Veterinary Microbiology",
+    "shortname": "UC0104",
+    "customfields": {
+      "uc_nombre": "UC0104",
+      "uc_titre_en": "Veterinary Microbiology",
+      "uc_acronyme": "VMIC",
+      "uc_annee": "1",
+      "uc_semestre": "2"
+    }
+  },
+  {
+    "visible": 1,
+    "category": "CAT1",
+    "fullname": "UC0105 - Animal Behavior and Welfare",
+    "shortname": "UC0105",
+    "customfields": {
+      "uc_nombre": "UC0105",
+      "uc_titre_en": "Animal Behavior and Welfare",
+      "uc_acronyme": "ABW",
+      "uc_annee": "1",
+      "uc_semestre": "2"
+    }
+  },
+  {
+    "visible": 0,
+    "category": "CAT3",
+    "fullname": "UC0204 - Veterinary Pathology",
+    "shortname": "UC0204",
+    "customfields": {
+      "uc_nombre": "UC0204",
+      "uc_titre_en": "Veterinary Pathology",
+      "uc_acronyme": "VPATH",
+      "uc_annee": "1",
+      "uc_semestre": "1"
+    }
+  }
+]

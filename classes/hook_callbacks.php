@@ -34,7 +34,6 @@ class hook_callbacks {
     public static function before_standard_top_of_body_html_generation(before_standard_top_of_body_html_generation $hook): void {
         global $PAGE;
 
-
         if (!isguestuser() && !isloggedin()) {
             return;
         }
@@ -42,7 +41,8 @@ class hook_callbacks {
         $context = $PAGE->context;
         if ($context->contextlevel == CONTEXT_COURSE && $context->instanceid != SITEID) {
             if (strpos(trim(strtolower($PAGE->course->shortname)), 'uc') === 0) {
-                $PAGE->requires->js_call_amd('local_envasyllabus/syllabus_button', 'init', [$PAGE->course->id]);
+                $canedit = has_capability('customfield/sprogramme:edit', $context);
+                $PAGE->requires->js_call_amd('local_envasyllabus/syllabus_button', 'init', [$PAGE->course->id, $canedit]);
             }
         }
     }

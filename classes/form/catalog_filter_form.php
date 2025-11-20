@@ -27,7 +27,6 @@ use core_customfield\field_controller;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class catalog_filter_form extends \moodleform {
-
     /**
      * Filterable course fields
      */
@@ -65,7 +64,9 @@ class catalog_filter_form extends \moodleform {
             $filtername = 'filter_' . $cfname;
             $choices = $this->get_customfield_choices($cfname);
             $choices[''] = get_string('all');
-            $mform->addElement('autocomplete', $filtername,
+            $mform->addElement(
+                'autocomplete',
+                $filtername,
                 get_string('cf:' . $cfname, 'local_envasyllabus'),
                 $choices,
                 ['multiple' => true]
@@ -75,11 +76,13 @@ class catalog_filter_form extends \moodleform {
         $sorttypes = [];
         foreach (self::FIELDS_SORT as $sortfield) {
             foreach (self::SORT_ORDER as $sortorder) {
-                $sorttypes["{$sortfield}-{$sortorder}"] = get_string('sort:'.$sortfield, 'local_envasyllabus') . ' '
+                $sorttypes["{$sortfield}-{$sortorder}"] = get_string('sort:' . $sortfield, 'local_envasyllabus') . ' '
                     . ' - ' . get_string('sortorder' . $sortorder, 'local_envasyllabus');
             }
         }
-        $mform->addElement('select', 'sort',
+        $mform->addElement(
+            'select',
+            'sort',
             get_string('sort', 'local_envasyllabus'),
             $sorttypes
         );

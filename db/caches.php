@@ -29,9 +29,9 @@ $definitions = [
     // Used to store processed lang files.
     // The keys used are the revision, lang and component of the string file.
     // The static acceleration size has been based upon student access of the site.
-    'filteredcourses' => [
+    'courseinfo' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
-        'invalidationevents' => ['changesincourse', 'changesincoursecat'],
+        'invalidationevents' => ['changesincourse', 'customfield_sprogramme/changesinsprogramme'],
     ],
 ];

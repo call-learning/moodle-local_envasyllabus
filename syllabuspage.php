@@ -15,12 +15,13 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * A syllabus page
+ * Syllabus page display
  *
  * @package     local_envasyllabus
  * @copyright   2022 CALL Learning - Laurent David <laurent@call-learning>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 require_once(__DIR__ . '/../../config.php');
 global $CFG, $DB, $PAGE;
 // Get submitted parameters.
@@ -42,13 +43,16 @@ $PAGE->set_context(context_course::instance($courseid));
 $PAGE->set_secondary_navigation(false);
 if ($PAGE->user_allowed_editing()) {
     $editcoursebutton = new single_button(
-        new moodle_url('/course/edit.php', [
+        new moodle_url(
+            '/course/edit.php',
+            [
             'id' => $courseid,
             'returnto' => 'url',
             'returnurl' => $currenturl->out_as_local_url(),
             'sesskey' => sesskey(),
-        ],
-            'id_tagshdr'),
+            ],
+            'id_tagshdr'
+        ),
         get_string('editcoursesettings', 'moodle'),
         'get'
     );

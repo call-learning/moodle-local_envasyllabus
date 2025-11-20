@@ -25,10 +25,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_envasyllabus';
-$plugin->release = '0.1.2';
-$plugin->version = 2023081202;
+$plugin->release = '2.2.0';
+$plugin->version = 2025103101;
 $plugin->requires = 2020061500;
-$plugin->maturity = MATURITY_ALPHA;
+$plugin->maturity = MATURITY_STABLE;
 $plugin->dependencies = [
     'local_competvetsuivi' => ANY_VERSION,
+    'customfield_sprogramme' => ANY_VERSION, // Version of the customfield_sprogramme plugin.
 ];

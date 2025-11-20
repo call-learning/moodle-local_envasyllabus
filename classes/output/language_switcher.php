@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
 namespace local_envasyllabus\output;
 
 use moodle_url;
@@ -29,7 +30,6 @@ use templatable;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class language_switcher implements renderable, templatable {
-
     /**
      * Parameter name.
      */
@@ -44,6 +44,11 @@ class language_switcher implements renderable, templatable {
      * @var string $currentlang
      */
     private $currentlang;
+
+    /**
+     * @var string $previouslang
+     */
+    private $previouslang;
 
     /**
      * Constructor
@@ -70,8 +75,7 @@ class language_switcher implements renderable, templatable {
         $singleselect = new \single_select($this->currenturl, self::LANG_PARAMETER_NAME, [
             'fra' => get_string('syllabus:lang:system', 'local_envasyllabus'),
             'en' => get_string('syllabus:lang:english', 'local_envasyllabus'),
-        ], $this->currentlang, null
-        );
+        ], $this->currentlang, null);
         $singleselect->set_label($pixiconout);
         return $singleselect->export_for_template($output);
     }
