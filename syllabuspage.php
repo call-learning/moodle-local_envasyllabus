@@ -22,6 +22,8 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_envasyllabus\output\language_switcher;
+
 require_once(__DIR__ . '/../../config.php');
 global $CFG, $DB, $PAGE;
 // Get submitted parameters.
@@ -61,8 +63,8 @@ if ($PAGE->user_allowed_editing()) {
 }
 $renderer = $PAGE->get_renderer('local_envasyllabus');
 
-$languageswitcher = new \local_envasyllabus\output\language_switcher();
-$csyllabus = new \local_envasyllabus\output\course_syllabus($courseid, $languageswitcher->get_current_langcode());
+$languageswitcher = new language_switcher();
+$csyllabus = new \local_envasyllabus\output\course_syllabus($courseid,  language_switcher::get_current_langcode());
 
 $viewcoursebtn = new single_button(
     new moodle_url('/course/view.php', ['id' => $courseid]),
@@ -77,8 +79,8 @@ $additionalbuttons .= $OUTPUT->render($viewcoursebtn) . $OUTPUT->render($viewcat
 
 echo $OUTPUT->header();
 echo $OUTPUT->box($additionalbuttons, 'generalbox syllabus-additional-buttons');
-$languageswitcher->set_lang();
+language_switcher::set_lang();
 echo $renderer->render($csyllabus);
-$languageswitcher->reset_lang();
+language_switcher::reset_lang();
 echo $OUTPUT->footer();
 // See local/envasyllabus/syllabuspage.php?id=801 .

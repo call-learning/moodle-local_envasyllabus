@@ -46,16 +46,12 @@ class language_switcher implements renderable, templatable {
     private $currentlang;
 
     /**
-     * @var string $previouslang
-     */
-    private $previouslang;
-
-    /**
      * Constructor
      */
     public function __construct() {
-        global $FULLME;
-        $this->currentlang = optional_param(self::LANG_PARAMETER_NAME, '', PARAM_LANG);
+        global $FULLME, $SESSION;
+        $this->currentlang = optional_param(self::LANG_PARAMETER_NAME, 'en', PARAM_LANG);
+        $SESSION->syllabus_currentlang = $this->currentlang;
         $currenturl = new moodle_url($FULLME);
         $currenturl->remove_params([self::LANG_PARAMETER_NAME]);
         $this->currenturl = $currenturl;
@@ -85,14 +81,9 @@ class language_switcher implements renderable, templatable {
      *
      * @return void
      */
-    public function set_lang() {
+    public static function set_lang() {
         global $SESSION;
-        $this->previouslang = $SESSION->lang ?? null;
-        if ($this->currentlang) {
-            $SESSION->lang = $this->currentlang;
-        } else {
-            unset($SESSION->lang);
-        }
+        $SESSION->forcelang = $SESSION->syllabus_currentlang;
     }
 
     /**
@@ -100,12 +91,9 @@ class language_switcher implements renderable, templatable {
      *
      * @return void
      */
-    public function reset_lang() {
+    public static function reset_lang() {
         global $SESSION;
-        unset($SESSION->lang);
-        if (!empty($this->previouslang)) {
-            $SESSION->lang = $this->previouslang;
-        }
+        unset($SESSION->forcelang);
     }
 
     /**
@@ -113,7 +101,9 @@ class language_switcher implements renderable, templatable {
      *
      * @return string
      */
-    public function get_current_langcode(): string {
-        return $this->currentlang == 'fra' ? '' : $this->currentlang;
+    public static function get_current_langcode(): string {
+        global $SESSION;
+        $currentlang = isset($SESSION->syllabus_currentlang) ? $SESSION->syllabus_currentlang : 'fra';
+        return $currentlang;
     }
 }

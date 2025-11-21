@@ -22,6 +22,7 @@ use core_external\external_function_parameters;
 use core_external\external_single_structure;
 use core_external\external_value;
 use local_envasyllabus\output\excel_exporter;
+use local_envasyllabus\output\language_switcher;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 /**
@@ -53,7 +54,6 @@ class export_catalog extends external_api {
      */
     public static function execute($lang = 'en', $extended = false) {
         global $CFG;
-
         $params = self::validate_parameters(self::execute_parameters(), [
             'lang' => $lang,
             'extended' => $extended,
@@ -71,25 +71,29 @@ class export_catalog extends external_api {
 
         // Generate unique token for this download.
         $token = md5(uniqid(rand(), true));
+        language_switcher::set_lang();
+        try {
+            // Create the Excel file.
+            $exporter = new excel_exporter($categoryid, $params['extended'], $params['lang']);
+            $spreadsheet = $exporter->create_spreadsheet();
 
-        // Create the Excel file.
-        $exporter = new excel_exporter($categoryid, $params['extended'], $params['lang']);
-        $spreadsheet = $exporter->create_spreadsheet();
+            // Save to temp directory with token.
+            $tempdir = make_temp_directory('envasyllabus/exports');
+            $filename = 'syllabus_export_' . ($params['extended'] ? 'extended_' : 'basic_') .
+                $params['lang'] . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+            $filepath = $tempdir . '/' . $token . '_' . $filename;
 
-        // Save to temp directory with token.
-        $tempdir = make_temp_directory('envasyllabus/exports');
-        $filename = 'syllabus_export_' . ($params['extended'] ? 'extended_' : 'basic_') .
-                    $params['lang'] . '_' . date('Y-m-d_H-i-s') . '.xlsx';
-        $filepath = $tempdir . '/' . $token . '_' . $filename;
+            $writer = new Xlsx($spreadsheet);
+            $writer->save($filepath);
 
-        $writer = new Xlsx($spreadsheet);
-        $writer->save($filepath);
-
-        // Return the download URL with token.
-        $downloadurl = new \moodle_url('/local/envasyllabus/download.php', [
-            'token' => $token,
-            'filename' => $filename,
-        ]);
+            // Return the download URL with token.
+            $downloadurl = new \moodle_url('/local/envasyllabus/download.php', [
+                'token' => $token,
+                'filename' => $filename,
+            ]);
+        } finally {
+            language_switcher::reset_lang();
+        }
 
         return [
             'success' => true,

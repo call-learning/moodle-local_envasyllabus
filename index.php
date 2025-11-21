@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_envasyllabus\output\language_switcher;
+
 require_once(__DIR__ . '/../../config.php');
 global $CFG, $DB, $PAGE;
 
@@ -33,14 +35,14 @@ global $OUTPUT;
 $PAGE->set_title($title);
 $PAGE->set_url(new moodle_url('/local/enva_syllabus/index.php'));
 $PAGE->set_heading($title);
-$languageswitcher = new \local_envasyllabus\output\language_switcher(true);
-$catalog = new \local_envasyllabus\output\catalog($languageswitcher->get_current_langcode());
+$languageswitcher = new language_switcher(true);
+$catalog = new \local_envasyllabus\output\catalog(language_switcher::get_current_langcode());
 $renderer = $PAGE->get_renderer('local_envasyllabus');
 
 $PAGE->set_secondary_navigation(false);
 echo $OUTPUT->header();
 
-$languageswitcher->set_lang();
+language_switcher::set_lang();
 echo $renderer->render($catalog);
-$languageswitcher->reset_lang();
+language_switcher::reset_lang();
 echo $OUTPUT->footer();
