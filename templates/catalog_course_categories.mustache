@@ -63,6 +63,17 @@
                         {{#courses}}
                             {{>local_envasyllabus/table_course}}
                         {{/courses}}
+                        {{#totals}}
+                            <tr class="table-active font-weight-bold">
+                                <td colspan="3" class="text-right"><strong>Total</strong></td>
+                                <td class="ects-column"><strong>{{cf.uc_ects.value}}</strong></td>
+                                {{#extendedmodus}}
+                                    {{#programmevalues}}
+                                        <td class="column" data-id="{{column}}"><strong>{{sum}}</strong></td>
+                                    {{/programmevalues}}
+                                {{/extendedmodus}}
+                            </tr>
+                        {{/totals}}
                     </tbody>
                 </table>
             {{/listview}}
