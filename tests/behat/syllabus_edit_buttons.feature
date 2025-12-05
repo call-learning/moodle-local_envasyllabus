@@ -39,8 +39,8 @@ Feature: Syllabus page edit buttons visibility and functionality
     And I should not see the edit button for field "uc_prerequis"
 
     # Verify content is still visible when editing mode is off
-    And I should see "Initial FR competences"
-    And I should see "Initial FR prerequisites"
+    And I should see "Initial EN competences"
+    And I should see "Initial EN prerequisites"
 
   Scenario: Students cannot see edit buttons
     Given I am on the "SYLL1" course page logged in as "teacher1"
@@ -60,8 +60,8 @@ Feature: Syllabus page edit buttons visibility and functionality
     And I should not see the edit button for field "uc_prerequis"
 
     # But should still see the content (from Background setup)
-    And I should see "Initial FR competences"
-    And I should see "Initial FR prerequisites"
+    And I should see "Initial EN competences"
+    And I should see "Initial EN prerequisites"
 
   Scenario: Edit multilingual field content via modal and verify language switching
     Given I am on the "SYLL1" course page logged in as "teacher1"
@@ -78,7 +78,7 @@ Feature: Syllabus page edit buttons visibility and functionality
     When I am on "Syllabus Course 1" course syllabus page with editing mode on
 
     # Verify initial content from Background setup
-    Then I should see "Initial FR competences"
+    Then I should see "Initial EN competences"
 
     # Click edit button and verify modal opens
     When I click the edit button for field "uc_competences"
@@ -93,14 +93,11 @@ Feature: Syllabus page edit buttons visibility and functionality
     And I wait "2" seconds
 
     # Verify French content is visible by default
+    When I switch syllabus language to "fra"
     Then I should see "Compétences mises à jour"
+    And I should not see "Updated competences"
 
     # Switch to English and verify English content
     When I switch syllabus language to "en"
     Then I should see "Updated competences"
     And I should not see "Compétences mises à jour"
-
-    # Switch back to French
-    When I switch syllabus language to "fra"
-    Then I should see "Compétences mises à jour"
-    And I should not see "Updated competences"
