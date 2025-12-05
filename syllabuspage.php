@@ -64,7 +64,7 @@ if ($PAGE->user_allowed_editing()) {
 $renderer = $PAGE->get_renderer('local_envasyllabus');
 
 $languageswitcher = new language_switcher();
-$csyllabus = new \local_envasyllabus\output\course_syllabus($courseid,  language_switcher::get_current_langcode());
+$csyllabus = new \local_envasyllabus\output\course_syllabus($courseid, language_switcher::get_current_langcode());
 
 $viewcoursebtn = new single_button(
     new moodle_url('/course/view.php', ['id' => $courseid]),
