@@ -17,24 +17,42 @@
 {{!
     @template local_envasyllabus/table_course
 
-    TODO describe template table_course
+    Course row fragment for table display - must be used within a table element
 
     Example context (json):
     {
+        "displayname": "Course Name",
+        "syllabusurl": "https://example.com/course/view.php?id=1",
+        "cf": {
+            "uc_acronyme": {"value": "CS101"},
+            "uc_ects": {"value": "5"}
+        },
+        "managers": [{"fullname": "Teacher Name"}],
+        "extendedmodus": true,
+        "programmevalues": [{"column": "cm", "sum": "24"}],
+        "cionly": true
     }
 }}
-<tr class="course-row position-relative">
-    <td class="course-column">
-        <a class="stretched-link" href="{{{syllabusurl}}}">
-            {{{displayname}}}
-        </a>
-    </td>
-    <td class="acronym-column">{{cf.uc_acronyme.value}}</td>
-    <td class="responsible-column">{{#managers}}{{fullname}}<span class="separator">, </span>{{/managers}}</td>
-    <td class="ects-column"> {{cf.uc_ects.value}}</td>
-    {{#extendedmodus}}
-        {{#programmevalues}}
-            <td class="column" data-id="{{column}}">{{sum}}</td>
-        {{/programmevalues}}
-    {{/extendedmodus}}
-</tr>
+{{#cionly}}
+<table>
+    <tbody>
+{{/cionly}}
+        <tr class="course-row position-relative">
+            <td class="course-column">
+                <a class="stretched-link" href="{{{syllabusurl}}}">
+                    {{{displayname}}}
+                </a>
+            </td>
+            <td class="acronym-column">{{cf.uc_acronyme.value}}</td>
+            <td class="responsible-column">{{#managers}}{{fullname}}<span class="separator">, </span>{{/managers}}</td>
+            <td class="ects-column"> {{cf.uc_ects.value}}</td>
+            {{#extendedmodus}}
+                {{#programmevalues}}
+                    <td class="column" data-id="{{column}}">{{sum}}</td>
+                {{/programmevalues}}
+            {{/extendedmodus}}
+        </tr>
+{{#cionly}}
+    </tbody>
+</table>
+{{/cionly}}
