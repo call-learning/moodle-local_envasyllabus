@@ -51,6 +51,9 @@ require([
             });
             output._chartjs.update();
         }
+        return output;
+    }).catch(function(error) {
+        window.console.error('Chart rendering failed:', error);
     });
 });
 {{/js}}
