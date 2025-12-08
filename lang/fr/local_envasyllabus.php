@@ -32,6 +32,7 @@ $string['catalog:index'] = 'Catalogue';
 $string['cf:uc_annee'] = 'Année';
 $string['cf:uc_nombre'] = 'UC';
 $string['cf:uc_semestre'] = 'Semestre';
+$string['chartview'] = 'Vue graphique';
 $string['competency:rep::name'] = 'Compétence ({$a})';
 $string['competency:rep:percent'] = 'Pourcent Compétence ({$a})';
 $string['confirm_delete'] = 'Êtes-vous sûr de vouloir supprimer ce fichier ?';
