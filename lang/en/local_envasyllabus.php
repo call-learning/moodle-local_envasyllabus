@@ -158,6 +158,7 @@ $string['syllabusreports'] = 'Syllabus Reports';
 $string['table_filename'] = 'File name';
 $string['table_filesize'] = 'File size';
 $string['task:send_spreadsheet'] = 'Send spreadsheet email reports';
+$string['task:warm_course_cache'] = 'Warm course cache';
 $string['th:acronym'] = 'Acronym';
 $string['th:ects'] = 'ECTS';
 $string['th:responsible'] = 'Responsible';

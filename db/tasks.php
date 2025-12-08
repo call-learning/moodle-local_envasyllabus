@@ -34,4 +34,13 @@ $tasks = [
         'dayofweek' => '*', // Tuesday.
         'month' => '*',
     ],
+    [
+        'classname' => 'local_envasyllabus\task\warm_course_cache',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '1',
+        'day' => '*',
+        'dayofweek' => '*',
+        'month' => '*',
+    ],
 ];

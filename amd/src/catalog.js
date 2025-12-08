@@ -100,6 +100,15 @@ export const init = (catalogTagId) => {
             refreshCoursesList(catalogTagId, currentFilterParams);
         }
     });
+
+    // Make table rows clickable.
+    document.addEventListener('click', (event) => {
+        const row = event.target.closest('tr.course-row[data-href]');
+        if (row && !event.target.closest('a')) {
+            window.location.href = row.dataset.href;
+        }
+    });
+
     document.addEventListener('click', async(event) => {
         const popOvers = document.querySelectorAll('[data-toggle="popover"]');
         const currentPopover = event.target.closest('[data-toggle="popover"]');

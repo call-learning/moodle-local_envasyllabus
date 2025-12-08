@@ -192,28 +192,53 @@ class get_filtered_courses extends external_api {
         if (!empty($categorycourses[SITEID])) {
             unset($categorycourses[SITEID]);
         }
+
         $courses = [];
         $cache = cache::make('local_envasyllabus', 'courseinfo');
+        $courseidstoload = [];
+
+        // First pass: check cache.
         foreach ($categorycourses as $cid => $courselistelement) {
-            if ($cache->get($cid)) {
-                $courses[$cid] = $cache->get($cid);
-                continue;
+            if ($cached = $cache->get($cid)) {
+                $courses[$cid] = $cached;
+            } else {
+                $courseidstoload[$cid] = $courselistelement;
             }
+        }
+
+        if (empty($courseidstoload)) {
+            return $courses;
+        }
+
+        // Batch load custom fields for all uncached courses.
+        $allcustomfields = course_handler::create()->get_instances_data(array_keys($courseidstoload), true);
+
+        // Batch load role users.
+        $allresponsible = self::get_roleusers_for_courses(array_keys($courseidstoload), ['responsablecourse']);
+
+        // Second pass: build course objects.
+        foreach ($courseidstoload as $cid => $courselistelement) {
             $course = (object) iterator_to_array($courselistelement->getIterator(), true);
             $course->contextid = $courselistelement->get_context()->id;
             $course->categoryid = $course->category;
             unset($course->category);
-            // Now get the custom fields for this course.
-            $coursecfs = course_handler::create()->get_instance_data($cid, true);
+
+            // Get custom fields (already loaded in batch).
+            $coursecfs = $allcustomfields[$cid] ?? [];
             $sprogrammefield = utils::get_programme_customfield($coursecfs);
             $programmesums = [];
             if ($sprogrammefield && $sprogrammefield->get('id')) {
                 $programmesums = $sprogrammefield->get_sum(); // Specific to this custom field.
             }
+
             $course->programmevalues = self::process_programme_values($programmesums);
             $course->categoryname = self::get_category_name_for_id($course->categoryid);
             $course->courseimageurl = (new moodle_url('/local/envasyllabus/pix/nocourseimage.jpg'))->out();
-            $course->responsible = self::get_roleusers_for_course($course->id, ['responsablecourse']);
+
+            // Get responsible users (already loaded in batch).
+            $course->responsible = $allresponsible[$cid] ?? [];
+
+            // Handle course image.
             $overviewfiles = $courselistelement->get_course_overviewfiles();
             if ($overviewfiles) {
                 $file = array_shift($overviewfiles);
@@ -226,6 +251,8 @@ class get_filtered_courses extends external_api {
                     $file->get_filename()
                 )->out(false);
             }
+
+            // Format managers.
             if (!empty($course->managers)) {
                 $course->managers = array_map(function ($manager) {
                     return [
@@ -236,6 +263,8 @@ class get_filtered_courses extends external_api {
             } else {
                 $course->managers = [];
             }
+
+            // Format responsible users.
             if (!empty($course->responsible)) {
                 $course->responsible = array_map(function ($manager) {
                     return [
@@ -246,6 +275,8 @@ class get_filtered_courses extends external_api {
             } else {
                 $course->responsible = [];
             }
+
+            // Process custom fields.
             $course->customfields = [];
             foreach ($coursecfs as $cfdatacontroller) {
                 $fieldshortname = $cfdatacontroller->get_field()->get('shortname');
@@ -259,9 +290,11 @@ class get_filtered_courses extends external_api {
                     ];
                 }
             }
+
             $cache->set($cid, $course);
             $courses[$cid] = $course;
         }
+
         return $courses;
     }
 
@@ -272,6 +305,12 @@ class get_filtered_courses extends external_api {
      * @return array
      */
     public static function process_programme_header(array $columns): array {
+        static $cachedheaders = null;
+
+        if ($cachedheaders !== null) {
+            return $cachedheaders;
+        }
+
         $programmecolumns = [];
         foreach ($columns as $column) {
             if ($column['column'] == 'perso_av' || $column['column'] == 'perso_ap') {
@@ -301,6 +340,8 @@ class get_filtered_courses extends external_api {
         $programmecolumns[] = $persocolumn;
         $programmecolumns[] = $activecolumn;
         $programmecolumns[] = $totalcolumn;
+
+        $cachedheaders = $programmecolumns;
         return $programmecolumns;
     }
 
@@ -510,6 +551,59 @@ class get_filtered_courses extends external_api {
         } else {
             return [];
         }
+    }
+
+    /**
+     * Get all role users for multiple courses at once.
+     *
+     * @param array $courseids
+     * @param array $rolesname
+     * @return array Keyed by courseid
+     */
+    protected static function get_roleusers_for_courses(array $courseids, array $rolesname): array {
+        global $DB;
+
+        if (empty($courseids)) {
+            return [];
+        }
+
+        [$roleswhere, $rolesparams] = $DB->get_in_or_equal($rolesname);
+        $teacherroles = $DB->get_fieldset_select('role', 'id', 'shortname ' . $roleswhere, $rolesparams);
+
+        if (empty($teacherroles)) {
+            return [];
+        }
+
+        [$roleswhere, $rolesparams] = $DB->get_in_or_equal($teacherroles);
+        [$courseswhere, $coursesparams] = $DB->get_in_or_equal($courseids);
+
+        $params = array_merge($rolesparams, $coursesparams);
+
+        $userfieldsapi = \core_user\fields::for_userpic()->including('username', 'deleted');
+        $userfields = $userfieldsapi->get_sql('u')->selects;
+
+        $sql = "SELECT ctx.instanceid as courseid, ra.id as raid, u.id, u.username {$userfields}
+                  FROM {role_assignments} ra
+                  JOIN {context} ctx ON ctx.id = ra.contextid AND ctx.contextlevel = " . CONTEXT_COURSE . "
+                  JOIN {user} u ON u.id = ra.userid
+                 WHERE ra.roleid {$roleswhere}
+                   AND ctx.instanceid {$courseswhere}
+                   AND u.deleted = 0
+              ORDER BY ctx.instanceid, u.lastname, u.firstname";
+
+        $records = $DB->get_records_sql($sql, $params);
+
+        // Group by course.
+        $result = [];
+        foreach ($records as $record) {
+            $courseid = $record->courseid;
+            if (!isset($result[$courseid])) {
+                $result[$courseid] = [];
+            }
+            $result[$courseid][] = $record;
+        }
+
+        return $result;
     }
 
     /**
