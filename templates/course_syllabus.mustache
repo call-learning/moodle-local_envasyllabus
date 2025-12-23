@@ -39,9 +39,16 @@
     </div>
     {{>local_envasyllabus/course_syllabus_header}}
     <div class="d-flex justify-content-between align-items-center">
-        <h3>{{#str}}summary, local_envasyllabus{{/str}}</h3> {{{summary.editbutton}}}
+        <h3>{{#str}}summary, local_envasyllabus{{/str}}</h3> {{#summary.haseditoption}}{{{summary.editbutton}}}{{/summary.haseditoption}}
     </div>
-    <div class="syllabus-summary">{{{summary.content}}}</div>
+    <div class="syllabus-summary">
+        {{#summary.haseditoption}}
+            {{{summary.content}}}
+        {{/summary.haseditoption}}
+        {{^summary.haseditoption}}
+            {{{summary}}}
+        {{/summary.haseditoption}}
+    </div>
     {{<local_envasyllabus/course_syllabus_collapsible}}
         {{$id}}teachers-{{uniqid}}{{/id}}
         {{$type}}teachers{{/type}}
