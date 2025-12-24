@@ -39,7 +39,8 @@
 <div class="course-syllabus-collapsible mb-4">
     <div class="collapse-header d-flex align-items-center mb-2">
         <div class="d-flex position-relative align-items-center flex-grow-1">
-            <a role="button" data-toggle="collapse"
+            <a role="button"
+                data-toggle="collapse"
                 href="#syllabuscollapse{{$id}}{{/id}}"
                 id="collapsereport{{$id}}{{/id}}"
                 aria-expanded="{{^contentcollapsed}}true{{/contentcollapsed}}{{#contentcollapsed}}false{{/contentcollapsed}}"
@@ -55,7 +56,10 @@
                     <span class="dir-ltr-hide">{{#pix}} t/collapsedchevron_rtl, core {{/pix}}</span>
                 </span>
             </a>
-            <h1>
+            <h1     data-toggle="collapse"
+                    data-target="#syllabuscollapse{{$id}}{{/id}}"
+                    aria-expanded="{{^contentcollapsed}}true{{/contentcollapsed}}{{#contentcollapsed}}false{{/contentcollapsed}}"
+                    aria-controls="syllabuscollapse{{$id}}{{/id}}" >
                 <span>{{$title}}{{/title}}</span>
             </h1>
         </div>

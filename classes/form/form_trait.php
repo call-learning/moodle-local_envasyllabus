@@ -76,6 +76,7 @@ trait form_trait {
      */
     protected function get_multilingual_field_pairs(): array {
         return [
+            'uc_summary' => 'uc_summary_en',
             'uc_competences' => 'uc_competences_en',
             'uc_prerequis' => 'uc_prerequis_en',
             'uc_programme' => 'uc_programme_en',

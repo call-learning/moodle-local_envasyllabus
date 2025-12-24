@@ -30,21 +30,28 @@
         "managers": [{"fullname": "Teacher Name"}],
         "extendedmodus": true,
         "programmevalues": [{"column": "cm", "sum": "24"}],
-        "cionly": true
+        "moodlecirun": true
     }
 }}
-<tr class="course-row" data-href="{{{syllabusurl}}}" style="cursor: pointer;">
-    <td class="course-column">
-        <a href="{{{syllabusurl}}}">
-            {{{displayname}}}
-        </a>
-    </td>
-    <td class="acronym-column">{{cf.uc_acronyme.value}}</td>
-    <td class="responsible-column">{{#managers}}{{fullname}}<span class="separator">, </span>{{/managers}}</td>
-    <td class="ects-column"> {{cf.uc_ects.value}}</td>
-    {{#extendedmodus}}
-        {{#programmevalues}}
-            <td class="column" data-id="{{column}}">{{sum}}</td>
-        {{/programmevalues}}
-    {{/extendedmodus}}
-</tr>
+{{#moodlecirun}}
+<!-- Table header should be defined outside this fragment so we define a moodlecirun to add this when running mustache ci-->
+<table>
+{{/moodlecirun}}
+  <tr class="course-row" data-href="{{{syllabusurl}}}" style="cursor: pointer;">
+      <td class="course-column">
+          <a href="{{{syllabusurl}}}">
+              {{{displayname}}}
+          </a>
+      </td>
+      <td class="acronym-column">{{cf.uc_acronyme.value}}</td>
+      <td class="responsible-column">{{#managers}}{{fullname}}<span class="separator">, </span>{{/managers}}</td>
+      <td class="ects-column"> {{cf.uc_ects.value}}</td>
+      {{#extendedmodus}}
+          {{#programmevalues}}
+              <td class="column" data-id="{{column}}">{{sum}}</td>
+          {{/programmevalues}}
+      {{/extendedmodus}}
+  </tr>
+{{#moodlecirun}}
+</table>
+{{/moodlecirun}}

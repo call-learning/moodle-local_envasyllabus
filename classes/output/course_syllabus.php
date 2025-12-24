@@ -411,25 +411,19 @@ class course_syllabus implements renderable, templatable {
 
         // Store original field name for edit button.
         $originalfieldname = $cfname;
-
-        if ($cfname == 'uc_summary_en') {
-            // Summary field is handled differently.
-            $cfname = 'uc_summary';
-            $originalfieldname = 'uc_summary_fr';
-        }
-        if ($cfname == 'uc_summary') {
-            // Summary field is handled differently.
-            $cfname = 'uc_summary_fr';
-            $originalfieldname = 'uc_summary_fr';
-        }
-
-        if (!empty($this->lang)) {
-            $cfname = "{$cfname}_{$this->lang}";
-        }
         if ($cfname == 'uc_programme' && $this->hasnewprogramme) {
             $cfname = 'programme';
+        } else {
+            if (!empty($this->lang)) {
+                $cfname = "{$cfname}_{$this->lang}";
+            } else {
+                $cfname = "{$cfname}_fr";
+            }
+            if (!isset($customfields[$cfname])) {
+                // Fallback to the non-lang specific field.
+                $cfname = $originalfieldname;
+            }
         }
-
         $cffieldvalue = $customfields[$cfname] ?? '';
         // Check if we should add edit button (exclude uc_programme as mentioned).
         $editbutton = $this->get_edit_button_for_field($originalfieldname, $output);

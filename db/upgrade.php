@@ -71,5 +71,13 @@ function xmldb_local_envasyllabus_upgrade($oldversion) {
         setup::create_customfields_fromobj((object)$data);
         upgrade_plugin_savepoint(true, 2025062200, 'local', 'envasyllabus');
     }
+    if ($oldversion < 2025103102) {
+        $ucsummaryfr = $DB->get_record('customfield_field', ['shortname' => 'uc_summary_fr']);
+        if ($ucsummaryfr) {
+            $ucsummaryfr->shortname = 'uc_summary';
+            $DB->update_record('customfield_field', $ucsummaryfr);
+        }
+        upgrade_plugin_savepoint(true, 2025103102, 'local', 'envasyllabus');
+    }
     return true;
 }
