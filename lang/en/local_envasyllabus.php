@@ -27,7 +27,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['actions'] = 'Actions';
 $string['active_help'] = 'Percentage of active teaching methods implemented within the UC';
-$string['aria:courseimage'] = 'Course image';
 $string['cachedef_filteredcourses'] = 'Filtered courses cache';
 $string['catalog:filter_sort'] = 'Filters and Sorts';
 $string['catalog:index'] = 'Catalog';

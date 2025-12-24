@@ -192,11 +192,11 @@ class get_filtered_courses extends external_api {
         if (!empty($categorycourses[SITEID])) {
             unset($categorycourses[SITEID]);
         }
-        $courses = [];
         $cache = cache::make('local_envasyllabus', 'courseinfo');
+        // Use get_many for better performance so we don't retrieve it one by one.
+        $courses = $cache->get_many(array_keys($categorycourses));
         foreach ($categorycourses as $cid => $courselistelement) {
-            if ($cache->get($cid)) {
-                $courses[$cid] = $cache->get($cid);
+            if ($courses[$cid] ?? false) {
                 continue;
             }
             $course = (object) iterator_to_array($courselistelement->getIterator(), true);
