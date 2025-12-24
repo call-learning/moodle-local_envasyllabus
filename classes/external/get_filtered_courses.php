@@ -17,6 +17,7 @@
 namespace local_envasyllabus\external;
 
 use cache;
+use cache_store;
 use context_course;
 use context_system;
 use core_course\customfield\course_handler;
@@ -177,14 +178,14 @@ class get_filtered_courses extends external_api {
     }
 
     /**
-     * Get all courses
+     * Get all courses. This is a public method so we can call it directly from a cron task.
      *
      * @param int $rootcategoryid
      * @return array array of courses
      * @throws \invalid_parameter_exception
      * @throws \moodle_exception
      */
-    protected static function get_courses(int $rootcategoryid): array {
+    public static function get_courses(int $rootcategoryid): array {
         $category = \core_course_category::get($rootcategoryid);
         // First we get all courses id in this category. Normally this is cached by core.
         $categorycourses = $category->get_courses(['recursive' => true, 'coursecontacts' => true]);
@@ -195,21 +196,38 @@ class get_filtered_courses extends external_api {
         $cache = cache::make('local_envasyllabus', 'courseinfo');
         // Use get_many for better performance so we don't retrieve it one by one.
         $courses = $cache->get_many(array_keys($categorycourses));
+        $courseidstoload = [];
+        // First pass: check cache.
         foreach ($categorycourses as $cid => $courselistelement) {
-            if ($courses[$cid] ?? false) {
-                continue;
+            if (!isset($courses[$cid]) || $courses[$cid] == false) {
+                $courseidstoload[$cid] = $courselistelement;
             }
+        }
+
+        if (empty($courseidstoload)) {
+            return $courses;
+        }
+        // Increate php timeout for this operation.
+        set_time_limit(0);
+        raise_memory_limit(MEMORY_EXTRA);
+        // Batch load custom fields for all uncached courses.
+        $allcustomfields = course_handler::create()->get_instances_data(array_keys($courseidstoload), true);
+
+        // Second pass: build course objects.
+        foreach ($courseidstoload as $cid => $courselistelement) {
             $course = (object) iterator_to_array($courselistelement->getIterator(), true);
             $course->contextid = $courselistelement->get_context()->id;
             $course->categoryid = $course->category;
             unset($course->category);
-            // Now get the custom fields for this course.
-            $coursecfs = course_handler::create()->get_instance_data($cid, true);
+
+            // Get custom fields (already loaded in batch).
+            $coursecfs = $allcustomfields[$cid] ?? [];
             $sprogrammefield = utils::get_programme_customfield($coursecfs);
             $programmesums = [];
             if ($sprogrammefield && $sprogrammefield->get('id')) {
                 $programmesums = $sprogrammefield->get_sum(); // Specific to this custom field.
             }
+
             $course->programmevalues = self::process_programme_values($programmesums);
             $course->categoryname = self::get_category_name_for_id($course->categoryid);
             $course->courseimageurl = (new moodle_url('/local/envasyllabus/pix/nocourseimage.jpg'))->out();
@@ -226,6 +244,8 @@ class get_filtered_courses extends external_api {
                     $file->get_filename()
                 )->out(false);
             }
+
+            // Format managers.
             if (!empty($course->managers)) {
                 $course->managers = array_map(function ($manager) {
                     return [
@@ -236,6 +256,8 @@ class get_filtered_courses extends external_api {
             } else {
                 $course->managers = [];
             }
+
+            // Format responsible users.
             if (!empty($course->responsible)) {
                 $course->responsible = array_map(function ($manager) {
                     return [
@@ -246,6 +268,8 @@ class get_filtered_courses extends external_api {
             } else {
                 $course->responsible = [];
             }
+
+            // Process custom fields.
             $course->customfields = [];
             foreach ($coursecfs as $cfdatacontroller) {
                 $fieldshortname = $cfdatacontroller->get_field()->get('shortname');
@@ -259,9 +283,11 @@ class get_filtered_courses extends external_api {
                     ];
                 }
             }
+
             $cache->set($cid, $course);
             $courses[$cid] = $course;
         }
+
         return $courses;
     }
 
@@ -272,6 +298,10 @@ class get_filtered_courses extends external_api {
      * @return array
      */
     public static function process_programme_header(array $columns): array {
+        $cache = cache::make_from_params(cache_store::MODE_REQUEST, 'local_envasyllabus', 'filtered_course');
+        if ($cached = $cache->get('programme_headers')) {
+            return $cached;
+        }
         $programmecolumns = [];
         foreach ($columns as $column) {
             if ($column['column'] == 'perso_av' || $column['column'] == 'perso_ap') {
@@ -301,6 +331,8 @@ class get_filtered_courses extends external_api {
         $programmecolumns[] = $persocolumn;
         $programmecolumns[] = $activecolumn;
         $programmecolumns[] = $totalcolumn;
+
+        $cache->set('programme_headers', $programmecolumns);
         return $programmecolumns;
     }
 
@@ -356,6 +388,7 @@ class get_filtered_courses extends external_api {
      * @return float
      */
     public static function get_active_percentage(array $programmesums): float {
+        $sumarray = [];
         foreach ($programmesums as $entry) {
             if (isset($entry['column'])) {
                 $key = strtolower($entry['column']);
@@ -510,6 +543,64 @@ class get_filtered_courses extends external_api {
         } else {
             return [];
         }
+    }
+
+    /**
+     * Get all role users for multiple courses at once.
+     *
+     * @param array $courseids
+     * @param array $rolesname
+     * @return array Keyed by courseid
+     */
+    protected static function get_roleusers_for_courses(array $courseids, array $rolesname): array {
+        global $DB;
+
+        if (empty($courseids)) {
+            return [];
+        }
+
+        [$roleswhere, $rolesparams] = $DB->get_in_or_equal($rolesname);
+        $teacherroles = $DB->get_fieldset_select('role', 'id', 'shortname ' . $roleswhere, $rolesparams);
+
+        if (empty($teacherroles)) {
+            return [];
+        }
+
+        [$roleswhere, $rolesparams] = $DB->get_in_or_equal($teacherroles);
+        [$courseswhere, $coursesparams] = $DB->get_in_or_equal($courseids);
+
+        $params = array_merge($rolesparams, $coursesparams);
+
+        $userfieldsapi = \core_user\fields::for_userpic()->including('username', 'deleted');
+        $userfields = $userfieldsapi->get_sql('u')->selects;
+
+        $sql = "SELECT CONCAT(ctx.instanceid,'_',ra.id, '_', u.id) as id,
+                    ctx.instanceid as courseid, 
+                    ra.id as raid, 
+                    u.id as userid,
+                    u.username {$userfields}
+                  FROM {role_assignments} ra
+                  JOIN {context} ctx ON ctx.id = ra.contextid AND ctx.contextlevel = " . CONTEXT_COURSE . "
+                  JOIN {user} u ON u.id = ra.userid
+                 WHERE ra.roleid {$roleswhere}
+                   AND ctx.instanceid {$courseswhere}
+                   AND u.deleted = 0
+              ORDER BY ctx.instanceid, u.lastname, u.firstname";
+
+        $records = $DB->get_records_sql($sql, $params);
+
+        // Group by course.
+        $result = [];
+        foreach ($records as $record) {
+            $courseid = $record->courseid;
+            if (!isset($result[$courseid])) {
+                $result[$courseid] = [];
+            }
+            $record->id = $record->userid; // For compatibility with get_role_users().
+            $result[$courseid][$record->userid] = $record;
+        }
+
+        return $result;
     }
 
     /**

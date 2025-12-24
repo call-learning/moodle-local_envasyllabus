@@ -151,6 +151,7 @@ $string['syllabusreports'] = 'Rapports Syllabus';
 $string['table_filename'] = 'Nom du fichier';
 $string['table_filesize'] = 'Taille du fichier';
 $string['task:send_spreadsheet'] = 'Envoyer les rapports Excel par email';
+$string['task:warm_course_cache'] = 'Réchauffer le cache des cours';
 $string['th:acronym'] = 'Acronyme';
 $string['th:responsible'] = 'Responsable';
 $string['total_help'] = 'Total du volume horaire consacré à l\'UC, incluant l\'estimation du travail personnel';
