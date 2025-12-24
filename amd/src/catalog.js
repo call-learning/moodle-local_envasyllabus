@@ -205,7 +205,7 @@ const buildCourseList = (courses, programmecolumns = []) => {
         });
     });
 
-    // Flattern the object into an array.
+    // Flatten the object into an array.
     return Object.entries(sortedCourses)
         // Preserve the order of the years as Object.entries does not.
         .sort((y1, y2) => y1[0].localeCompare(y2[0]))
