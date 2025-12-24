@@ -161,6 +161,7 @@ const buildCourseList = (courses, programmecolumns = []) => {
             const totals = {
                 displayname: '',
                 cf: {
+                    // eslint-disable-next-line camelcase
                     uc_ects: {value: 0}
                 },
                 programmevalues: [],
