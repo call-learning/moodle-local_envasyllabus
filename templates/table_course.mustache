@@ -17,10 +17,39 @@
 {{!
     @template local_envasyllabus/table_course
 
-    TODO describe template table_course
+    Template for a course row in the syllabus table.
 
     Example context (json):
     {
+        "syllabusurl": "http://localhost/moodle/local/envasyllabus/view.php?id=1",
+        "displayname": "Course Name",
+        "cf": {
+            "uc_acronyme": {
+                "value": "CNAME"
+            },
+            "uc_ects": {
+                "value": "6"
+            }
+        },
+        "managers": [
+            {
+                "fullname": "Manager One"
+            },
+            {
+                "fullname": "Manager Two"
+            }
+        ],
+        "extendedmodus": true,
+        "programmevalues": [
+            {
+                "column": "prog1",
+                "sum": "10"
+            },
+            {
+                "column": "prog2",
+                "sum": "15"
+            }
+        ]
     }
 }}
 <tr class="course-row position-relative">

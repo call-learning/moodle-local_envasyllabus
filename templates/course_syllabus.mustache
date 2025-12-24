@@ -23,9 +23,89 @@
 
   Example context (json):
   {
-    "coursedata": { "fullname": "Course name", "courseimage": "https://moodlesite/theme/image.php/boost/block_myoverview/1535727318/courses" },
-    "headerdata": [ { "class": "class", "icon": "icon", "title": "title", "value": "value" } ]
-  }
+      "coursedata": {
+        "id": 575,
+        "fullname": "UC0511 - Autopsie, BioPôle",
+        "shortname": "UC0511-AUTOPS",
+        "displayname": "Autopsies / BioPôle",
+        "summary": "Clinical rotations in the BioPôle and Autopsy units",
+        "courseimage": "https://example.com/course-image.png",
+        "viewurl": "https://eve.call-learning.io/course/view.php?id=575",
+        "category": "Companion animals",
+        "visible": true
+      },
+
+      "teachers": [
+        {
+          "fullname": "Bellier Sylvain",
+          "email": "sylvain.bellier@vet-alfort.fr"
+        },
+        {
+          "fullname": "Chevallier Lucie",
+          "email": "lucie.chevallier@vet-alfort.fr"
+        }
+      ],
+
+      "managers": [
+        {
+          "fullname": "Bellier Sylvain",
+          "email": "sylvain.bellier@vet-alfort.fr"
+        }
+      ],
+
+      "headerdata": [
+        {
+          "class": "highlighted-top",
+          "icon": "",
+          "title": "Total hours",
+          "value": 100.75
+        },
+        {
+          "class": "",
+          "icon": "",
+          "title": "Lectures (CM)",
+          "value": 20.25
+        },
+        {
+          "class": "",
+          "icon": "",
+          "title": "Tutorials (TD)",
+          "value": 18
+        },
+        {
+          "class": "highlighted-top",
+          "icon": "ects",
+          "title": "ECTS credits",
+          "value": 3
+        }
+      ],
+
+      "competencies": {
+        "summary": [
+          "Perform and interpret biochemical analyses",
+          "Recognize normal and abnormal blood cells",
+          "Apply histology and cytology techniques",
+          "Carry out a complete animal autopsy"
+        ]
+      },
+
+      "prerequisites": "Clinical biology basics",
+
+      "evaluation": [
+        {
+          "name": "Autopsy rotation exam",
+          "type": "Written (Moodle)",
+          "duration_minutes": 40,
+          "coefficient": 1
+        },
+        {
+          "name": "BioPôle rotation exam",
+          "type": "Written (Moodle)",
+          "duration_minutes": 20,
+          "coefficient": 1
+        }
+      ]
+    }
 
 }}
 
