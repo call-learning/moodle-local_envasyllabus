@@ -42,15 +42,18 @@ require([
     var chartArea = $('#chart-area-' + uniqid);
     var chartImage = chartArea.find('.chart-image');
 
+    // Ensure chartData is an object and set barThickness before building the chart.
+    if (typeof chartData === 'string') {
+        chartData = JSON.parse(chartData);
+    }
+    if (chartData && chartData.data && Array.isArray(chartData.data.datasets)) {
+        chartData.data.datasets.forEach(function(dataset) {
+            dataset.barThickness = 50;
+        });
+    }
+
     Builder.make(chartData).then(function(ChartInst) {
         var output = new Output(chartImage, ChartInst);
-        // Set fixed bar thickness of 50px for all datasets.
-        if (output._config && output._config.data && output._config.data.datasets) {
-            output._config.data.datasets.forEach(function(dataset) {
-                dataset.barThickness = 50;
-            });
-            output._chartjs.update();
-        }
         return output;
     }).catch(function(error) {
         window.console.error('Chart rendering failed:', error);
