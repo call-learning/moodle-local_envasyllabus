@@ -105,7 +105,7 @@ const refreshCoursesList = (catalogTagId, filterParams = {}) => {
  */
 const renderCourses = (element, data) => {
     Templates.render('local_envasyllabus/catalog_course_categories', {
-        sortedCourses: buildCourseList(data.courses),
+        sortedCourses: buildCourseList(data.courses, data.programmecolumns),
         programmecolumns: data.programmecolumns,
         gridview: (element.dataset.viewtype == 'grid'),
         listview: (element.dataset.viewtype == 'list'),
@@ -121,9 +121,10 @@ const renderCourses = (element, data) => {
  *
  * Also tweaks the display depending on language selected
  * @param {Array} courses
+ * @param {Array} programmecolumns - Programme column definitions for ordering
  * @returns {{year: *, semesters: *}[]}
  */
-const buildCourseList = (courses) => {
+const buildCourseList = (courses, programmecolumns = []) => {
     let sortedCourses = {};
     for (let course of courses.values()) {
         const yearValue = findValueForCustomField(course, 'uc_annee');
@@ -153,7 +154,58 @@ const buildCourseList = (courses) => {
             sortedCourses[yearValue].semesters[semesterValue].courses.push(course);
         }
     }
-    // Flattern the object into an array.
+
+    // Calculate totals for each semester.
+    Object.values(sortedCourses).forEach((yearDef) => {
+        Object.values(yearDef.semesters).forEach((semester) => {
+            const totals = {
+                displayname: '',
+                cf: {
+                    uc_ects: {value: 0}
+                },
+                programmevalues: [],
+                istotal: true
+            };
+
+            // Sum ECTS and programme values.
+            const programmeMap = new Map();
+            semester.courses.forEach((course) => {
+                // Sum ECTS.
+                const ects = parseFloat(course.cf?.uc_ects?.value) || 0;
+                totals.cf.uc_ects.value += ects;
+
+                // Sum programme values.
+                if (course.programmevalues) {
+                    course.programmevalues.forEach((pv) => {
+                        const currentSum = programmeMap.get(pv.column) || 0;
+                        const pvValue = parseFloat(pv.sum) || 0;
+                        programmeMap.set(pv.column, currentSum + pvValue);
+                    });
+                }
+            });
+
+            // Convert programme map to array in the correct column order.
+            if (programmecolumns.length > 0) {
+                // Use the column order from programmecolumns.
+                programmecolumns.forEach((col) => {
+                    const sum = programmeMap.get(col.column) || 0;
+                    totals.programmevalues.push({column: col.column, sum});
+                });
+            } else {
+                // Fallback: use the map order.
+                programmeMap.forEach((sum, column) => {
+                    totals.programmevalues.push({column, sum});
+                });
+            }
+
+            // Round ECTS to 2 decimal places.
+            totals.cf.uc_ects.value = Math.round(totals.cf.uc_ects.value * 100) / 100;
+
+            semester.totals = totals;
+        });
+    });
+
+    // Flatten the object into an array.
     return Object.entries(sortedCourses)
         // Preserve the order of the years as Object.entries does not.
         .sort((y1, y2) => y1[0].localeCompare(y2[0]))
