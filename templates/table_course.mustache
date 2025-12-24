@@ -33,26 +33,18 @@
         "cionly": true
     }
 }}
-{{#cionly}}
-<table>
-    <tbody>
-{{/cionly}}
-        <tr class="course-row" data-href="{{{syllabusurl}}}" style="cursor: pointer;">
-            <td class="course-column">
-                <a href="{{{syllabusurl}}}">
-                    {{{displayname}}}
-                </a>
-            </td>
-            <td class="acronym-column">{{cf.uc_acronyme.value}}</td>
-            <td class="responsible-column">{{#managers}}{{fullname}}<span class="separator">, </span>{{/managers}}</td>
-            <td class="ects-column"> {{cf.uc_ects.value}}</td>
-            {{#extendedmodus}}
-                {{#programmevalues}}
-                    <td class="column" data-id="{{column}}">{{sum}}</td>
-                {{/programmevalues}}
-            {{/extendedmodus}}
-        </tr>
-{{#cionly}}
-    </tbody>
-</table>
-{{/cionly}}
+<tr class="course-row" data-href="{{{syllabusurl}}}" style="cursor: pointer;">
+    <td class="course-column">
+        <a href="{{{syllabusurl}}}">
+            {{{displayname}}}
+        </a>
+    </td>
+    <td class="acronym-column">{{cf.uc_acronyme.value}}</td>
+    <td class="responsible-column">{{#managers}}{{fullname}}<span class="separator">, </span>{{/managers}}</td>
+    <td class="ects-column"> {{cf.uc_ects.value}}</td>
+    {{#extendedmodus}}
+        {{#programmevalues}}
+            <td class="column" data-id="{{column}}">{{sum}}</td>
+        {{/programmevalues}}
+    {{/extendedmodus}}
+</tr>
