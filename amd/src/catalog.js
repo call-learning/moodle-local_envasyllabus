@@ -109,7 +109,7 @@ export const init = (catalogTagId) => {
         }
     });
 
-    document.addEventListener('click', async(event) => {
+    document.addEventListener('click', (event) => {
         const popOvers = document.querySelectorAll('[data-toggle="popover"]');
         const currentPopover = event.target.closest('[data-toggle="popover"]');
         if (popOvers.length > 0) {
