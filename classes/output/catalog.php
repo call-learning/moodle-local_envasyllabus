@@ -63,7 +63,14 @@ class catalog implements renderable, templatable {
      * @param string $currentlang
      */
     public function __construct($currentlang = '') {
-        $this->listview = optional_param('listview', false, PARAM_BOOL);
+        $this->listview = optional_param('viewtype', 'list', PARAM_ALPHA);
+        switch ($this->listview) {
+            case 'grid':
+                $this->gridview = true;
+                break;
+            default:
+                $this->listview = true;
+        }
         if ($this->listview) {
             $this->gridview = false;
         }

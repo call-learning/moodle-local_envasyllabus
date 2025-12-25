@@ -66,7 +66,7 @@ export const init = (catalogTagId) => {
         gridViewButton.classList.remove('active');
         const catalogCourseTag = getCatalogCourseTag(catalogTagId);
         catalogCourseTag.dataset.viewtype = 'list';
-        updateUrl('listview', '1');
+        updateUrl('viewtype', 'list');
         refreshCoursesList(catalogTagId, currentFilterParams);
     });
     gridViewButton.addEventListener('click', (event) => {
@@ -76,7 +76,7 @@ export const init = (catalogTagId) => {
         gridViewButton.classList.add('active');
         const catalogCourseTag = getCatalogCourseTag(catalogTagId);
         catalogCourseTag.dataset.viewtype = 'grid';
-        updateUrl('listview', '0');
+        updateUrl('viewtype', 'grid');
         refreshCoursesList(catalogTagId, currentFilterParams);
     });
     chartViewButton.addEventListener('click', (event) => {
@@ -86,7 +86,7 @@ export const init = (catalogTagId) => {
         chartViewButton.classList.add('active');
         const catalogCourseTag = getCatalogCourseTag(catalogTagId);
         catalogCourseTag.dataset.viewtype = 'chart';
-        updateUrl('listview', 'chart');
+        updateUrl('viewtype', 'chart');
         refreshCoursesChart(catalogTagId, currentFilterParams);
     });
     const extendedModeCheckbox = document.getElementById('catalog-extendedmode');
@@ -160,6 +160,7 @@ const refreshCoursesChart = (catalogTagId, filterParams = {}) => {
 const renderCourses = (element, data) => {
     Templates.render('local_envasyllabus/catalog_course_categories', {
         sortedCourses: buildCourseList(data.courses, data.programmecolumns),
+        mainheaders: data.mainheaders,
         programmecolumns: data.programmecolumns,
         gridview: (element.dataset.viewtype == 'grid'),
         listview: (element.dataset.viewtype == 'list'),

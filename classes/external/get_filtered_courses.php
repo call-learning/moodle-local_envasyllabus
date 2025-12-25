@@ -30,6 +30,7 @@ use core_external\external_single_structure;
 use core_external\external_value;
 use customfield_sprogramme\local\programme_manager;
 use Exception;
+use local_envasyllabus\output\language_switcher;
 use local_envasyllabus\utils;
 use local_envasyllabus\visibility;
 use moodle_url;
@@ -133,8 +134,8 @@ class get_filtered_courses extends external_api {
         return [
             'courses' => $filteredcourse,
             'programmecolumns' => self::process_programme_header($columns),
+            'mainheaders' => self::get_programme_main_headers(),
         ];
-        return $filteredcourse;
     }
 
     /**
@@ -675,6 +676,31 @@ class get_filtered_courses extends external_api {
                     ]
                 )
             ),
+            'mainheaders' => new external_multiple_structure(
+                new external_single_structure(
+                    [
+                        'label' => new external_value(PARAM_RAW, 'The label of the header'),
+                        'class' => new external_value(PARAM_RAW, 'The css class of the header', VALUE_OPTIONAL, ''),
+                    ]
+                )
+            ),
         ]);
+    }
+
+    /**
+     * Get programme main headers
+     *
+     * @return array
+     */
+    private static function get_programme_main_headers() {
+        language_switcher::set_lang();
+        $columns = [
+            ['label' => get_string('th:uc', 'local_envasyllabus'), 'class' => "w-25"],
+            ['label' => get_string('th:acronym', 'local_envasyllabus'), 'class' => "w-10"],
+            ['label' => get_string('th:responsible', 'local_envasyllabus'), 'class' => "w-15"],
+            ['label' => get_string('th:ects', 'local_envasyllabus'), 'class' => ""],
+        ];
+        language_switcher::reset_lang();
+        return $columns;
     }
 }
