@@ -54,46 +54,7 @@ class export_catalog extends external_api {
      */
     public static function execute($lang = 'en', $extended = false) {
         global $CFG;
-        $params = self::validate_parameters(self::execute_parameters(), [
-            'lang' => $lang,
-            'extended' => $extended,
-        ]);
 
-        $context = context_system::instance();
-        self::validate_context($context);
-        require_capability('local/envasyllabus:exportcatalog', $context);
-
-        // Get configuration.
-        $categoryid = get_config('local_envasyllabus', 'rootcategoryid');
-        if (!$categoryid) {
-            $categoryid = 1; // Default to category 1.
-        }
-
-        // Generate unique token for this download.
-        $token = md5(uniqid(rand(), true));
-        language_switcher::set_lang();
-        try {
-            // Create the Excel file.
-            $exporter = new excel_exporter($categoryid, $params['extended'], $params['lang']);
-            $spreadsheet = $exporter->create_spreadsheet();
-
-            // Save to temp directory with token.
-            $tempdir = make_temp_directory('envasyllabus/exports');
-            $filename = 'syllabus_export_' . ($params['extended'] ? 'extended_' : 'basic_') .
-                $params['lang'] . '_' . date('Y-m-d_H-i-s') . '.xlsx';
-            $filepath = $tempdir . '/' . $token . '_' . $filename;
-
-            $writer = new Xlsx($spreadsheet);
-            $writer->save($filepath);
-
-            // Return the download URL with token.
-            $downloadurl = new \moodle_url('/local/envasyllabus/download.php', [
-                'token' => $token,
-                'filename' => $filename,
-            ]);
-        } finally {
-            language_switcher::reset_lang();
-        }
 
         return [
             'success' => true,

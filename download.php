@@ -22,54 +22,55 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_envasyllabus\output\excel_exporter;
+use local_envasyllabus\output\language_switcher;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 require_once(__DIR__ . '/../../config.php');
 
 require_login();
 
+$context = context_system::instance();
+require_capability('local/envasyllabus:exportcatalog', $context);
+
+// Get configuration.
+$categoryid = get_config('local_envasyllabus', 'rootcategoryid');
+if (!$categoryid) {
+    $categoryid = 1; // Default to category 1.
+}
+
+// Generate unique token for this download.
+$token = md5(uniqid(rand(), true));
+language_switcher::set_lang();
 try {
-    $token = required_param('token', PARAM_ALPHANUM);
-    $filename = required_param('filename', PARAM_FILE);
+    $lang = optional_param('lang', 'en', PARAM_LANG);
+    $extended = optional_param('extended', 0, PARAM_BOOL);
+    // Create the Excel file.
+    $exporter = new excel_exporter($categoryid, $extended, $lang);
+    $spreadsheet = $exporter->create_spreadsheet();
 
-    $context = context_system::instance();
-    require_capability('local/envasyllabus:exportcatalog', $context);
-} catch (Exception $e) {
-    debugging('Error in download.php params: ' . $e->getMessage(), DEBUG_DEVELOPER);
-    http_response_code(500);
-    die('Error: ' . $e->getMessage());
+    // Save to temp directory with token.
+    $tempdir = make_temp_directory('envasyllabus/exports');
+    $filename = 'syllabus_export_' . ($extended ? 'extended_' : 'basic_') .
+        $lang . '_' . date('Y-m-d_H-i-s') . '.xlsx';
+    $filepath = $tempdir . '/' . $token . '_' . $filename;
+
+    $writer = new Xlsx($spreadsheet);
+    $writer->save($filepath);
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Content-Length: ' . filesize($filepath));
+    header('Cache-Control: max-age=0');
+    header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+    header('Cache-Control: cache, must-revalidate');
+    header('Pragma: public');
+
+    // Output file contents.
+    readfile($filepath);
+
+    // Delete the file after sending.
+    @unlink($filepath);
+} finally {
+    language_switcher::reset_lang();
 }
-
-// Validate token and get file.
-// Use make_temp_directory to ensure we get the same path as the external service.
-$tempdir = make_temp_directory('envasyllabus/exports');
-$filepath = $tempdir . '/' . $token . '_' . $filename;
-
-// Debug logging.
-debugging('Looking for file: ' . $filepath, DEBUG_DEVELOPER);
-debugging('File exists: ' . (file_exists($filepath) ? 'yes' : 'no'), DEBUG_DEVELOPER);
-
-if (!file_exists($filepath)) {
-    // Try to list files in the directory for debugging.
-    if (is_dir($tempdir)) {
-        $files = scandir($tempdir);
-        debugging('Files in directory: ' . implode(', ', $files), DEBUG_DEVELOPER);
-    }
-    http_response_code(404);
-    die('File not found: ' . $filepath);
-}
-
-// Send the file with appropriate headers.
-header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment; filename="' . $filename . '"');
-header('Content-Length: ' . filesize($filepath));
-header('Cache-Control: max-age=0');
-header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-header('Cache-Control: cache, must-revalidate');
-header('Pragma: public');
-
-// Output file contents.
-readfile($filepath);
-
-// Delete the file after sending.
-@unlink($filepath);
-exit;

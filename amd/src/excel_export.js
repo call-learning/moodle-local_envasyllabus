@@ -21,7 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 
 const SELECTORS = {
@@ -37,85 +36,128 @@ export const init = () => {
 };
 
 /**
- * Initialize export button event handler
+ * Export button init.
  */
 const initExportButton = () => {
-    const exportBtn = document.querySelector(SELECTORS.EXPORT_BUTTON);
-
-    if (!exportBtn) {
+    const button = document.querySelector(SELECTORS.EXPORT_BUTTON);
+    if (!button) {
         return;
     }
 
-    exportBtn.addEventListener('click', (e) => {
+    button.addEventListener('click', (e) => {
         e.preventDefault();
 
-        // Don't allow clicking if already locked.
-        if (exportBtn.getAttribute('data-locked') === 'true') {
+        if (isLocked(button)) {
             return;
         }
 
-        handleExportClick(exportBtn);
+        // MUST stay synchronous (popup-safe)
+        withButtonLock(button, () => {
+            const {lang, extended} = getExportParamsFromUrl();
+            const url = buildDownloadUrl(lang, extended);
+            triggerDownloadViaNewTab(url);
+        });
     });
 };
 
+/* =========================
+ * Helpers
+ * ========================= */
+
 /**
- * Handle export button click
+ * Check if button is locked.
  *
- * @param {HTMLElement} button The export button element
+ * @param {HTMLElement} button
+ * @return {boolean}
  */
-const handleExportClick = async(button) => {
+const isLocked = (button) =>
+    button.getAttribute('data-locked') === 'true';
+
+/**
+ * Lock or unlock button.
+ *
+ * @param {HTMLElement} button
+ * @param {boolean} locked
+ */
+const setLocked = (button, locked) => {
+    button.setAttribute('data-locked', locked ? 'true' : 'false');
+    button.disabled = locked;
+};
+
+/**
+ * Set icon to loading spinner or original.
+ *
+ * @param {HTMLElement} button
+ * @param {boolean} loading
+ * @param {string} originalClasses
+ */
+const setIconLoading = (button, loading, originalClasses) => {
     const icon = button.querySelector(SELECTORS.ICON);
-    const originalClasses = icon.className;
+    if (!icon) {
+        return;
+    }
+    icon.className = loading ? 'fa fa-spinner fa-spin' : originalClasses;
+};
 
-    // Lock the button.
-    button.setAttribute('data-locked', 'true');
-    button.disabled = true;
-    icon.className = 'fa fa-spinner fa-spin';
+/**
+ * Get export params from URL.
+ * @return {{lang, extended: boolean}}
+ */
+const getExportParamsFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        lang: params.get('lang') || 'en',
+        extended: params.get('modus') === 'extended',
+    };
+};
 
-    // Get export parameters.
-    const urlParams = new URLSearchParams(window.location.search);
-    const lang = urlParams.get('lang') || 'en';
-    const extended = urlParams.get('modus') === 'extended';
+/**
+ * Build download URL with params.
+ *
+ * @param {string} lang
+ * @param {string} extended
+ * @return {string}
+ */
+const buildDownloadUrl = (lang, extended) => {
+    const url = new URL(M.cfg.wwwroot + '/local/envasyllabus/download.php');
+    url.searchParams.set('lang', lang);
+    url.searchParams.set('modus', extended ? 'extended' : 'normal');
+    return url.toString();
+};
+
+/**
+ * Trigger download via new tab (popup-safe).
+ * @param {string} url
+ */
+const triggerDownloadViaNewTab = (url) => {
+    window.open(url, '_blank', 'noopener');
+};
+
+/**
+ * Lock button, show spinner, run synchronous action, then unlock.
+ * @param {Element} button
+ * @param {Function} action Synchronous action to perform
+ */
+const withButtonLock = (button, action) => {
+    const icon = button.querySelector(SELECTORS.ICON);
+    const originalClasses = icon ? icon.className : '';
 
     try {
-        // Call the external service.
-        const response = await Ajax.call([{
-            methodname: 'local_envasyllabus_export_catalog',
-            args: {
-                lang: lang,
-                extended: extended
-            }
-        }])[0];
+        setLocked(button, true);
+        setIconLoading(button, true, originalClasses);
 
-        if (response.success) {
-            // Trigger download using hidden iframe.
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = response.downloadurl;
-            document.body.appendChild(iframe);
+        // Must NOT contain await / promises.
+        action();
 
-            // Remove iframe after download starts.
-            setTimeout(() => {
-                if (iframe.parentNode) {
-                    iframe.parentNode.removeChild(iframe);
-                }
-            }, 5000);
+        // UX unlock (download already started).
+        window.setTimeout(() => {
+            setLocked(button, false);
+            setIconLoading(button, false, originalClasses);
+        }, 1500);
 
-            // Reset button after short delay.
-            setTimeout(() => {
-                button.setAttribute('data-locked', 'false');
-                button.disabled = false;
-                icon.className = originalClasses;
-            }, 2000);
-        } else {
-            throw new Error('Export failed');
-        }
     } catch (error) {
-        // Reset button on error.
-        button.setAttribute('data-locked', 'false');
-        button.disabled = false;
-        icon.className = originalClasses;
-
+        setLocked(button, false);
+        setIconLoading(button, false, originalClasses);
         Notification.exception(error);
     }
 };
