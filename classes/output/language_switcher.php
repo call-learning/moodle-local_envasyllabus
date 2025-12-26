@@ -79,6 +79,7 @@ class language_switcher implements renderable, templatable {
     /**
      * Set current language
      *
+     * @param string $forcelang
      * @return void
      */
     public static function set_lang(string $forcelang = '') {

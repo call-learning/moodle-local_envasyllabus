@@ -119,7 +119,7 @@ const renderPage = (element, data) => {
     LocalisedTemplates.setLanguage(element.dataset.currentLang ?? 'fr');
     const sortedCourses = buildCourseList(data.courses, data.programmecolumns);
     const isChartView = (element.dataset.viewtype === 'chart');
-    let  templateName= 'local_envasyllabus/catalog_course_categories';
+    let templateName = 'local_envasyllabus/catalog_course_categories';
     let context = {};
     if (isChartView) {
         context = {
@@ -271,12 +271,13 @@ const findValueForCustomField = (course, cfsname, defaultValue = null) => {
     }
     return defaultValue;
 };
+
 /**
-* Update the current page URL with the selected query parameters
-*
-* @param {String} key
-* @param {String} value
-*/
+ * Update the current page URL with the selected query parameters
+ *
+ * @param {String} key
+ * @param {String} value
+ */
 const jumpTo = (key, value) => {
     const url = new URL(window.location.href);
     if (value) {

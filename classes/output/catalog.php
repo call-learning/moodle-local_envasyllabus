@@ -41,8 +41,13 @@ class catalog implements renderable, templatable {
      * Catalog constructor
      *
      * @param string $currentlang
+     * @param string $viewtype
+     * @param string $modus
      */
     public function __construct(
+        /**
+         * @var string $currentlang
+         */
         private string $currentlang = '',
         /**
          * @var string $viewtype

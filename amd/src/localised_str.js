@@ -51,6 +51,7 @@ const getComponentBucket = (component, lang) => {
 
 const getCacheKey = ({key, component, lang}) => `localised_str/${key}/${component}/${lang}`;
 
+/* eslint-disable no-restricted-properties */
 /**
  * Like core/str.getStrings but language-safe.
  *

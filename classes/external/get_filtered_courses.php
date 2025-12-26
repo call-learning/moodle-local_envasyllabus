@@ -580,8 +580,8 @@ class get_filtered_courses extends external_api {
         $userfields = $userfieldsapi->get_sql('u')->selects;
 
         $sql = "SELECT CONCAT(ctx.instanceid,'_',ra.id, '_', u.id) as id,
-                    ctx.instanceid as courseid, 
-                    ra.id as raid, 
+                    ctx.instanceid as courseid,
+                    ra.id as raid,
                     u.id as userid,
                     u.username {$userfields}
                   FROM {role_assignments} ra

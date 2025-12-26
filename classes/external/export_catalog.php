@@ -55,7 +55,6 @@ class export_catalog extends external_api {
     public static function execute($lang = 'en', $extended = false) {
         global $CFG;
 
-
         return [
             'success' => true,
             'downloadurl' => $downloadurl->out(false),

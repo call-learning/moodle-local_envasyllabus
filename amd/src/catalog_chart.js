@@ -21,7 +21,7 @@
  */
 import Builder from 'core/chart_builder';
 import Output from 'core/chart_output_chartjs';
-
+import Notification from 'core/notification';
 /**
  * Render a catalog chart in the given container.
  * @param {HTMLElement} chartElementId - The container element for the chart.
@@ -34,11 +34,8 @@ export const init = (chartElementId) => {
     const chartImage = chartElement.querySelector('.chart-image');
     const chartData = chartElement.dataset.chartData ? JSON.parse(chartElement.dataset.chartData) : null;
     if (chartData) {
-        Builder.make(chartData).then(function (ChartInst) {
-            const output = new Output(chartImage, ChartInst);
-            return output;
-        }).catch(function (error) {
-            window.console.error('Chart rendering failed:', error);
-        });
+        Builder.make(chartData)
+            .then((ChartInst) => new Output(chartImage, ChartInst).render())
+            .catch(Notification.exception);
     }
 };
