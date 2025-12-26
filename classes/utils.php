@@ -17,6 +17,7 @@
 namespace local_envasyllabus;
 
 use core\context;
+use local_envasyllabus\output\language_switcher;
 
 /**
  * Set of utility functions for the local_envasyllabus plugin.
@@ -64,5 +65,24 @@ class utils {
             return array_values($filtered)[0];
         }
         return null;
+    }
+
+    /**
+     * Get the string in the current syllabus language.
+     *
+     * @param string $identifier The string identifier.
+     * @param string $component The component name (default is '').
+     * @param mixed $a Optional argument for string placeholders (default is null).
+     * @return string The localized string.
+     */
+    public static function get_string_current_lang(string $identifier, string $component = '', mixed $a = null): string {
+        $currentlang = language_switcher::get_current_langcode();
+        $stringmanager = get_string_manager();
+        return $stringmanager->get_string(
+            $identifier,
+            $component ?: 'local_envasyllabus',
+            $a,
+            $currentlang,
+        );
     }
 }

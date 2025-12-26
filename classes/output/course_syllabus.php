@@ -121,7 +121,7 @@ class course_syllabus implements renderable, templatable {
         $PAGE->requires->js_call_amd('local_envasyllabus/edit_field_modal', 'init');
         $PAGE->requires->js_call_amd('local_envasyllabus/edit_teachers_modal', 'init');
 
-        $currentlang = current_language();
+        $currentlang = language_switcher::get_current_langcode();
         $contextdata = new stdClass();
         $course = $DB->get_record('course', ['id' => $this->courseid]);
         $context = \context_course::instance($this->courseid);

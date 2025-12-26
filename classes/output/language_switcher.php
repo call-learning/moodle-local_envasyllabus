@@ -33,7 +33,7 @@ class language_switcher implements renderable, templatable {
     /**
      * Parameter name.
      */
-    const LANG_PARAMETER_NAME = 'curlang';
+    public const LANG_PARAMETER_NAME = 'curlang';
 
     /**
      * @var moodle_url $currenturl
@@ -69,7 +69,7 @@ class language_switcher implements renderable, templatable {
         $pixicon = new \pix_icon('i/languages', get_string('syllabus:lang:label', 'local_envasyllabus'), 'local_envasyllabus');
         $pixiconout = $output->render($pixicon);
         $singleselect = new \single_select($this->currenturl, self::LANG_PARAMETER_NAME, [
-            'fra' => get_string('syllabus:lang:system', 'local_envasyllabus'),
+            'fr' => get_string('syllabus:lang:system', 'local_envasyllabus'),
             'en' => get_string('syllabus:lang:english', 'local_envasyllabus'),
         ], $this->currentlang, null);
         $singleselect->set_label($pixiconout);
@@ -81,9 +81,9 @@ class language_switcher implements renderable, templatable {
      *
      * @return void
      */
-    public static function set_lang() {
+    public static function set_lang(string $forcelang = '') {
         global $SESSION;
-        $SESSION->forcelang = $SESSION->syllabus_currentlang;
+        $SESSION->forcelang = $forcelang ? $forcelang : $SESSION->syllabus_currentlang;
     }
 
     /**
@@ -103,7 +103,11 @@ class language_switcher implements renderable, templatable {
      */
     public static function get_current_langcode(): string {
         global $SESSION;
-        $currentlang = isset($SESSION->syllabus_currentlang) ? $SESSION->syllabus_currentlang : 'fra';
+        $currentlangparm = optional_param(self::LANG_PARAMETER_NAME, '', PARAM_LANG);
+        if (!empty($currentlangparm)) {
+            $SESSION->syllabus_currentlang = $currentlangparm;
+        }
+        $currentlang = isset($SESSION->syllabus_currentlang) ? $SESSION->syllabus_currentlang : 'fr';
         return $currentlang;
     }
 }

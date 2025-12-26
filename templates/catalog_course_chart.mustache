@@ -21,42 +21,16 @@
 
     Example context (json):
     {
-        "chartdata": "{}",
         "uniqid": "12345"
     }
 }}
 <div class="catalog-chart-container">
-    <div class="chart-area" id="chart-area-{{uniqid}}">
+    <div class="chart-area" id="chart-area-{{uniqid}}" data-chart-data="{{chartdata}}">
         <div class="chart-image" role="presentation"></div>
     </div>
 </div>
-
 {{#js}}
-require([
-    'jquery',
-    'core/chart_builder',
-    'core/chart_output_chartjs',
-], function($, Builder, Output) {
-    var chartData = {{{chartdata}}};
-    var uniqid = "{{uniqid}}";
-    var chartArea = $('#chart-area-' + uniqid);
-    var chartImage = chartArea.find('.chart-image');
-
-    // Ensure chartData is an object and set barThickness before building the chart.
-    if (typeof chartData === 'string') {
-        chartData = JSON.parse(chartData);
-    }
-    if (chartData && chartData.data && Array.isArray(chartData.data.datasets)) {
-        chartData.data.datasets.forEach(function(dataset) {
-            dataset.barThickness = 50;
-        });
-    }
-
-    Builder.make(chartData).then(function(ChartInst) {
-        var output = new Output(chartImage, ChartInst);
-        return output;
-    }).catch(function(error) {
-        window.console.error('Chart rendering failed:', error);
-    });
+require(['local_envasyllabus/catalog_chart'], function(CatalogChart) {
+    CatalogChart.init('chart-area-{{uniqid}}');
 });
 {{/js}}

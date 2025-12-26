@@ -103,7 +103,7 @@ class get_filtered_courses extends external_api {
             unset($courses[$id]); // We cannot view the course so, let's remove it.
         }
         // Now the filter.
-        $currentlang = $params['currentlang'];
+        $currentlang = $params['currentlang'] ?? 'fr';
         $filteredcourse = self::filter_courses($courses, $params['filters'], $currentlang);
 
         // Compute small summary and title depending on current lang.
@@ -130,12 +130,15 @@ class get_filtered_courses extends external_api {
         }
 
         self::sort_courses($filteredcourse, $sort);
+        // Force lang for programme headers.
+        language_switcher::set_lang($currentlang);
         $columns = programme_manager::get_numeric_columns();
+        language_switcher::reset_lang();
         return [
             'courses' => $filteredcourse,
             'programmecolumns' => self::process_programme_header($columns),
-            'mainheaders' => self::get_programme_main_headers(),
         ];
+        return $filteredcourse;
     }
 
     /**
@@ -300,7 +303,8 @@ class get_filtered_courses extends external_api {
      */
     public static function process_programme_header(array $columns): array {
         $cache = cache::make_from_params(cache_store::MODE_REQUEST, 'local_envasyllabus', 'filtered_course');
-        if ($cached = $cache->get('programme_headers')) {
+        $currentlang = language_switcher::get_current_langcode();
+        if ($cached = $cache->get('programme_headers' . $currentlang)) {
             return $cached;
         }
         $programmecolumns = [];
@@ -314,19 +318,19 @@ class get_filtered_courses extends external_api {
             'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
             'column' => 'perso',
             'label' => 'Perso',
-            'help' => get_string('perso_help', 'local_envasyllabus'),
+            'help' => utils::get_string_current_lang('perso_help', 'local_envasyllabus'),
         ];
         $activecolumn = [
             'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
             'column' => 'active',
             'label' => '%Actif',
-            'help' => get_string('active_help', 'local_envasyllabus'),
+            'help' => utils::get_string_current_lang('active_help', 'local_envasyllabus'),
         ];
         $totalcolumn = [
             'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
             'column' => 'total',
             'label' => 'Total',
-            'help' => get_string('total_help', 'local_envasyllabus'),
+            'help' => utils::get_string_current_lang('total_help', 'local_envasyllabus'),
         ];
 
         $programmecolumns[] = $persocolumn;
@@ -676,31 +680,6 @@ class get_filtered_courses extends external_api {
                     ]
                 )
             ),
-            'mainheaders' => new external_multiple_structure(
-                new external_single_structure(
-                    [
-                        'label' => new external_value(PARAM_RAW, 'The label of the header'),
-                        'class' => new external_value(PARAM_RAW, 'The css class of the header', VALUE_OPTIONAL, ''),
-                    ]
-                )
-            ),
         ]);
-    }
-
-    /**
-     * Get programme main headers
-     *
-     * @return array
-     */
-    private static function get_programme_main_headers() {
-        language_switcher::set_lang();
-        $columns = [
-            ['label' => get_string('th:uc', 'local_envasyllabus'), 'class' => "w-25"],
-            ['label' => get_string('th:acronym', 'local_envasyllabus'), 'class' => "w-10"],
-            ['label' => get_string('th:responsible', 'local_envasyllabus'), 'class' => "w-15"],
-            ['label' => get_string('th:ects', 'local_envasyllabus'), 'class' => ""],
-        ];
-        language_switcher::reset_lang();
-        return $columns;
     }
 }

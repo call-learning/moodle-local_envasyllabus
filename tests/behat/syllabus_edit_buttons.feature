@@ -93,7 +93,7 @@ Feature: Syllabus page edit buttons visibility and functionality
     And I wait "2" seconds
 
     # Verify French content is visible by default
-    When I switch syllabus language to "fra"
+    When I switch syllabus language to "fr"
     Then I should see "Compétences mises à jour"
     And I should not see "Updated competences"
 

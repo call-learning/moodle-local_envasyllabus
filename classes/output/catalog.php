@@ -38,45 +38,23 @@ class catalog implements renderable, templatable {
     const DEFAULT_COURSE_CATEGORY = 124;
 
     /**
-     * @var mixed|string
-     */
-    private $currentlang;
-
-    /**
-     * @var bool $listview
-     */
-    private $listview = false;
-
-    /**
-     * @var string $modus
-     */
-    private $modus = 'normal';
-
-    /**
-     * @var bool $gridview
-     */
-    private $gridview = true;
-
-    /**
-     * Current lang
+     * Catalog constructor
      *
      * @param string $currentlang
      */
-    public function __construct($currentlang = '') {
-        $this->listview = optional_param('viewtype', 'list', PARAM_ALPHA);
-        switch ($this->listview) {
-            case 'grid':
-                $this->gridview = true;
-                break;
-            default:
-                $this->listview = true;
-        }
-        if ($this->listview) {
-            $this->gridview = false;
-        }
-        $this->modus = optional_param('modus', 'normal', PARAM_TEXT);
-        $this->currentlang = $currentlang;
+    public function __construct(
+        private string $currentlang = '',
+        /**
+         * @var string $viewtype
+         */
+        private string $viewtype = 'list',
+        /**
+         * @var string $modus
+         */
+        private string $modus = 'normal'
+    ) {
     }
+
     /**
      * Export for template
      *
@@ -91,12 +69,13 @@ class catalog implements renderable, templatable {
         $context->filterform = $filterform->render();
         $context->categoryrootid = get_config('local_envasyllabus', 'rootcategoryid');
         $context->currentlang = $this->currentlang ?? '';
-        $context->viewtype = $this->listview ? 'list' : 'grid';
+        $context->viewtype = $this->viewtype;
         $context->modus = $this->modus;
         $context->extendedmodus = $this->modus === 'extended';
         $context->normalmodus = $this->modus === 'normal';
-        $context->listview = $this->listview;
-        $context->gridview = $this->gridview;
+        $context->listview = $this->viewtype === 'list';
+        $context->gridview = $this->viewtype === 'grid';
+        $context->chartview = $this->viewtype === 'chart';
         $context->canexport = has_capability(
             'local/envasyllabus:exportcatalog',
             context_system::instance()

@@ -27,7 +27,7 @@
     }
 }}
 <div id="catalog-course-category-{{uniqid}}" class="local-envasyllabus-ccat">
-    {{#sortedCourses}}
+    {{#sortedcourses}}
         {{#semesters}}
             {{#semester}}
             <h3 class="listheader{{#gridview}} mb-3{{/gridview}}">{{#str}}
@@ -48,9 +48,10 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            {{#mainheaders}}
-                                <th scope="col" class="{{class}}">{{label}}</th>
-                            {{/mainheaders}}
+                            <th scope="col" class="w-25">{{#str}}th:uc, local_envasyllabus{{/str}}</th>
+                            <th scope="col" class="w-10">{{#str}}th:acronym, local_envasyllabus{{/str}}</th>
+                            <th scope="col" class="w-15">{{#str}}th:responsible, local_envasyllabus{{/str}}</th>
+                            <th scope="col">{{#str}}th:ects, local_envasyllabus{{/str}}</th>
                             {{#extendedmodus}}
                                 {{#programmecolumns}}
                                     <th scope="col" data-id="{{column}}" {{#help}}class="hashelp" data-toggle="popover" data-placement="bottom" data-html="true" data-content="{{{help}}}"{{/help}}>{{label}}</th>
@@ -77,8 +78,5 @@
                 </table>
             {{/listview}}
         {{/semesters}}
-    {{/sortedCourses}}
-    {{#chartview}}
-        {{>local_envasyllabus/catalog_chart}}
-    {{/chartview}}
+    {{/sortedcourses}}
 </div>

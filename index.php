@@ -33,12 +33,14 @@ require_login(true);
 $title = get_string('courses:index', 'local_envasyllabus');
 global $OUTPUT;
 $PAGE->set_title($title);
-$viewtype = optional_param('viewtype', 'list', PARAM_ALPHA);
+$viewtype = optional_param('viewtype', 'grid', PARAM_ALPHA);
 $PAGE->set_url(new moodle_url('/local/enva_syllabus/index.php', ['viewtype' => $viewtype]));
 $PAGE->set_heading($title);
 $PAGE->set_pagetype('local-envasyllabus-index');
 $languageswitcher = new language_switcher();
-$catalog = new \local_envasyllabus\output\catalog(language_switcher::get_current_langcode());
+$modus = optional_param('modus', 'normal', PARAM_TEXT);
+
+$catalog = new \local_envasyllabus\output\catalog(language_switcher::get_current_langcode(), $viewtype, $modus);
 $renderer = $PAGE->get_renderer('local_envasyllabus');
 
 $PAGE->set_secondary_navigation(false);
