@@ -106,7 +106,7 @@ const setIconLoading = (button, loading, originalClasses) => {
 const getExportParamsFromUrl = () => {
     const params = new URLSearchParams(window.location.search);
     return {
-        lang: params.get('lang') || 'en',
+        lang: params.get('curlang') || 'en',
         extended: params.get('modus') === 'extended',
     };
 };

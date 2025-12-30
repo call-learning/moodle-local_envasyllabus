@@ -44,14 +44,15 @@ $token = md5(uniqid(rand(), true));
 language_switcher::set_lang();
 try {
     $lang = optional_param('lang', 'en', PARAM_LANG);
-    $extended = optional_param('extended', 0, PARAM_BOOL);
+    $modus = optional_param('modus', 'normal', PARAM_ALPHA);
+    $isextended = ($modus === 'extended');
     // Create the Excel file.
-    $exporter = new excel_exporter($categoryid, $extended, $lang);
+    $exporter = new excel_exporter($categoryid, $isextended, $lang);
     $spreadsheet = $exporter->create_spreadsheet();
 
     // Save to temp directory with token.
     $tempdir = make_temp_directory('envasyllabus/exports');
-    $filename = 'syllabus_export_' . ($extended ? 'extended_' : 'basic_') .
+    $filename = 'syllabus_export_' . ($isextended ? 'extended_' : 'basic_') .
         $lang . '_' . date('Y-m-d_H-i-s') . '.xlsx';
     $filepath = $tempdir . '/' . $token . '_' . $filename;
 
