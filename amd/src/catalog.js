@@ -195,6 +195,7 @@ const buildCourseList = (courses, programmecolumns = []) => {
 
             // Sum ECTS and programme values.
             const programmeMap = new Map();
+            const programmeValueCount = new Map();
             semester.courses.forEach((course) => {
                 // Sum ECTS.
                 const ects = parseFloat(course.cf?.uc_ects?.value) || 0;
@@ -204,8 +205,12 @@ const buildCourseList = (courses, programmecolumns = []) => {
                 if (course.programmevalues) {
                     course.programmevalues.forEach((pv) => {
                         const currentSum = programmeMap.get(pv.column) || 0;
-                        const pvValue = parseFloat(pv.sum) || 0;
-                        programmeMap.set(pv.column, currentSum + pvValue);
+                        const pvValue = parseFloat(pv.sum);
+                        if (!isNaN(pvValue) && pvValue) {
+                            programmeMap.set(pv.column, currentSum + pvValue);
+                            const currentCount = programmeValueCount.get(pv.column) || 0;
+                            programmeValueCount.set(pv.column, currentCount + 1);
+                        }
                     });
                 }
             });
@@ -215,7 +220,12 @@ const buildCourseList = (courses, programmecolumns = []) => {
                 // Use the column order from programmecolumns.
                 programmecolumns.forEach((col) => {
                     const sum = programmeMap.get(col.column) || 0;
-                    totals.programmevalues.push({column: col.column, sum});
+                    if (col?.totaltype === 'average') {
+                        const count = programmeValueCount.get(col.column) || 1;
+                        totals.programmevalues.push({column: col.column, sum: Math.round(sum / count)});
+                    } else {
+                        totals.programmevalues.push({column: col.column, sum});
+                    }
                 });
             } else {
                 // Fallback: use the map order.

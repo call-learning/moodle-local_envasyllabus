@@ -221,7 +221,7 @@ class excel_exporter {
         // Add extended mode headers.
         if ($this->extendedmode) {
             foreach ($this->programmecolumns as $column) {
-                $headers[] = $column['name'] ?? $column['column'] ?? '';
+                $headers[] = $column['label'] ?? $column['column'] ?? '';
             }
         }
 
@@ -315,8 +315,16 @@ class excel_exporter {
 
                 // Add sum formulas for columns 4 onward (ECTS and programme columns).
                 for ($col = 4; $col <= $numcols; $col++) {
+                    $currentcol = $this->programmecolumns[$col - 5] ?? null; // Here -5 because we have the ECTS column at index 4 and
+                    // then the programme columns.
+                    $isaverage = ($currentcol['totaltype'] ?? '') === 'average';
                     $colletter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
-                    $formula = '=SUM(' . $colletter . $semesterstartrow . ':' . $colletter . $semesterendrow . ')';
+                    if ($isaverage) {
+                        $formula = "=ROUNDUP(IFERROR(AVERAGEIF({$colletter}{$semesterstartrow}:{$colletter}{$semesterendrow},\"<>0\"),0),0)";
+                    } else {
+                        $formula = "=SUM({$colletter}{$semesterstartrow}:{$colletter}{$semesterendrow})";
+
+                    }
                     $cellcoordinate = $colletter . $row;
                     $sheet->setCellValue($cellcoordinate, $formula);
                 }

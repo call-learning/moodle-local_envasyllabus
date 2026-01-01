@@ -138,7 +138,6 @@ class get_filtered_courses extends external_api {
             'courses' => $filteredcourse,
             'programmecolumns' => self::process_programme_header($columns),
         ];
-        return $filteredcourse;
     }
 
     /**
@@ -325,6 +324,7 @@ class get_filtered_courses extends external_api {
             'column' => 'active',
             'label' => '%Actif',
             'help' => utils::get_string_current_lang('active_help', 'local_envasyllabus'),
+            'totaltype' => 'average', // We make an average.
         ];
         $totalcolumn = [
             'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
@@ -642,7 +642,9 @@ class get_filtered_courses extends external_api {
                                     'columnid' => new external_value(PARAM_INT, 'The id of the custom field'),
                                     'column' => new external_value(PARAM_RAW, 'The name of the custom field'),
                                     'label' => new external_value(PARAM_RAW, 'The shortname of the custom field'),
-                                    'sum' => new external_value(PARAM_FLOAT, 'The value of the custom field'),
+                                    // We use the terminology sum here but it is not necessarily a sum, it can be an average or
+                                    // another calculation depending on the column.
+                                    'sum' => new external_value(PARAM_FLOAT, 'The value of the custom field', VALUE_OPTIONAL),
                                 ]
                             ),
                             'Custom fields',
@@ -677,6 +679,14 @@ class get_filtered_courses extends external_api {
                         'column' => new external_value(PARAM_RAW, 'The name of the custom field'),
                         'label' => new external_value(PARAM_RAW, 'The shortname of the custom field '),
                         'help' => new external_value(PARAM_RAW, 'The help text for the custom field', VALUE_OPTIONAL, ''),
+                        // The 'totaltype' can be sum or average, so when we do the totals we know
+                        // what to do when calculating totals.
+                        'totaltype' => new external_value(
+                            PARAM_RAW,
+                            'The way we calculate the totals for this column',
+                            VALUE_OPTIONAL,
+                            'sum'
+                        ),
                     ]
                 )
             ),
