@@ -50,7 +50,7 @@ class language_switcher implements renderable, templatable {
      */
     public function __construct() {
         global $FULLME, $SESSION;
-        $this->currentlang = optional_param(self::LANG_PARAMETER_NAME, 'en', PARAM_LANG);
+        $this->currentlang = optional_param(self::LANG_PARAMETER_NAME, 'fr', PARAM_LANG);
         $SESSION->syllabus_currentlang = $this->currentlang;
         $currenturl = new moodle_url($FULLME);
         $currenturl->remove_params([self::LANG_PARAMETER_NAME]);
@@ -64,14 +64,18 @@ class language_switcher implements renderable, templatable {
      * @return array|\stdClass
      */
     public function export_for_template(renderer_base $output) {
-        $enlangurl = new moodle_url($this->currenturl);
-        $enlangurl->param(self::LANG_PARAMETER_NAME, 'en');
         $pixicon = new \pix_icon('i/languages', get_string('syllabus:lang:label', 'local_envasyllabus'), 'local_envasyllabus');
         $pixiconout = $output->render($pixicon);
-        $singleselect = new \single_select($this->currenturl, self::LANG_PARAMETER_NAME, [
+        $singleselect = new \single_select(
+            $this->currenturl,
+            self::LANG_PARAMETER_NAME,
+            [
             'fr' => get_string('syllabus:lang:system', 'local_envasyllabus'),
             'en' => get_string('syllabus:lang:english', 'local_envasyllabus'),
-        ], $this->currentlang, null);
+            ],
+            $this->currentlang,
+            null
+        );
         $singleselect->set_label($pixiconout);
         return $singleselect->export_for_template($output);
     }
@@ -84,7 +88,7 @@ class language_switcher implements renderable, templatable {
      */
     public static function set_lang(string $forcelang = '') {
         global $SESSION;
-        $SESSION->forcelang = $forcelang ? $forcelang : $SESSION->syllabus_currentlang;
+        $SESSION->forcelang = $forcelang ?: $SESSION->syllabus_currentlang;
     }
 
     /**
