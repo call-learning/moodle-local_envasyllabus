@@ -54,24 +54,24 @@ class course_syllabus implements renderable, templatable {
             'fields' => [
                 ['type' => 'categorysum', 'languagestring' => 'syllabuspage:student_total_hours', 'class' => 'highlighted-top',
                     'fields' => [
-                        ['type' => 'cf', 'fieldname' => 'uc_heures_cm_etudiant', 'programmenames' => 'cm'],
-                        ['type' => 'cf', 'fieldname' => 'uc_heures_td_etudiant', 'programmenames' => 'td'],
-                        ['type' => 'cf', 'fieldname' => 'uc_heures_tp_etudiant', 'programmenames' => 'tp'],
-                        ['type' => 'cf', 'fieldname' => 'uc_heures_tpa_etudiant', 'programmenames' => 'tpa'],
-                        ['type' => 'cf', 'fieldname' => 'uc_heures_tc_etudiant', 'programmenames' => 'tc'],
-                        ['type' => 'cf', 'fieldname' => 'uc_heures_fmp_etudiant', 'programmenames' => 'fmp'],
+                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_cm_etudiant', 'programmenames' => 'cm'],
+                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_td_etudiant', 'programmenames' => 'td'],
+                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_tp_etudiant', 'programmenames' => 'tp'],
+                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_tpa_etudiant', 'programmenames' => 'tpa'],
+                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_tc_etudiant', 'programmenames' => 'tc'],
+                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_fmp_etudiant', 'programmenames' => 'fmp'],
                     ],
                 ],
                 ['type' => 'categorysum', 'languagestring' => 'syllabuspage:student_total_hours_he', 'class' => 'highlighted-top',
                     'fields' => [
-                        ['type' => 'cf', 'fieldname' => 'uc_heures_he_aas_etudiant', 'programmenames' => 'aas'],
-                        ['type' => 'cf', 'fieldname' => 'uc_heures_he_tpers_etudiant', 'programmenames' => 'perso_av, perso_ap'],
+                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_he_aas_etudiant', 'programmenames' => 'aas'],
+                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_he_tpers_etudiant', 'programmenames' => 'perso_av, perso_ap'],
                     ],
                 ],
             ],
         ],
         [
-            'type' => 'cf',
+            'type' => 'cfprogramme',
             'fieldname' => 'uc_ects',
             'languagestring' => 'syllabuspage:student_ects',
             'icon' => 'ects',
@@ -251,10 +251,14 @@ class course_syllabus implements renderable, templatable {
                     $fieldinfo['icon'] ?? ''
                 );
                 switch ($fieldinfo['type']) {
-                    case 'cf':
+                    case 'cfprogramme':
                         $sum = $this->get_programme_sum($fieldinfo, $customfields);
                         $headerinfo->value = $sum > 0 ? (string)$sum : '-';
-                        ;
+                        $headerdata[] = $headerinfo;
+                        break;
+                    case 'cf':
+                        $cfvalue = $customfields[$fieldinfo['fieldname']];
+                        $headerinfo->value = !empty($cfvalue) ? $cfvalue : '-';
                         $headerdata[] = $headerinfo;
                         break;
                     case 'categorysum':
@@ -348,7 +352,7 @@ class course_syllabus implements renderable, templatable {
         foreach ($fieldinfolist as $fieldinfo) {
             if (!empty($fieldinfo['type'])) {
                 switch ($fieldinfo['type']) {
-                    case 'cf':
+                    case 'cfprogramme':
                         $total += $this->get_programme_sum($fieldinfo, $customfields);
                         break;
                     case 'categorysum':
