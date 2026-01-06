@@ -101,6 +101,11 @@
     height: 200px;
     width: 100%;
 }
+.local-envasyllabus-ccat .course-card .card-img-top img {
+    object-fit: cover;
+    object-position: center; /* optional but recommended */
+    /* Ok because the parent container has a height and width */
+}
 .local-envasyllabus-ccat .course-img {
     background-size: cover;
 }
