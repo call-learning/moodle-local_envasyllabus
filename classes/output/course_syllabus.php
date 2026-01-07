@@ -65,7 +65,8 @@ class course_syllabus implements renderable, templatable {
                 ['type' => 'categorysum', 'languagestring' => 'syllabuspage:student_total_hours_he', 'class' => 'highlighted-top',
                     'fields' => [
                         ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_he_aas_etudiant', 'programmenames' => 'aas'],
-                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_he_tpers_etudiant', 'programmenames' => 'perso_av, perso_ap'],
+                        ['type' => 'cfprogramme',
+                            'fieldname' => 'uc_heures_he_tpers_etudiant', 'programmenames' => 'perso_av, perso_ap'],
                     ],
                 ],
             ],

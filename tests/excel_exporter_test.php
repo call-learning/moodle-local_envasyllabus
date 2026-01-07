@@ -77,8 +77,8 @@ final class excel_exporter_test extends \advanced_testcase {
         $property = $reflection->getProperty('programmecolumns');
         $property->setAccessible(true);
         $property->setValue($exporter, [
-            ['column' => 'prog1', 'name' => 'Programme 1'],
-            ['column' => 'prog2', 'name' => 'Programme 2'],
+            ['column' => 'prog1', 'label' => 'Programme 1'],
+            ['column' => 'prog2', 'label' => 'Programme 2'],
         ]);
 
         $headers = $exporter->get_headers();

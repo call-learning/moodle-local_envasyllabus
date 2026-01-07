@@ -301,7 +301,7 @@ final class get_filtered_courses_test extends \externallib_advanced_testcase {
             $expected,
             array_column(
                 $programmesumsforcourse,
-                'value',
+                'sum',
                 'column'
             )
         );
