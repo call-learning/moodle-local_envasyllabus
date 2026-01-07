@@ -35,7 +35,9 @@ export const init = (chartElementId) => {
     const chartData = chartElement.dataset.chartData ? JSON.parse(chartElement.dataset.chartData) : null;
     if (chartData) {
         Builder.make(chartData)
-            .then((ChartInst) => new Output(chartImage, ChartInst).render())
+            .then((ChartInst) => {
+                return new Output(chartImage, ChartInst);
+            })
             .catch(Notification.exception);
     }
 };
