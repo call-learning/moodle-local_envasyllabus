@@ -50,7 +50,8 @@ class language_switcher implements renderable, templatable {
      */
     public function __construct() {
         global $FULLME, $SESSION;
-        $this->currentlang = optional_param(self::LANG_PARAMETER_NAME, 'fr', PARAM_LANG);
+        $currentlang = current_language();
+        $this->currentlang = optional_param(self::LANG_PARAMETER_NAME, $currentlang, PARAM_LANG);
         $SESSION->syllabus_currentlang = $this->currentlang;
         $currenturl = new moodle_url($FULLME);
         $currenturl->remove_params([self::LANG_PARAMETER_NAME]);
