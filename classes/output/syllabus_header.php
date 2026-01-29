@@ -36,63 +36,27 @@ use templatable;
  */
 class syllabus_header implements renderable {
     /**
-     * @var array $programmetotals programme total
-     */
-    private array $programmetotals = [];
-
-    /**
      * Cfield definition
      */
-    public const CF_HEADER_DEFINITION = [
-        ['type' => 'cf', 'fieldname' => 'uc_departement', 'class' => 'highlighted-top'],
-        [
-            'type' => 'categorysum',
-            'languagestring' => 'syllabuspage:student_grand_total_hours',
+    public const CF_HEADER_DISPLAY_DEFINITION = [
+        'uc_departement' => [
             'class' => 'highlighted-top',
-            'positionafter' => true,
-            'fields' => [
-                [
-                    'type' => 'categorysum',
-                    'languagestring' => 'syllabuspage:student_total_hours',
-                    'class' => 'highlighted-top',
-                    'fields' => [
-                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_cm_etudiant', 'programmenames' => 'cm'],
-                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_td_etudiant', 'programmenames' => 'td'],
-                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_tp_etudiant', 'programmenames' => 'tp'],
-                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_tpa_etudiant', 'programmenames' => 'tpa'],
-                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_tc_etudiant', 'programmenames' => 'tc'],
-                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_fmp_etudiant', 'programmenames' => 'fmp'],
-                    ],
-                ],
-                [
-                    'type' => 'categorysum',
-                    'languagestring' => 'syllabuspage:student_total_hours_he',
-                    'class' => 'highlighted-top',
-                    'fields' => [
-                        ['type' => 'cfprogramme', 'fieldname' => 'uc_heures_he_aas_etudiant', 'programmenames' => 'aas'],
-                        [
-                            'type' => 'cfprogramme',
-                            'fieldname' => 'uc_heures_he_tpers_etudiant',
-                            'programmenames' => 'perso_av, perso_ap',
-                        ],
-                    ],
-                ],
-            ],
         ],
-        [
-            'type' => 'cfprogramme',
-            'fieldname' => 'uc_ects',
+        'student_grand_total_hours' => [
+            'class' => 'highlighted-top',
+        ],
+        'student_total_hours' => [
+            'class' => 'highlighted-top',
+        ],
+        'student_total_hours_he' => [
+            'class' => 'highlighted-top',
+        ],
+        'uc_ects' => [
             'languagestring' => 'syllabuspage:student_ects',
             'icon' => 'ects',
             'class' => 'highlighted-top',
         ],
     ];
-
-    /**
-     * @var array $customfieldsvalue array of custom field values
-     */
-    protected array $customfieldsvalue = [];
-
     /**
      * Constructor
      *
@@ -102,12 +66,6 @@ class syllabus_header implements renderable {
         /**@var int $courseid Course ID */
         protected int $courseid,
     ) {
-        $handler = \core_customfield\handler::get_handler('core_course', 'course');
-        $cfdata = $handler->get_instance_data($this->courseid, true);
-        foreach ($cfdata as $cfdatacontroller) {
-            $shortname = $cfdatacontroller->get_field()->get('shortname');
-            $this->customfieldsvalue[$shortname] = $cfdatacontroller->export_value();
-        }
     }
 
     /**
@@ -117,128 +75,23 @@ class syllabus_header implements renderable {
      * @return array|stdClass|void
      */
     public function export_for_template(renderer_base $output) {
-        if (utils::is_new_programme_enabled($this->courseid)) {
-            $sprogrammefield = utils::get_programme_customfield($this->courseid);
-            $this->programmetotals = $sprogrammefield->get_column_totals();
+        $computeheader = new course_header_data($this->courseid);
+        $headerdata = $computeheader->compute_header_data();
+        // Now add the layout and other values.
+        $headervalues = [];
+        foreach ($headerdata as $fieldname => $value) {
+            $layoutinfo = self::CF_HEADER_DISPLAY_DEFINITION[$fieldname] ?? [];
+            $fielddesc = !empty($layoutinfo['languagestring'])
+                ? get_string($layoutinfo['languagestring'], 'local_envasyllabus')
+                : get_string('syllabuspage:' . $fieldname, 'local_envasyllabus');
+            $headerinfo = [
+                'class' => $layoutinfo['class'] ?? '',
+                'title' => $fielddesc,
+                'value' => $value ? (string) $value : '-',
+                'icon' => $layoutinfo['icon'] ?? '',
+            ];
+            $headervalues[$fieldname] = (object) $headerinfo;
         }
-
-        return $this->get_header_data(self::CF_HEADER_DEFINITION);
-    }
-
-    /**
-     * Create a header data object
-     *
-     * @param string $class
-     * @param string $title
-     * @param string $icon
-     * @return stdClass
-     */
-    protected function create_header_data(string $class, string $title, string $icon): stdClass {
-        $headerinfo = new stdClass();
-        $headerinfo->class = $class;
-        $headerinfo->title = $title;
-        $headerinfo->value = '';
-        $headerinfo->icon = $icon;
-        return $headerinfo;
-    }
-
-    /**
-     * Get header data for course summary
-     *
-     * @param array $fieldinfolist
-     * @return array
-     * @throws \coding_exception
-     */
-    protected function get_header_data(array $fieldinfolist): array {
-        $headerdata = [];
-        foreach ($fieldinfolist as $fieldinfo) {
-            if (!empty($fieldinfo['type'])) {
-                if (empty($fieldinfo['languagestring'])) {
-                    $fielddesc = get_string('syllabuspage:' . $fieldinfo['fieldname'], 'local_envasyllabus');
-                } else {
-                    $fielddesc = get_string($fieldinfo['languagestring'], 'local_envasyllabus');
-                }
-                $headerinfo = $this->create_header_data(
-                    $fieldinfo['class'] ?? '',
-                    $fielddesc,
-                    $fieldinfo['icon'] ?? ''
-                );
-                switch ($fieldinfo['type']) {
-                    case 'cfprogramme':
-                        $sum = $this->get_programme_sum($fieldinfo);
-                        $headerinfo->value = $sum > 0 ? (string)$sum : '-';
-                        $headerdata[] = $headerinfo;
-                        break;
-                    case 'cf':
-                        $cfvalue = $this->customfieldsvalue[$fieldinfo['fieldname']];
-                        $headerinfo->value = !empty($cfvalue) ? $cfvalue : '-';
-                        $headerdata[] = $headerinfo;
-                        break;
-                    case 'categorysum':
-                        $subheaders = $this->get_header_data($fieldinfo['fields']);
-                        $headerinfo->value = $this->get_header_sum($fieldinfo['fields']);
-                        if (!empty($fieldinfo['positionafter'])) {
-                            array_push($headerdata, ...$subheaders);
-                            $headerdata[] = $headerinfo;
-                        } else {
-                            $headerdata[] = $headerinfo;
-                            array_push($headerdata, ...$subheaders);
-                        }
-                }
-            }
-        }
-        return $headerdata;
-    }
-
-    /**
-     * Get header data for course summary
-     *
-     * @param array $fieldinfolist
-     * @return float
-     * @throws \coding_exception
-     */
-    protected function get_header_sum(array $fieldinfolist): float {
-        $total = 0;
-        foreach ($fieldinfolist as $fieldinfo) {
-            if (!empty($fieldinfo['type'])) {
-                switch ($fieldinfo['type']) {
-                    case 'cfprogramme':
-                        $total += $this->get_programme_sum($fieldinfo);
-                        break;
-                    case 'categorysum':
-                        $total += $this->get_header_sum($fieldinfo['fields']);
-                        break;
-                }
-            }
-        }
-        return $total;
-    }
-
-
-    /**
-     * Get programme sum
-     *
-     * @param array $fieldinfo
-     * @return float
-     */
-    protected function get_programme_sum(array $fieldinfo): float {
-        $fieldname = $fieldinfo['fieldname'];
-        $programmenames = $fieldinfo['programmenames'] ?? '';
-        if (empty($fieldname)) {
-            return 0;
-        }
-        if (empty($programmenames) || !utils::is_new_programme_enabled($this->courseid)) {
-            return intval($this->customfieldsvalue[$fieldname]) ?? 0;
-        }
-        $programmmenames = explode(',', $programmenames);
-        $programmmenames = array_map('trim', $programmmenames);
-        $sum = 0;
-        $totalswithkeys = array_column($this->programmetotals, 'sum', 'column');
-        foreach ($programmmenames as $programmename) {
-            if (isset($totalswithkeys[$programmename])) {
-                $sum += $totalswithkeys[$programmename];
-            }
-        }
-        return $sum;
+        return array_values($headervalues);
     }
 }
