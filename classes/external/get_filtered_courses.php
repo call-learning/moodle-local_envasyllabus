@@ -225,7 +225,7 @@ class get_filtered_courses extends external_api {
 
             // Get custom fields (already loaded in batch).
             $coursecfs = $allcustomfields[$cid] ?? [];
-            $sprogrammefield = utils::get_programme_customfield($coursecfs);
+            $sprogrammefield = utils::get_programme_customfield($cid, $coursecfs);
             $programmesums = [];
             if ($sprogrammefield && $sprogrammefield->get('id')) {
                 $programmesums = $sprogrammefield->get_sum(); // Specific to this custom field.
@@ -429,32 +429,6 @@ class get_filtered_courses extends external_api {
             $categories[$categoryid] = $category->get_formatted_name();
         }
         return $categories[$categoryid];
-    }
-
-    /**
-     * Map custom fields
-     *
-     * @param array $courses
-     * @return void
-     */
-    protected static function map_customfiedls(array &$courses): void {
-        $allcustomfields = course_handler::create()->get_instances_data(array_keys($courses), true);
-        foreach ($courses as $cid => &$course) {
-            $coursecfs = $allcustomfields[$cid] ?? [];
-            $course->customfields = [];
-            foreach ($coursecfs as $cfdatacontroller) {
-                $fieldshortname = $cfdatacontroller->get_field()->get('shortname');
-                $ispublicfield = visibility::is_syllabus_public_field($fieldshortname);
-                if ($ispublicfield) {
-                    $course->customfields[$fieldshortname] = [
-                        'type' => $cfdatacontroller->get_field()->get('type'),
-                        'value' => $cfdatacontroller->export_value(),
-                        'name' => $cfdatacontroller->get_field()->get('name'),
-                        'shortname' => $fieldshortname,
-                    ];
-                }
-            }
-        }
     }
 
     /**

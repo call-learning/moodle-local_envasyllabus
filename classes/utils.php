@@ -17,6 +17,7 @@
 namespace local_envasyllabus;
 
 use core\context;
+use customfield_sprogramme\data_controller;
 use local_envasyllabus\output\language_switcher;
 
 /**
@@ -52,10 +53,16 @@ class utils {
     /**
      * Get the custom field of type 'sprogramme' with shortname 'programme' from a list of course custom fields data.
      *
-     * @param array $coursecustomfieldsdata An array of course custom fields data controllers.
-     * @return \customfield_sprogramme\data_controller|null The found custom field or null if not found.
+     * @param array|null $coursecustomfieldsdata An array of course custom fields data controllers.
+     * @return data_controller|null The found custom field or null if not found.
+     * @throws \moodle_exception
      */
-    public static function get_programme_customfield(array $coursecustomfieldsdata): ?\customfield_sprogramme\data_controller {
+    public static function get_programme_customfield(int $courseid, ?array $coursecustomfieldsdata = null): ?\customfield_sprogramme\data_controller {
+        if ($coursecustomfieldsdata === null) {
+            $handler = \core_customfield\handler::get_handler('core_course', 'course');
+            $coursecustomfieldsdata = $handler->get_instance_data($courseid, true);
+        }
+
         $filtered = array_filter($coursecustomfieldsdata, function ($cfdatacontroller) {
             $field = $cfdatacontroller->get_field();
             return $field->get('type') == 'sprogramme'
@@ -65,6 +72,21 @@ class utils {
             return array_values($filtered)[0];
         }
         return null;
+    }
+
+    /**
+     * Check if a course has the new programme custom field defined.
+     *
+     * @param int $courseid The course ID to check.
+     * @return bool True if the course has the new programme custom field, false otherwise.
+     */
+    public static function has_new_programme_data(int $courseid): bool {
+        $handler = \core_customfield\handler::get_handler('core_course', 'course');
+        $cfdata = $handler->get_instance_data($courseid, true);
+        $sprogrammefield = self::get_programme_customfield($courseid, $cfdata);
+        return $sprogrammefield
+            && $sprogrammefield->get_value() // Ensure the programme is enabled on this course.
+            && self::is_new_programme_enabled($courseid);
     }
 
     /**

@@ -275,7 +275,7 @@ final class get_filtered_courses_test extends \externallib_advanced_testcase {
         $coursedef['category'] = $category->id;
         $course = $this->create_course_from_def($coursedef);
         $coursecfs = course_handler::create()->get_instance_data($course->id, true);
-        $sprogrammefield = utils::get_programme_customfield($coursecfs);
+        $sprogrammefield = utils::get_programme_customfield($course->id, $coursecfs);
         $programmesums = [];
         if ($sprogrammefield && $sprogrammefield->get('id')) {
             $programmesums = $sprogrammefield->get_sum();
