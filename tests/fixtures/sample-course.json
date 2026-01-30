@@ -8,7 +8,9 @@
     "uc_titre_en": "Basics of Veterinary Medicine",
     "uc_acronyme": "BVM",
     "uc_annee": "1",
-    "uc_semestre": "1"
+    "uc_semestre": "1",
+    "uc_departement": "1",
+    "uc_ects": "6"
   },
   "programmedata": [
     {

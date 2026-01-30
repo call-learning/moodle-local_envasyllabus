@@ -55,8 +55,8 @@ final class course_syllabus_test extends \advanced_testcase {
         $this->assertEquals('Teacher One', $data->teachers[0]->userfullname);
         $this->assertEquals("UC0101 - Fundamentals of Veterinary Medicine", $data->coursedata->displayname);
         $expectedstats = [
-            'Teaching department' => '-',
-            'Total hours on timetable' => '66.0',
+            'Teaching department' => 'DSBP',
+            'Total hours on timetable' => '66',
             'Lectures (CM)' => '18',
             'Tutorials (TD)' => '26',
             'Practical work (TP)' => '2',
@@ -67,7 +67,7 @@ final class course_syllabus_test extends \advanced_testcase {
             'Supervised Self learning (AAS)' => '11',
             'Personal work' => "95.5",
             'Total hours' => "172.5",
-            'ECTS credits' => '-',
+            'ECTS credits' => '6',
         ];
 
         $actualstats = array_column($data->headerdata, 'value', 'title');

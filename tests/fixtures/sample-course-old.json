@@ -1,0 +1,23 @@
+{
+  "visible": 1,
+  "category": "CAT1",
+  "fullname": "UC0101 - Fundamentals of Veterinary Medicine",
+  "shortname": "UC0101",
+  "customfields": {
+    "uc_nombre": "UC0101",
+    "uc_titre_en": "Basics of Veterinary Medicine",
+    "uc_acronyme": "BVM",
+    "uc_annee": "1",
+    "uc_semestre": "1",
+    "uc_departement": "1",
+    "uc_ects": "6",
+    "uc_heures_td_etudiant": "26",
+    "uc_heures_tp_etudiant": "2",
+    "uc_heures_cm_etudiant": "18",
+    "uc_heures_tpa_etudiant": "20",
+    "uc_heures_tc_etudiant": "0",
+    "uc_heures_fmp_etudiant": "0",
+    "uc_heures_he_aas_etudiant": "11",
+    "uc_heures_he_tpers_etudiant": "95.5"
+  }
+}

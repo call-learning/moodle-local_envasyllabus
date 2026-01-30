@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License.
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace local_envasyllabus\local;
 
 use local_envasyllabus\utils;
@@ -73,6 +74,7 @@ class course_header_data {
             'fieldname' => 'uc_ects',
         ],
     ];
+
     /**
      * @var array $programmetotals programme total
      */
@@ -86,24 +88,31 @@ class course_header_data {
      * @var bool $isnewprogrammeenabled is new programme enabled
      */
     private bool $isnewprogrammeenabled = false;
+
     /**
      * Constructor
      *
      * @param int $courseid Course ID
+     * @param array|null $existingcustomtfielddata Existing custom field data to use (for performance)
      */
     public function __construct(
         /**@var int $courseid Course ID */
         protected int $courseid,
+        ?array $existingcustomtfielddata = null,
     ) {
-        $handler = \core_customfield\handler::get_handler('core_course', 'course');
-        $cfdata = $handler->get_instance_data($this->courseid, true);
+        if ($existingcustomtfielddata !== null) {
+            $cfdata = $existingcustomtfielddata;
+        } else {
+            $handler = \core_customfield\handler::get_handler('core_course', 'course');
+            $cfdata = $handler->get_instance_data($this->courseid, true);
+        }
         foreach ($cfdata as $cfdatacontroller) {
             $shortname = $cfdatacontroller->get_field()->get('shortname');
             $this->customfieldsvalues[$shortname] = $cfdatacontroller->export_value();
         }
-        $this->isnewprogrammeenabled = utils::is_new_programme_enabled($this->courseid);
-        if (utils::is_new_programme_enabled($this->courseid)) {
-            $sprogrammefield = utils::get_programme_customfield($this->courseid);
+        $this->isnewprogrammeenabled = course_syllabus_helper::is_new_programme_enabled($this->courseid);
+        if (course_syllabus_helper::is_new_programme_enabled($this->courseid)) {
+            $sprogrammefield = course_syllabus_helper::get_programme_customfield($this->courseid, $cfdata);
             $this->programmetotals = $sprogrammefield->get_column_totals();
         }
     }
@@ -130,6 +139,9 @@ class course_header_data {
                     case 'cf':
                         $cfvalue = $this->customfieldsvalues[$fieldinfo['fieldname']];
                         $value = !empty($cfvalue) ? $cfvalue : null;
+                        if (is_numeric($value)) {
+                            $value = floatval($value);
+                        }
                         break;
                     case 'categorysum':
                         $subheaders = $this->compute_header_data($fieldinfo['fields']);
@@ -184,7 +196,7 @@ class course_header_data {
             return 0;
         }
         if (empty($programmenames) || !$this->isnewprogrammeenabled) {
-            return floatval($customfieldsvalue[$fieldname]) ?? 0;
+            return floatval($this->customfieldsvalues[$fieldname]) ?? 0;
         }
         $programmmenames = explode(',', $programmenames);
         $programmmenames = array_map('trim', $programmmenames);

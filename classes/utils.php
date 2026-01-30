@@ -17,6 +17,7 @@
 namespace local_envasyllabus;
 
 use core\context;
+use core\di;
 use customfield_sprogramme\data_controller;
 use local_envasyllabus\output\language_switcher;
 
@@ -29,65 +30,6 @@ use local_envasyllabus\output\language_switcher;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class utils {
-    /**
-     * Check if the new programme feature is enabled for a specific course.
-     *
-     * @param int $courseid The course ID to check.
-     * @return bool True if the new programme feature is enabled for the course, false otherwise.
-     */
-    public static function is_new_programme_enabled(int $courseid): bool {
-        $newprogrammeenabled = get_config('local_envasyllabus', 'enablenewprogramme');
-        if ($newprogrammeenabled) {
-            return true;
-        }
-        $courselist = get_config('local_envasyllabus', 'enablenewprogrammeforcourse');
-        if (empty($courselist)) {
-            return false;
-        }
-        $courselist = explode(',', trim($courselist));
-        $courselist = array_map('trim', $courselist);
-        $courselist = array_map('intval', $courselist);
-        return in_array($courseid, $courselist, true);
-    }
-
-    /**
-     * Get the custom field of type 'sprogramme' with shortname 'programme' from a list of course custom fields data.
-     *
-     * @param array|null $coursecustomfieldsdata An array of course custom fields data controllers.
-     * @return data_controller|null The found custom field or null if not found.
-     * @throws \moodle_exception
-     */
-    public static function get_programme_customfield(int $courseid, ?array $coursecustomfieldsdata = null): ?\customfield_sprogramme\data_controller {
-        if ($coursecustomfieldsdata === null) {
-            $handler = \core_customfield\handler::get_handler('core_course', 'course');
-            $coursecustomfieldsdata = $handler->get_instance_data($courseid, true);
-        }
-
-        $filtered = array_filter($coursecustomfieldsdata, function ($cfdatacontroller) {
-            $field = $cfdatacontroller->get_field();
-            return $field->get('type') == 'sprogramme'
-                && $field->get('shortname') == 'programme';
-        });
-        if (!empty($filtered)) {
-            return array_values($filtered)[0];
-        }
-        return null;
-    }
-
-    /**
-     * Check if a course has the new programme custom field defined.
-     *
-     * @param int $courseid The course ID to check.
-     * @return bool True if the course has the new programme custom field, false otherwise.
-     */
-    public static function has_new_programme_data(int $courseid): bool {
-        $handler = \core_customfield\handler::get_handler('core_course', 'course');
-        $cfdata = $handler->get_instance_data($courseid, true);
-        $sprogrammefield = self::get_programme_customfield($courseid, $cfdata);
-        return $sprogrammefield
-            && $sprogrammefield->get_value() // Ensure the programme is enabled on this course.
-            && self::is_new_programme_enabled($courseid);
-    }
 
     /**
      * Get the string in the current syllabus language.

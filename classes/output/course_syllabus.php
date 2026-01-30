@@ -20,6 +20,7 @@ use core_course\external\course_summary_exporter;
 use core_customfield\data_controller;
 use local_competvetsuivi\matrix\matrix;
 use local_envasyllabus\local\course_header_data;
+use local_envasyllabus\local\course_syllabus_helper;
 use local_envasyllabus\utils;
 use local_envasyllabus\visibility;
 use moodle_exception;
@@ -88,7 +89,7 @@ class course_syllabus implements renderable, templatable {
             $shortname = $cfdatacontroller->get_field()->get('shortname');
             $this->customfieldsvalue[$shortname] = $cfdatacontroller->export_value();
         }
-        $this->hasnewprogramme = utils::has_new_programme_data($this->courseid);
+        $this->hasnewprogramme = course_syllabus_helper::has_new_programme_data($this->courseid);
     }
 
     /**

@@ -22,6 +22,7 @@ global $CFG;
 
 use core_course\customfield\course_handler;
 use core_external\external_api;
+use local_envasyllabus\local\course_syllabus_helper;
 use local_envasyllabus\tests\test_helper;
 use local_envasyllabus\utils;
 
@@ -262,48 +263,5 @@ final class get_filtered_courses_test extends \externallib_advanced_testcase {
                 ],
             ],
         ];
-    }
-
-    /**
-     * Test the programme sum calculation
-     */
-    public function test_programme_sum(): void {
-        $this->resetAfterTest();
-        $category = $this->getDataGenerator()->create_category();
-        $json = file_get_contents(self::get_fixture_path('local_envasyllabus', 'sample-course.json'));
-        $coursedef = json_decode($json, true);
-        $coursedef['category'] = $category->id;
-        $course = $this->create_course_from_def($coursedef);
-        $coursecfs = course_handler::create()->get_instance_data($course->id, true);
-        $sprogrammefield = utils::get_programme_customfield($course->id, $coursecfs);
-        $programmesums = [];
-        if ($sprogrammefield && $sprogrammefield->get('id')) {
-            $programmesums = $sprogrammefield->get_sum();
-        }
-        $refgetfilter = new \ReflectionClass(get_filtered_courses::class);
-        $refmethod = $refgetfilter->getMethod('process_programme_values');
-        $refmethod->setAccessible(true);
-        $programmesumsforcourse = $refmethod->invoke(null, $programmesums);
-        // On ne garde que les colonnes et les sommes pour la comparaison.
-        $expected = [
-            'cm' => 18,
-            'td' => 26,
-            'tp' => 2,
-            'tpa' => 20,
-            'tc' => 0,
-            'aas' => 11,
-            'fmp' => 0,
-            'perso' => 95.5,
-            'active' => 76,
-            'total' => 172.5,
-        ];
-        $this->assertEquals(
-            $expected,
-            array_column(
-                $programmesumsforcourse,
-                'sum',
-                'column'
-            )
-        );
     }
 }

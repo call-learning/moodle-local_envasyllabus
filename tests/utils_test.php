@@ -16,6 +16,9 @@
 
 namespace local_envasyllabus;
 
+use core\di;
+use local_envasyllabus\output\language_switcher;
+
 /**
  * Tests for the get_filtered_courses class.
  *
@@ -26,29 +29,30 @@ namespace local_envasyllabus;
  */
 final class utils_test extends \advanced_testcase {
     /**
-     * Test the is_new_programme_enabled function.
+     * Test get_string_current_lang function.
      *
-     * @covers ::is_new_programme_enabled
+     * @covers ::get_string_current_lang
      */
-    public function test_is_new_programme_enabled(): void {
+    public function test_get_string_current_lang(): void {
         $this->resetAfterTest();
-        // Create a course to test with.
-        $course1 = $this->getDataGenerator()->create_course(['fullname' => 'Test Course']);
-        $course2 = $this->getDataGenerator()->create_course(['fullname' => 'Test Course2']);
-        $course3 = $this->getDataGenerator()->create_course(['fullname' => 'Test Course3']);
-        set_config('enablenewprogramme', 1, 'local_envasyllabus');
-        set_config('enablenewprogrammeforcourse', '', 'local_envasyllabus');
-        $this->assertTrue(utils::is_new_programme_enabled($course1->id));
-        $this->assertTrue(utils::is_new_programme_enabled($course2->id));
-        $this->assertTrue(utils::is_new_programme_enabled($course3->id));
-        set_config('enablenewprogramme', 0, 'local_envasyllabus');
-        set_config('enablenewprogrammeforcourse', "$course1->id, $course2->id, na", 'local_envasyllabus');
-        $this->assertTrue(utils::is_new_programme_enabled($course1->id));
-        $this->assertTrue(utils::is_new_programme_enabled($course2->id));
-        $this->assertFalse(utils::is_new_programme_enabled($course3->id));
-        set_config('enablenewprogrammeforcourse', '', 'local_envasyllabus');
-        $this->assertFalse(utils::is_new_programme_enabled($course1->id));
-        $this->assertFalse(utils::is_new_programme_enabled($course2->id));
-        $this->assertFalse(utils::is_new_programme_enabled($course3->id));
+        di::set(\core_string_manager::class, testable_string_manager::class);
+        // Test default language (fr).
+        language_switcher::set_lang('fr');
+        $str1 = utils::get_string_current_lang('cf:uc_annee', 'local_envasyllabus');
+        $this->assertEquals('Année', $str1);
+        // Test English language.
+        language_switcher::set_lang('en');
+        $str2 = utils::get_string_current_lang('cf:uc_annee', 'local_envasyllabus', null);
+        $this->assertEquals('Year', $str2);
     }
 }
+
+/**
+ * Testable string manager class.
+ */
+class testable_string_manager extends \core_string_manager_standard {
+    #[\Override]
+    public function get_list_of_translations($returnall = false) {
+        return ['en' => 'English', 'fr' => 'French'];
+    }
+};
