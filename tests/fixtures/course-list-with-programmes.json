@@ -1,0 +1,269 @@
+[
+  {
+    "visible": 1,
+    "category": "CAT1",
+    "fullname": "UC0101 - Fundamentals of Veterinary Medicine",
+    "shortname": "UC0101",
+    "customfields": {
+      "uc_nombre": "UC0101",
+      "uc_titre_en": "Basics of Veterinary Medicine",
+      "uc_acronyme": "BVM",
+      "uc_annee": "1",
+      "uc_semestre": "1",
+      "uc_departement": "1",
+      "uc_ects": "6"
+    },
+    "programmedata": [
+      {
+        "moduleid": -1,
+        "modulesortorder": 0,
+        "modulename": "Test Module 1",
+        "deleted": false,
+        "rows": [
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 1,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 1", "type": "text", "group": "" },
+              { "column": "cm", "value": 8, "type": "float", "group": "unique" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          },
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 2,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 2", "type": "text", "group": "" },
+              { "column": "cm", "value": 4, "type": "float", "group": "unique" },
+              { "column": "td", "value": 6, "type": "float", "group": "unique" },
+              { "column": "tp", "value": 2, "type": "float", "group": "unique" },
+              { "column": "tpa", "value": 1, "type": "float", "group": "unique" },
+              { "column": "tc", "value": 3, "type": "float", "group": "unique" },
+              { "column": "perso_ap", "value": 10, "type": "float", "group": "" },
+              { "column": "perso_av", "value": 5, "type": "float", "group": "" },
+              { "column": "fmp", "value": 10, "type": "float", "group": "" },
+              { "column": "aas", "value": 11, "type": "float", "group": "" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "visible": 1,
+    "category": "CAT1",
+    "fullname": "UC0102 - Introduction to Animal Biology",
+    "shortname": "UC0102",
+    "customfields": {
+      "uc_nombre": "UC0102",
+      "uc_titre_en": "Intro to Animal Biology",
+      "uc_acronyme": "IAB",
+      "uc_annee": "1",
+      "uc_semestre": "1",
+      "uc_departement": "2",
+      "uc_ects": "5"
+    },
+    "programmedata": [
+      {
+        "moduleid": -1,
+        "modulesortorder": 0,
+        "modulename": "Biology Module",
+        "deleted": false,
+        "rows": [
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 1,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 1", "type": "text", "group": "" },
+              { "column": "cm", "value": 6, "type": "float", "group": "unique" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          },
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 2,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 2", "type": "text", "group": "" },
+              { "column": "cm", "value": 3, "type": "float", "group": "unique" },
+              { "column": "td", "value": 2, "type": "float", "group": "unique" },
+              { "column": "tp", "value": 1, "type": "float", "group": "unique" },
+              { "column": "tpa", "value": 2, "type": "float", "group": "unique" },
+              { "column": "tc", "value": 1, "type": "float", "group": "unique" },
+              { "column": "perso_ap", "value": 7, "type": "float", "group": "" },
+              { "column": "perso_av", "value": 3, "type": "float", "group": "" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "visible": 1,
+    "category": "CAT2",
+    "fullname": "UC0201 - Advanced Pathology",
+    "shortname": "UC0201",
+    "customfields": {
+      "uc_nombre": "UC0201",
+      "uc_titre_en": "Advanced Pathology",
+      "uc_acronyme": "AP",
+      "uc_annee": "2",
+      "uc_semestre": "2",
+      "uc_departement": "3",
+      "uc_ects": "7"
+    },
+    "programmedata": [
+      {
+        "moduleid": -1,
+        "modulesortorder": 0,
+        "modulename": "Pathology Module",
+        "deleted": false,
+        "rows": [
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 1,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 1", "type": "text", "group": "" },
+              { "column": "cm", "value": 10, "type": "float", "group": "unique" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          },
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 2,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 2", "type": "text", "group": "" },
+              { "column": "cm", "value": 2, "type": "float", "group": "unique" },
+              { "column": "td", "value": 1, "type": "float", "group": "unique" },
+              { "column": "tp", "value": 2, "type": "float", "group": "unique" },
+              { "column": "tpa", "value": 1, "type": "float", "group": "unique" },
+              { "column": "tc", "value": 2, "type": "float", "group": "unique" },
+              { "column": "perso_ap", "value": 4, "type": "float", "group": "" },
+              { "column": "perso_av", "value": 2, "type": "float", "group": "" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "visible": 1,
+    "category": "CAT2",
+    "fullname": "UC0202 - Clinical Practice",
+    "shortname": "UC0202",
+    "customfields": {
+      "uc_nombre": "UC0202",
+      "uc_titre_en": "Clinical Practice",
+      "uc_acronyme": "CP",
+      "uc_annee": "2",
+      "uc_semestre": "2",
+      "uc_departement": "4",
+      "uc_ects": "8"
+    },
+    "programmedata": [
+      {
+        "moduleid": -1,
+        "modulesortorder": 0,
+        "modulename": "Practice Module",
+        "deleted": false,
+        "rows": [
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 1,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 1", "type": "text", "group": "" },
+              { "column": "cm", "value": 12, "type": "float", "group": "unique" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          },
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 2,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 2", "type": "text", "group": "" },
+              { "column": "cm", "value": 1, "type": "float", "group": "unique" },
+              { "column": "td", "value": 2, "type": "float", "group": "unique" },
+              { "column": "tp", "value": 1, "type": "float", "group": "unique" },
+              { "column": "tpa", "value": 2, "type": "float", "group": "unique" },
+              { "column": "tc", "value": 1, "type": "float", "group": "unique" },
+              { "column": "perso_ap", "value": 3, "type": "float", "group": "" },
+              { "column": "perso_av", "value": 1, "type": "float", "group": "" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "visible": 1,
+    "category": "CAT2",
+    "fullname": "UC0203 - Veterinary Ethics",
+    "shortname": "UC0203",
+    "customfields": {
+      "uc_nombre": "UC0203",
+      "uc_titre_en": "Veterinary Ethics",
+      "uc_acronyme": "VE",
+      "uc_annee": "2",
+      "uc_semestre": "2",
+      "uc_departement": "5",
+      "uc_ects": "4"
+    },
+    "programmedata": [
+      {
+        "moduleid": -1,
+        "modulesortorder": 0,
+        "modulename": "Ethics Module",
+        "deleted": false,
+        "rows": [
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 1,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 1", "type": "text", "group": "" },
+              { "column": "cm", "value": 5, "type": "float", "group": "unique" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          },
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 2,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 2", "type": "text", "group": "" },
+              { "column": "cm", "value": 1, "type": "float", "group": "unique" },
+              { "column": "td", "value": 2, "type": "float", "group": "unique" },
+              { "column": "tp", "value": 1, "type": "float", "group": "unique" },
+              { "column": "tpa", "value": 2, "type": "float", "group": "unique" },
+              { "column": "tc", "value": 1, "type": "float", "group": "unique" },
+              { "column": "perso_ap", "value": 3, "type": "float", "group": "" },
+              { "column": "perso_av", "value": 1, "type": "float", "group": "" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          }
+        ]
+      }
+    ]
+  }
+]

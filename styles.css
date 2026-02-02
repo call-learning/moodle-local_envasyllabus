@@ -101,11 +101,6 @@
     height: 200px;
     width: 100%;
 }
-.local-envasyllabus-ccat .course-card .card-img-top img {
-    object-fit: cover;
-    object-position: center; /* optional but recommended */
-    /* Ok because the parent container has a height and width */
-}
 .local-envasyllabus-ccat .course-img {
     background-size: cover;
 }
@@ -156,8 +151,7 @@
 .local-envasyllabus-ccat .table-hover tbody tr a {
     color: #1d2125;
 }
-.local-envasyllabus-ccat .table-hover tbody tr a:hover,
-.local-envasyllabus-ccat .table-hover tbody tr a:focus {
+.local-envasyllabus-ccat .table-hover tbody tr a:hover, .local-envasyllabus-ccat .table-hover tbody tr a:focus {
     color: #1d2125;
     text-decoration: none;
 }

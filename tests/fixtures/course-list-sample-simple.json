@@ -1,0 +1,57 @@
+[
+  {
+    "visible": 1,
+    "category": "CAT1",
+    "fullname": "UC0101 - Fundamentals of Veterinary Medicine",
+    "shortname": "UC0101",
+    "customfields": {
+      "uc_nombre": "UC0101",
+      "uc_titre_en": "Basics of Veterinary Medicine",
+      "uc_acronyme": "BVM",
+      "uc_annee": "1",
+      "uc_semestre": "1",
+      "uc_departement": "1",
+      "uc_ects": "6"
+    },
+    "programmedata": [
+      {
+        "moduleid": -1,
+        "modulesortorder": 0,
+        "modulename": "Test Module 1",
+        "deleted": false,
+        "rows": [
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 1,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 1", "type": "text", "group": "" },
+              { "column": "cm", "value": 8, "type": "float", "group": "unique" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          },
+          {
+            "id": -1,
+            "deleted": false,
+            "sortorder": 2,
+            "cells": [
+              { "column": "intitule_seance", "value": "Seance 2", "type": "text", "group": "" },
+              { "column": "cm", "value": 4, "type": "float", "group": "unique" },
+              { "column": "td", "value": 6, "type": "float", "group": "unique" },
+              { "column": "tp", "value": 2, "type": "float", "group": "unique" },
+              { "column": "tpa", "value": 1, "type": "float", "group": "unique" },
+              { "column": "tc", "value": 3, "type": "float", "group": "unique" },
+              { "column": "perso_ap", "value": 10, "type": "float", "group": "" },
+              { "column": "perso_av", "value": 5, "type": "float", "group": "" },
+              { "column": "fmp", "value": 10, "type": "float", "group": "" },
+              { "column": "aas", "value": 11, "type": "float", "group": "" }
+            ],
+            "disciplines": [],
+            "competencies": []
+          }
+        ]
+      }
+    ]
+  }
+]

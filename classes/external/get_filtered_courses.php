@@ -135,10 +135,12 @@ class get_filtered_courses extends external_api {
         // Force lang for programme headers.
         language_switcher::set_lang($currentlang);
         $columns = programme_manager::get_numeric_columns();
+        $programmeheaders = course_syllabus_helper::process_programme_header($columns);
         language_switcher::reset_lang();
         return [
             'courses' => $filteredcourse,
-            'programmecolumns' => self::process_programme_header($columns),
+            'programmecolumns' => $programmeheaders,
+            'semestertotals' => course_syllabus_helper::compute_semester_totals($filteredcourse, $programmeheaders),
         ];
     }
 
@@ -213,13 +215,13 @@ class get_filtered_courses extends external_api {
             foreach ($courseidstoload as $cid => $courselistelement) {
                 $course = (object) iterator_to_array($courselistelement->getIterator(), true);
                 $course->contextid = $courselistelement->get_context()->id;
-                $course->categoryid = $course->category;
-                unset($course->category);
                 $courseinfo = course_syllabus_helper::get_course_additional_info(
                     $course,
                     $allcustomfields[$cid] ?? [],
                     $courselistelement->get_course_overviewfiles()
                 );
+                $course->categoryid = $course->category;
+                unset($course->category);
                 $course = (object) array_merge((array) $course, (array) $courseinfo);
                 $cache->set($cid, $course);
                 $courses[$cid] = $course;
@@ -227,54 +229,6 @@ class get_filtered_courses extends external_api {
         }
 
         return $courses;
-    }
-
-
-    /**
-     * Process programme header values to return the correct structure.
-     * perso_av and perso_ap are summed up in perso.
-     * @param array $columns
-     * @return array
-     */
-    public static function process_programme_header(array $columns): array {
-        $cache = cache::make_from_params(cache_store::MODE_REQUEST, 'local_envasyllabus', 'filtered_course');
-        $currentlang = language_switcher::get_current_langcode();
-        if ($cached = $cache->get('programme_headers' . $currentlang)) {
-            return $cached;
-        }
-        $programmecolumns = [];
-        foreach ($columns as $column) {
-            if ($column['column'] == 'perso_av' || $column['column'] == 'perso_ap') {
-                continue; // Skip perso_av and perso_ap, they will be summed up in perso.
-            }
-            $programmecolumns[] = $column;
-        }
-        $persocolumn = [
-            'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
-            'column' => 'perso',
-            'label' => 'Perso',
-            'help' => utils::get_string_current_lang('perso_help', 'local_envasyllabus'),
-        ];
-        $activecolumn = [
-            'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
-            'column' => 'active',
-            'label' => '%Actif',
-            'help' => utils::get_string_current_lang('active_help', 'local_envasyllabus'),
-            'totaltype' => 'average', // We make an average.
-        ];
-        $totalcolumn = [
-            'columnid' => 0, // This is not a real column id, but we need it to be able to display the column.
-            'column' => 'total',
-            'label' => 'Total',
-            'help' => utils::get_string_current_lang('total_help', 'local_envasyllabus'),
-        ];
-
-        $programmecolumns[] = $persocolumn;
-        $programmecolumns[] = $activecolumn;
-        $programmecolumns[] = $totalcolumn;
-
-        $cache->set('programme_headers', $programmecolumns);
-        return $programmecolumns;
     }
 
     /**
@@ -350,7 +304,6 @@ class get_filtered_courses extends external_api {
         }
     }
 
-
     /**
      * Returns description of method result value
      *
@@ -422,16 +375,38 @@ class get_filtered_courses extends external_api {
                         'column' => new external_value(PARAM_RAW, 'The name of the custom field'),
                         'label' => new external_value(PARAM_RAW, 'The shortname of the custom field '),
                         'help' => new external_value(PARAM_RAW, 'The help text for the custom field', VALUE_OPTIONAL, ''),
-                        // The 'totaltype' can be sum or average, so when we do the totals we know
-                        // what to do when calculating totals.
+                        // The 'totaltype' is usually the sum of all values for this column but can be changed to average or
+                        // other calculation types.
                         'totaltype' => new external_value(
                             PARAM_RAW,
                             'The way we calculate the totals for this column',
                             VALUE_OPTIONAL,
-                            'sum'
+                            ''
                         ),
                     ]
                 )
+            ),
+            'semestertotals' => new external_multiple_structure(
+                new external_single_structure([
+                    'semester' => new external_value(PARAM_TEXT, 'Semester identifier', VALUE_REQUIRED),
+                    'year' => new external_value(PARAM_TEXT, 'Year number', VALUE_REQUIRED),
+                    'ects' => new external_value(PARAM_FLOAT, 'ECTS Value', VALUE_OPTIONAL, 0),
+                    'programmevalues' => new external_multiple_structure(
+                        new external_single_structure([
+                            'column' => new external_value(PARAM_RAW, 'Column name'),
+                            'sum' => new external_value(PARAM_FLOAT, 'Sum or average value', VALUE_OPTIONAL, 0),
+                        ]),
+                        'Programme value',
+                        VALUE_OPTIONAL
+                    ),
+                    'courseidlist' => new external_multiple_structure(
+                        new external_single_structure([
+                            'id' => new external_value(PARAM_INT, 'course id'),
+                        ]),
+                        'Courses in this semester/year',
+                        VALUE_OPTIONAL
+                    ),
+                ]),
             ),
         ]);
     }

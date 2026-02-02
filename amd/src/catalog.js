@@ -26,6 +26,7 @@ import Config from 'core/config';
 import $ from 'jquery';
 import LocalisedTemplates from "./localised_templates";
 import {buildChartData} from "./chart_builder";
+
 /**
  * Current filter parameters
  * @type {Object}
@@ -117,7 +118,7 @@ const refreshCoursesList = (catalogTagId, filterParams = {}) => {
  */
 const renderPage = (element, data) => {
     LocalisedTemplates.setLanguage(element.dataset.currentLang ?? 'fr');
-    const sortedCourses = buildCourseList(data.courses, data.programmecolumns);
+    const sortedCourses = buildCourseList(data.courses, data.semestertotals);
     const isChartView = (element.dataset.viewtype === 'chart');
     let templateName = 'local_envasyllabus/catalog_course_categories';
     let context = {};
@@ -146,140 +147,53 @@ const renderPage = (element, data) => {
  *
  * Also tweaks the display depending on language selected
  * @param {Array} courses
- * @param {Array} programmecolumns - Programme column definitions for ordering
+ * @param {Array} semestertotals - Precalculated semester totals from the API and sorted courses
  * @returns {{year: *, semesters: *}[]}
  */
-const buildCourseList = (courses, programmecolumns = []) => {
-    let sortedCourses = {};
-    for (let course of courses.values()) {
-        const yearValue = findValueForCustomField(course, 'uc_annee');
-        const semesterValue = findValueForCustomField(course, 'uc_semestre');
-        if (yearValue) {
-            if (!sortedCourses.hasOwnProperty(yearValue)) {
-                sortedCourses[yearValue] = {
-                    year: yearValue,
+const buildCourseList = (courses, semestertotals) => {
+    // Add course info and custom fields to each semester
+    const semesterWithCourses = semestertotals.map(semesterInfo => {
+        const semester = {
+            semester: semesterInfo.semester,
+            year: semesterInfo.year,
+            courses: [],
+            totals: {
+                programmevalues: semesterInfo.programmevalues,
+                ects: semesterInfo.ects,
+            }
+        };
+        const semesterCourses = semesterInfo.courseidlist.map(courseidinfo => {
+            return courses.find(course => course.id === courseidinfo.id);
+        });
+
+        semester.courses = semesterCourses.map(
+            (course) => {
+                if (course.customfields) {
+                    course.cf = {};
+                    course.customfields.forEach((cf) => {
+                        course.cf[cf.shortname] = cf;
+                    });
+                }
+                course.viewurl = Config.wwwroot + '/course/view.php?id=' + course.id;
+                course.syllabusurl = Config.wwwroot + '/local/envasyllabus/syllabuspage.php?id=' + course.id;
+                return course;
+            }
+        );
+        return semester;
+    });
+    return Object.values(
+        semesterWithCourses.reduce((acc, semester) => {
+            const year = semester.year;
+            if (!acc[year]) {
+                acc[year] = {
+                    year: year,
                     semesters: []
                 };
             }
-            if (!sortedCourses[yearValue].semesters[semesterValue]) {
-                sortedCourses[yearValue].semesters[semesterValue] = {
-                    semester: semesterValue,
-                    year: yearValue,
-                    courses: []
-                };
-            }
-            if (course.customfields) {
-                course.cf = {};
-                course.customfields.forEach((cf) => {
-                    course.cf[cf.shortname] = cf;
-                });
-            }
-            course.viewurl = Config.wwwroot + '/course/view.php?id=' + course.id;
-            course.syllabusurl = Config.wwwroot + '/local/envasyllabus/syllabuspage.php?id=' + course.id;
-            sortedCourses[yearValue].semesters[semesterValue].courses.push(course);
-        }
-    }
-
-    // Calculate totals for each semester.
-    Object.values(sortedCourses).forEach((yearDef) => {
-        Object.values(yearDef.semesters).forEach((semester) => {
-            const totals = {
-                displayname: '',
-                cf: {
-                    // eslint-disable-next-line camelcase
-                    uc_ects: {value: 0}
-                },
-                programmevalues: [],
-                istotal: true
-            };
-
-            // Sum ECTS and programme values.
-            const programmeMap = new Map();
-            const programmeValueCount = new Map();
-            semester.courses.forEach((course) => {
-                // Sum ECTS.
-                const ects = parseFloat(course.cf?.uc_ects?.value) || 0;
-                totals.cf.uc_ects.value += ects;
-
-                // Sum programme values.
-                if (course.programmevalues) {
-                    course.programmevalues.forEach((pv) => {
-                        const currentSum = programmeMap.get(pv.column) || 0;
-                        const pvValue = parseFloat(pv.sum);
-                        if (!isNaN(pvValue) && pvValue) {
-                            programmeMap.set(pv.column, currentSum + pvValue);
-                            const currentCount = programmeValueCount.get(pv.column) || 0;
-                            programmeValueCount.set(pv.column, currentCount + 1);
-                        }
-                    });
-                }
-            });
-
-            // Convert programme map to array in the correct column order.
-            if (programmecolumns.length > 0) {
-                // Use the column order from programmecolumns.
-                programmecolumns.forEach((col) => {
-                    const sum = programmeMap.get(col.column) || 0;
-                    if (col?.totaltype === 'average') {
-                        const count = programmeValueCount.get(col.column) || 1;
-                        totals.programmevalues.push({column: col.column, sum: Math.round(sum / count)});
-                    } else {
-                        totals.programmevalues.push({column: col.column, sum});
-                    }
-                });
-            } else {
-                // Fallback: use the map order.
-                programmeMap.forEach((sum, column) => {
-                    totals.programmevalues.push({column, sum});
-                });
-            }
-
-            // Round ECTS to 2 decimal places.
-            totals.cf.uc_ects.value = Math.round(totals.cf.uc_ects.value * 100) / 100;
-
-            semester.totals = totals;
-        });
-    });
-
-    // Flatten the object into an array.
-    return Object.entries(sortedCourses)
-        // Preserve the order of the years as Object.entries does not.
-        .sort((y1, y2) => y1[0].localeCompare(y2[0]))
-        .map(
-            ([, yearDef]) => {
-                // Always sort by semesters.
-                const sortedSemesters = Object.keys(yearDef.semesters)
-                    .sort()
-                    .reduce((acc, key) => {
-                        acc[key] = yearDef.semesters[key];
-                        return acc;
-                    }, {});
-
-                return {
-                    year: yearDef.year,
-                    semesters: Object.values(sortedSemesters)
-                };
-            }
-        );
-};
-
-/**
- * Retrieve the value of a give customfield from course data
- *
- * @param {Object} course course data
- * @param {string} cfsname shortname for customfield
- * @param {null|Object|int|String} defaultValue
- * @returns null|Object|int|String
- */
-const findValueForCustomField = (course, cfsname, defaultValue = null) => {
-    if (typeof course.customfields !== 'undefined') {
-        for (let cf of course.customfields.values()) {
-            if (cf.shortname === cfsname) {
-                return cf.value;
-            }
-        }
-    }
-    return defaultValue;
+            acc[year].semesters.push(semester);
+            return acc;
+        }, {})
+    );
 };
 
 /**

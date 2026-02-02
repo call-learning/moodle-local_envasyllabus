@@ -21,6 +21,7 @@ use local_envasyllabus\utils;
 /**
  * Course header data helper class.
  *
+ * Used for the Syllabus page header data (in a course))
  * @package    local_envasyllabus
  * @copyright  2026 Laurent David <laurent@call-learning.fr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -113,7 +114,7 @@ class course_header_data {
         $this->isnewprogrammeenabled = course_syllabus_helper::is_new_programme_enabled($this->courseid);
         if (course_syllabus_helper::is_new_programme_enabled($this->courseid)) {
             $sprogrammefield = course_syllabus_helper::get_programme_customfield($this->courseid, $cfdata);
-            $this->programmetotals = $sprogrammefield->get_column_totals();
+            $this->programmetotals = $sprogrammefield->get_sum();
         }
     }
     /**

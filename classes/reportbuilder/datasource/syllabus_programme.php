@@ -26,7 +26,7 @@ use customfield_sprogramme\reportbuilder\local\entities\competency_assignment;
 use customfield_sprogramme\reportbuilder\local\entities\discipline;
 use customfield_sprogramme\reportbuilder\local\entities\discipline_assignment;
 use customfield_sprogramme\reportbuilder\local\entities\module;
-
+use local_envasyllabus\local\course_syllabus_helper;
 
 /**
  * TODO datasource
@@ -194,8 +194,9 @@ class syllabus_programme extends datasource {
                    JOIN {role_assignments} {$rolassignmentalias} ON {$rolassignmentalias}.userid = {$useralias}.id
                    JOIN {context} {$contextalias} ON {$contextalias}.id = {$rolassignmentalias}.contextid AND
                    {$contextalias}.contextlevel = " . CONTEXT_COURSE . "
-                   WHERE {$rolassignmentalias}.roleid IN (SELECT r.id FROM {role} r WHERE r.shortname IN ('responsablecourse'))
-                   AND {$contextalias}.instanceid = {$coursealias}.id)";
+                   WHERE {$rolassignmentalias}.roleid IN (SELECT r.id FROM {role} r WHERE r.shortname = '"
+                    . course_syllabus_helper::RESPONSABLE_ROLE_NAME
+                   . "') AND {$contextalias}.instanceid = {$coursealias}.id)";
         $this->add_entity($responsible
             ->add_join("LEFT JOIN {user} {$responsiblealias} ON {$responsiblealias}.id IN $insql"));
         $this->add_all_from_entities();

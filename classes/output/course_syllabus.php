@@ -38,16 +38,6 @@ use templatable;
  */
 class course_syllabus implements renderable, templatable {
     /**
-     * @var array TEACHER_ROLES_NAME
-     */
-    const TEACHER_ROLES_NAME = ['editingteacher', 'teacher'];
-
-    /**
-     * @var array RESPONSABLE_ROLES_NAME
-     */
-    const RESPONSABLE_ROLES_NAME = ['responsablecourse'];
-
-    /**
      * @var int $courseid course id
      */
     protected $courseid = 0;
@@ -120,7 +110,7 @@ class course_syllabus implements renderable, templatable {
             }
         }
         $contextdata->teachers = [];
-        $managers = $this->get_teacher_for_course($this->courseid, self::RESPONSABLE_ROLES_NAME);
+        $managers = course_syllabus_helper::get_responsible_for_course($this->courseid);
         $canviewuseridentity = has_capability('moodle/site:viewuseridentity', $context);
         if ($canviewuseridentity) {
             $identityfields = array_flip(explode(',', $CFG->showuseridentity));
@@ -144,7 +134,7 @@ class course_syllabus implements renderable, templatable {
         $contextdata->headerdata = $headerdata->export_for_template($output);
 
         $contextdata->teachers = [];
-        $teachers = $this->get_teacher_for_course($this->courseid);
+        $teachers = course_syllabus_helper::get_users_with_roles($this->courseid);
         foreach ($teachers as $teacheruser) {
             $teacher = new stdClass();
             $teacher->userpicture = '';
@@ -179,26 +169,6 @@ class course_syllabus implements renderable, templatable {
         $contextdata->vaq = $this->get_cf_displayable_info('uc_validation', $output);
         $contextdata->additionalinfos = $this->get_cf_displayable_info('uc_infos_compl', $output);
         return $contextdata;
-    }
-
-    /**
-     * Get users matching the teacher role.
-     *
-     * @param int $courseid
-     * @param array $rolesname
-     * @return array
-     */
-    protected function get_teacher_for_course(int $courseid, array $rolesname = self::TEACHER_ROLES_NAME): array {
-        global $DB;
-        [$where, $params] = $DB->get_in_or_equal($rolesname);
-        $teacherroles = $DB->get_fieldset_select('role', 'id', 'shortname ' . $where, $params);
-        if (!empty($teacherroles)) {
-            $userfieldsapi = \core_user\fields::for_userpic()->including('username', 'deleted');
-            $userfields = 'ra.id, u.id, u.username' . $userfieldsapi->get_sql('u')->selects;
-            return get_role_users($teacherroles, \context_course::instance($courseid), true, $userfields);
-        } else {
-            return [];
-        }
     }
 
     /**

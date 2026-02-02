@@ -24,7 +24,9 @@
 
 namespace local_envasyllabus\output;
 
+use customfield_sprogramme\local\programme_manager;
 use local_envasyllabus\external\get_filtered_courses;
+use local_envasyllabus\local\course_syllabus_helper;
 
 /**
  * Class excel_exporter
@@ -33,16 +35,24 @@ use local_envasyllabus\external\get_filtered_courses;
  */
 class excel_exporter {
     /** @var int Category ID */
-    private $categoryid;
+    private int $categoryid;
 
     /** @var bool Extended mode */
-    private $extendedmode;
+    private bool $extendedmode;
 
     /** @var string Language */
-    private $lang;
+    private string $lang;
 
     /** @var array Programme columns */
-    private $programmecolumns = [];
+    protected array $programmecolumns = [];
+    /**
+     * @var array
+     */
+    protected array $semestertotals = [];
+    /**
+     * @var array
+     */
+    protected array $courses = [];
 
     /**
      * Constructor
@@ -58,89 +68,14 @@ class excel_exporter {
     }
 
     /**
-     * Get export data
-     *
-     * @return array
+     * Init export data
      */
-    public function get_export_data(): array {
-        // Use the webservice to get filtered courses.
-        $result = get_filtered_courses::execute($this->categoryid, $this->lang, []);
-
+    protected function init(): void {
         // Store programme columns for header generation.
+        $result = get_filtered_courses::execute($this->categoryid, $this->lang, []);
         $this->programmecolumns = $result['programmecolumns'] ?? [];
-
-        // Sort courses like JavaScript buildCourseList.
-        $sortedcourses = $this->build_course_list($result['courses']);
-
-        return $sortedcourses;
-    }
-
-    /**
-     * Build course list sorted by year and semester (like JavaScript buildCourseList)
-     *
-     * @param array $courses
-     * @return array
-     */
-    private function build_course_list(array $courses): array {
-        $sortedcourses = [];
-
-        foreach ($courses as $course) {
-            $yearvalue = $this->find_value_for_custom_field($course, 'uc_annee');
-            $semestervalue = $this->find_value_for_custom_field($course, 'uc_semestre');
-
-            if ($yearvalue) {
-                if (!isset($sortedcourses[$yearvalue])) {
-                    $sortedcourses[$yearvalue] = [
-                        'year' => $yearvalue,
-                        'semesters' => [],
-                    ];
-                }
-
-                if (!isset($sortedcourses[$yearvalue]['semesters'][$semestervalue])) {
-                    $sortedcourses[$yearvalue]['semesters'][$semestervalue] = [
-                        'semester' => $semestervalue,
-                        'year' => $yearvalue,
-                        'courses' => [],
-                    ];
-                }
-
-                $sortedcourses[$yearvalue]['semesters'][$semestervalue]['courses'][] = $course;
-            }
-        }
-
-        // Sort years.
-        ksort($sortedcourses);
-
-        // Sort semesters within each year and flatten structure.
-        $result = [];
-        foreach ($sortedcourses as $yeardef) {
-            ksort($yeardef['semesters']);
-            $result[] = [
-                'year' => $yeardef['year'],
-                'semesters' => array_values($yeardef['semesters']),
-            ];
-        }
-
-        return $result;
-    }
-
-    /**
-     * Find value for custom field (like JavaScript findValueForCustomField)
-     *
-     * @param \stdClass $course
-     * @param string $fieldname
-     * @param mixed $defaultvalue
-     * @return mixed
-     */
-    private function find_value_for_custom_field(\stdClass $course, string $fieldname, $defaultvalue = null) {
-        if (!empty($course->customfields)) {
-            foreach ($course->customfields as $field) {
-                if ($field['shortname'] === $fieldname) {
-                    return $field['value'];
-                }
-            }
-        }
-        return $defaultvalue;
+        $this->courses = array_column($result['courses'] ?? [], null, 'id');
+        $this->semestertotals = $result['semestertotals'] ?? [];
     }
 
     /**
@@ -149,7 +84,7 @@ class excel_exporter {
      * @param \stdClass $course
      * @return array
      */
-    public function process_course_data(\stdClass $course): array {
+    private function process_course_data(\stdClass $course): array {
         $data = [];
 
         // Course name.
@@ -159,13 +94,13 @@ class excel_exporter {
         $data[] = $this->get_custom_field_value($course, 'uc_acronyme');
 
         // Responsible (managers).
-        $managers = [];
-        if (!empty($course->managers)) {
-            foreach ($course->managers as $manager) {
-                $managers[] = $manager['fullname'] ?? '';
+        $responsibles = [];
+        if (!empty($course->responsible)) {
+            foreach ($course->responsible as $responsible) {
+                $responsibles[] = $responsible['fullname'] ?? '';
             }
         }
-        $data[] = implode(', ', $managers);
+        $data[] = implode(', ', $responsibles);
 
         // ECTS.
         $data[] = $this->get_custom_field_value($course, 'uc_ects');
@@ -210,7 +145,7 @@ class excel_exporter {
      *
      * @return array
      */
-    public function get_headers(): array {
+    private function get_headers(): array {
         $headers = [
             get_string('course'),
             get_string('th:acronym', 'local_envasyllabus'),
@@ -234,9 +169,7 @@ class excel_exporter {
      * @return \PhpOffice\PhpSpreadsheet\Spreadsheet
      */
     public function create_spreadsheet(): \PhpOffice\PhpSpreadsheet\Spreadsheet {
-        // Get sorted data.
-        $sorteddata = $this->get_export_data();
-
+        $this->init();
         // Create spreadsheet.
         $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -263,92 +196,89 @@ class excel_exporter {
 
         // Add sorted data with semester headers.
         $row = 2;
-        foreach ($sorteddata as $yeardata) {
-            foreach ($yeardata['semesters'] as $semesterdata) {
-                // Add semester header row.
-                $semestertext = !empty($semesterdata['semester']) ?
-                    get_string('course_semester', 'local_envasyllabus', [
-                        'semester' => $semesterdata['semester'],
-                        'year' => $semesterdata['year'],
-                    ]) :
-                    get_string('course_no_semester', 'local_envasyllabus', $semesterdata['year']);
+        foreach ($this->semestertotals as $semesterdata) {
+            // Add semester header row.
+            $semestertext = !empty($semesterdata['semester']) ?
+                get_string('course_semester', 'local_envasyllabus', [
+                    'semester' => $semesterdata['semester'],
+                    'year' => $semesterdata['year'],
+                ]) :
+                get_string('course_no_semester', 'local_envasyllabus', $semesterdata['year']);
 
-                // Set semester in column 1, year in column 2, repeat headers for other columns.
-                $sheet->setCellValue('A' . $row, $semestertext);
-                $sheet->setCellValue('B' . $row, $semesterdata['year']);
+            // Set semester in column 1, year in column 2, repeat headers for other columns.
+            $sheet->setCellValue('A' . $row, $semestertext);
+            $sheet->setCellValue('B' . $row, $semesterdata['year']);
 
-                // Repeat column headers for columns 3 onward.
-                for ($col = 3; $col <= $numcols; $col++) {
+            // Repeat column headers for columns 3 onward.
+            for ($col = 3; $col <= $numcols; $col++) {
+                $cellcoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row;
+                $sheet->setCellValue($cellcoordinate, $headers[$col - 1]);
+            }
+
+            // Style semester header row.
+            $semesterheaderrange = 'A' . $row . ':' .
+                \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($numcols) . $row;
+            $sheet->getStyle($semesterheaderrange)->getFont()->setBold(true)->setSize(12)->getColor()->setRGB('FFFFFF');
+            $sheet->getStyle($semesterheaderrange)->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setRGB('46185F');
+
+            $row++;
+            $semesterstartrow = $row; // Remember start of courses for this semester.
+
+            // Add courses for this semester.
+            foreach ($semesterdata['courseidlist'] as $courseidinfo) {
+                $course = $this->courses[$courseidinfo['id']] ?? null;
+                if (!$course) {
+                    continue;
+                }
+
+                $coursedata = $this->process_course_data($course);
+                $col = 1;
+                foreach ($coursedata as $value) {
                     $cellcoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row;
-                    $sheet->setCellValue($cellcoordinate, $headers[$col - 1]);
+                    $sheet->setCellValue($cellcoordinate, $value);
+                    $col++;
                 }
-
-                // Style semester header row.
-                $semesterheaderrange = 'A' . $row . ':' .
-                    \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($numcols) . $row;
-                $sheet->getStyle($semesterheaderrange)->getFont()->setBold(true)->setSize(12)->getColor()->setRGB('FFFFFF');
-                $sheet->getStyle($semesterheaderrange)->getFill()
-                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                    ->getStartColor()->setRGB('46185F');
-
-                $row++;
-                $semesterstartrow = $row; // Remember start of courses for this semester.
-
-                // Add courses for this semester.
-                foreach ($semesterdata['courses'] as $course) {
-                    $coursedata = $this->process_course_data($course);
-                    $col = 1;
-                    foreach ($coursedata as $value) {
-                        $cellcoordinate = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row;
-                        $sheet->setCellValue($cellcoordinate, $value);
-                        $col++;
-                    }
-                    $row++;
-                }
-
-                $semesterendrow = $row - 1; // Last row with course data.
-
-                // Add sum row with formulas for ECTS and other numeric columns (starting from column 4).
-                $sheet->setCellValue('A' . $row, 'Total');
-                $sheet->setCellValue('B' . $row, '');
-                $sheet->setCellValue('C' . $row, '');
-
-                // Add sum formulas for columns 4 onward (ECTS and programme columns).
-                for ($col = 4; $col <= $numcols; $col++) {
-                    $currentcol = $this->programmecolumns[$col - 5] ?? null;
-                    // Here -5 because we have the ECTS column at index 4 and
-                    // then the programme columns.
-                    $isaverage = ($currentcol['totaltype'] ?? '') === 'average';
-                    $colletter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
-                    if ($isaverage) {
-                        $formula = "=ROUNDUP(IFERROR(AVERAGEIF("
-                            . "{$colletter}{$semesterstartrow}:{$colletter}{$semesterendrow},\"<>0\"),0),0)";
-                    } else {
-                        $formula = "=SUM({$colletter}{$semesterstartrow}:{$colletter}{$semesterendrow})";
-                    }
-                    $cellcoordinate = $colletter . $row;
-                    $sheet->setCellValue($cellcoordinate, $formula);
-                }
-
-                // Style sum row.
-                $sumrowrange = 'A' . $row . ':' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($numcols) . $row;
-                $sheet->getStyle($sumrowrange)->getFont()->setBold(true);
-                $sheet->getStyle($sumrowrange)->getFill()
-                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                    ->getStartColor()->setRGB('F5D9F9');
-
-                // Add black border around the entire semester block (header + courses + sum row).
-                $blockrange = 'A' . ($semesterstartrow - 1) . ':' .
-                    \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($numcols) . $row;
-                $sheet->getStyle($blockrange)->getBorders()->getOutline()
-                    ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-                $sheet->getStyle($blockrange)->getBorders()->getOutline()->getColor()->setRGB('000000');
-
-                $row++; // Move to next row after sum row.
-
-                // Add empty separator row (borderless).
                 $row++;
             }
+
+            $semesterendrow = $row - 1; // Last row with course data.
+
+            // Add sum row with formulas for ECTS and other numeric columns (starting from column 4).
+            $sheet->setCellValue('A' . $row, 'Total');
+            $sheet->setCellValue('B' . $row, '');
+            $sheet->setCellValue('C' . $row, '');
+            $sheet->setCellValue('D' . $row, $semesterdata['ects'] ?? 0);
+            // Add sum formulas for columns 4 onward (ECTS and programme columns).
+            for ($col = 5; $col <= $numcols; $col++) {
+                $currentcol = $semesterdata['programmevalues'][$col - 5] ?? null;
+                if (!$currentcol || !isset($currentcol['sum'])) {
+                    continue;
+                }
+                $colletter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
+                $cellcoordinate = $colletter . $row;
+                $sheet->setCellValue($cellcoordinate, $currentcol['sum']);
+            }
+
+            // Style sum row.
+            $sumrowrange = 'A' . $row . ':' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($numcols) . $row;
+            $sheet->getStyle($sumrowrange)->getFont()->setBold(true);
+            $sheet->getStyle($sumrowrange)->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setRGB('F5D9F9');
+
+            // Add black border around the entire semester block (header + courses + sum row).
+            $blockrange = 'A' . ($semesterstartrow - 1) . ':' .
+                \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($numcols) . $row;
+            $sheet->getStyle($blockrange)->getBorders()->getOutline()
+                ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle($blockrange)->getBorders()->getOutline()->getColor()->setRGB('000000');
+
+            $row++; // Move to next row after sum row.
+
+            // Add empty separator row (borderless).
+            $row++;
         }
 
         // Auto-size columns.

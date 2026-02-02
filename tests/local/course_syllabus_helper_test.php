@@ -19,6 +19,7 @@ namespace local;
 use core_course\customfield\course_handler;
 use local_envasyllabus\external\get_filtered_courses;
 use local_envasyllabus\local\course_syllabus_helper;
+use local_envasyllabus\output\excel_exporter;
 use local_envasyllabus\tests\test_helper;
 
 /**
@@ -70,12 +71,8 @@ final class course_syllabus_helper_test extends \advanced_testcase {
         $course = $this->create_course_from_def($coursedef);
         $coursecfs = course_handler::create()->get_instance_data($course->id, true);
         $sprogrammefield = course_syllabus_helper::get_programme_customfield($course->id, $coursecfs);
-        $programmesums = [];
-        if ($sprogrammefield && $sprogrammefield->get('id')) {
-            $programmesums = $sprogrammefield->get_sum();
-        }
         $programmesumsforcourse = course_syllabus_helper::process_programme_values(
-            $programmesums
+            $sprogrammefield
         );
         // On ne garde que les colonnes et les sommes pour la comparaison.
         $expected = [
@@ -146,5 +143,110 @@ final class course_syllabus_helper_test extends \advanced_testcase {
             $expected,
             $progremmevalues
         );
+    }
+
+
+    /**
+     * Test find_value_for_custom_field method
+     */
+    public function test_find_value_for_custom_field(): void {
+        // Create test course object.
+        $course = new \stdClass();
+        $course->customfields = [
+            ['shortname' => 'uc_annee', 'value' => '2024'],
+            ['shortname' => 'uc_semestre', 'value' => '1'],
+            ['shortname' => 'uc_ects', 'value' => '6'],
+        ];
+
+        // Use reflection to access private method.
+        $reflection = new \ReflectionClass(course_syllabus_helper::class);
+        $method = $reflection->getMethod('find_value_for_custom_field');
+        $method->setAccessible(true);
+
+        $result = $method->invokeArgs(null, [$course, 'uc_annee']);
+        $this->assertEquals('2024', $result);
+
+        $result = $method->invokeArgs(null, [$course, 'uc_semestre']);
+        $this->assertEquals('1', $result);
+
+        $result = $method->invokeArgs(null, [$course, 'nonexistent', 'default']);
+        $this->assertEquals('default', $result);
+
+        // Test with empty customfields.
+        $course->customfields = null;
+        $result = $method->invokeArgs(null, [$course, 'uc_annee', 'fallback']);
+        $this->assertEquals('fallback', $result);
+    }
+
+
+    /**
+     * Test build_course_list method
+     */
+    public function test_build_course_list(): void {
+        $exporter = new excel_exporter(123);
+
+        // Create test courses.
+        $courses = [
+            $this->create_simple_test_course('Course 1', '2024', '1'),
+            $this->create_simple_test_course('Course 2', '2024', '2'),
+            $this->create_simple_test_course('Course 3', '2023', '1'),
+            $this->create_simple_test_course('Course 4', '2024', '1'),
+        ];
+
+        // Use reflection to access private method.
+        $reflection = new \ReflectionClass(course_syllabus_helper::class);
+        $method = $reflection->getMethod('build_course_list');
+        $method->setAccessible(true);
+
+        $result = $method->invokeArgs(null, [$courses]);
+
+        // Should have 2 years (2023, 2024).
+        $this->assertCount(2, $result);
+
+        // Check year ordering (should be ascending).
+        $this->assertEquals('2023', $result[0]['year']);
+        $this->assertEquals('2024', $result[1]['year']);
+
+        // Check 2023 has 1 semester.
+        $this->assertCount(1, $result[0]['semesters']);
+        $this->assertEquals('1', $result[0]['semesters'][1]['semester']);
+        $this->assertCount(1, $result[0]['semesters'][1]['courses']);
+
+        // Check 2024 has 2 semesters.
+        $this->assertCount(2, $result[1]['semesters']);
+        $this->assertEquals('1', $result[1]['semesters'][1]['semester']);
+        $this->assertEquals('2', $result[1]['semesters'][2]['semester']);
+
+        // Check semester 1 of 2024 has 2 courses.
+        $this->assertCount(2, $result[1]['semesters'][1]['courses']);
+        // Check semester 2 of 2024 has 1 course.
+        $this->assertCount(1, $result[1]['semesters'][2]['courses']);
+    }
+
+
+    /**
+     * Helper method to create test course objects
+     *
+     * @param string $name
+     * @param string $year
+     * @param string $semester
+     * @return \stdClass
+     */
+    private function create_simple_test_course(string $name, string $year, string $semester): \stdClass {
+        $course = new \stdClass();
+        $course->displayname = $name;
+        $course->fullname = $name;
+        $course->customfields = [
+            ['shortname' => 'uc_annee', 'value' => $year],
+            ['shortname' => 'uc_semestre', 'value' => $semester],
+            ['shortname' => 'uc_acronyme', 'value' => strtoupper(substr($name, 0, 6))],
+            ['shortname' => 'uc_ects', 'value' => '6'],
+        ];
+        $course->managers = [
+            (object)['fullname' => 'Test Manager'],
+        ];
+        $course->programmevalues = [];
+
+        return $course;
     }
 }

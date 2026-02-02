@@ -59,18 +59,29 @@ trait test_helper {
         $cdef['category'] = $category->id;
         $course = $generator->create_course($cdef);
 
-        // Create the programme custom field and data.
+        // Check if the programme field already exists or not and then create it.
+        $coursehandler = \core_course\customfield\course_handler::create();
+        $fields = $coursehandler->get_fields();
+        $programmefield = null;
+        foreach ($fields as $field) {
+            if ($field->get('shortname') == 'programme') {
+                $programmefield = $field;
+                break;
+            }
+        }
         $cfgenerator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
-
-        $cfcat = $cfgenerator->create_category();
-        $programmefield = $cfgenerator->create_field(
-            [
-                'categoryid' => $cfcat->get('id'),
-                'shortname' => 'programme',
-                'type' => 'sprogramme',
-                'configdata' => ['required' => 1],
-            ]
-        );
+        if (is_null($programmefield)) {
+            // Create the programme custom field and data.
+            $cfcat = $cfgenerator->create_category();
+            $programmefield = $cfgenerator->create_field(
+                [
+                    'categoryid' => $cfcat->get('id'),
+                    'shortname' => 'programme',
+                    'type' => 'sprogramme',
+                    'configdata' => ['required' => 1],
+                ]
+            );
+        }
         $pgenerator = $this->getDataGenerator()->get_plugin_generator('customfield_sprogramme');
         $cfdata = $cfgenerator->add_instance_data($programmefield, $course->id, 1);
         if (isset($coursedef['programmedata'])) {

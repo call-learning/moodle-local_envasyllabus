@@ -16,6 +16,7 @@
 
 namespace local_envasyllabus\output;
 
+use local_envasyllabus\local\course_syllabus_helper;
 use local_envasyllabus\tests\test_helper;
 
 /**
@@ -47,8 +48,8 @@ final class course_syllabus_test extends \advanced_testcase {
         $teacher = $generator->create_user(['firstname' => 'Teacher', 'lastname' => 'One']);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'teacher');
         $responsable = $generator->create_user(['firstname' => 'Responsible', 'lastname' => 'One']);
-        $this->getDataGenerator()->create_role(['shortname' => 'responsablecourse', 'archetype' => 'editingteacher']);
-        $this->getDataGenerator()->enrol_user($responsable->id, $course->id, 'responsablecourse');
+        $this->getDataGenerator()->create_role(['shortname' => course_syllabus_helper::RESPONSABLE_ROLE_NAME, 'archetype' => 'editingteacher']);
+        $this->getDataGenerator()->enrol_user($responsable->id, $course->id, course_syllabus_helper::RESPONSABLE_ROLE_NAME);
         $syllabus = new course_syllabus($course->id);
         $data = $syllabus->export_for_template($PAGE->get_renderer('local_envasyllabus'));
         $this->assertEquals('Responsible One', $data->managers);

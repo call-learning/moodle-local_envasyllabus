@@ -56,18 +56,18 @@ export const buildChartData = (sortedCourses, programmecolumns) => {
             labels.push(semesterLabel);
 
             // Add data for each programme column from totals.
-            if (semester.totals && semester.totals.programmevalues) {
-                semester.totals.programmevalues.forEach((pv) => {
-                    if (datasets[pv.column]) {
-                        datasets[pv.column].data.push(parseFloat(pv.sum) || 0);
+            chartColumns.forEach((col) => {
+                if (datasets[col.column]) {
+                    let value = 0;
+                    if (semester.totals && semester.totals.programmevalues) {
+                        const pv = semester.totals.programmevalues.find(pv => pv.column === col.column);
+                        if (pv) {
+                            value = parseFloat(pv.sum) || 0;
+                        }
                     }
-                });
-            } else {
-                // If no totals, add zeros.
-                chartColumns.forEach((col) => {
-                    datasets[col.column].data.push(0);
-                });
-            }
+                    datasets[col.column].data.push(value);
+                }
+            });
         });
     });
 

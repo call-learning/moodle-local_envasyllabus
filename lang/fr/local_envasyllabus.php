@@ -27,8 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 
 $string['actions'] = 'Actions';
 $string['active_help'] = 'Pourcentage de méthodes pédagogiques actives mises en place au sein de l\'UC';
+$string['catalog:extended:percentactive'] = '% Actif';
+$string['catalog:extended:perso'] = 'Perso.';
+$string['catalog:extended:total'] = 'Total';
 $string['catalog:filter_sort'] = 'Filtres et Tris';
 $string['catalog:index'] = 'Catalogue';
+
 $string['cf:uc_annee'] = 'Année';
 $string['cf:uc_nombre'] = 'UC';
 $string['cf:uc_semestre'] = 'Semestre';

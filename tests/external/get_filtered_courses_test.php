@@ -51,12 +51,14 @@ final class get_filtered_courses_test extends \externallib_advanced_testcase {
      * @var array $courses course lst
      */
     protected $courses = [];
+
     /**
      * Create courses and categories
      *
+     * @param string $samplefile
      * @return void
      */
-    public function create_courses_and_categories(): void {
+    public function create_courses_and_categories(string $samplefile = 'course-list.json'): void {
         for ($catindex = 1; $catindex < self::MAX_CAT; $catindex++) {
             $catdef = ['idnumber' => 'CAT' . $catindex];
             if ($catindex > 1 && ($catindex % 2)) {
@@ -66,7 +68,7 @@ final class get_filtered_courses_test extends \externallib_advanced_testcase {
             $this->categories['CAT' . $catindex] = $category;
         }
         $this->courses = [];
-        $json = file_get_contents(self::get_fixture_path('local_envasyllabus', 'course-list.json'));
+        $json = file_get_contents(self::get_fixture_path('local_envasyllabus', $samplefile));
         $coursesdef = json_decode($json, true);
         foreach ($coursesdef as $cdef) {
             $course = $this->create_course_from_def($cdef);
@@ -112,6 +114,7 @@ final class get_filtered_courses_test extends \externallib_advanced_testcase {
 
     /**
      * Test execute API CALL to get filtered courses by year
+     *
      * @param array $filters
      * @param array $expected
      * @dataProvider filter_dataprovider
@@ -197,6 +200,47 @@ final class get_filtered_courses_test extends \externallib_advanced_testcase {
             return '';
         }, $courses);
         $this->assertEquals($expected, $courseyears);
+    }
+
+    /**
+     * Test execute API CALL to get totals
+     */
+    public function test_get_filtered_courses_totals(): void {
+        $this->resetAfterTest();
+        $this->create_courses_and_categories('course-list-with-programmes.json');
+        $this->setAdminUser();
+        $result = $this->get_filtered_courses(0); // Get all courses.
+        $this->assertCount(5, $result['courses']);
+        $semestertotals = $result['semestertotals'];
+        $this->assertEquals(11.0, $semestertotals[0]['ects']);
+        $this->assertEquals(19.0, $semestertotals[1]['ects']);
+        $semestertexpected = [
+            'cm' => 8.0 + 4.0 + 6.0 + 3.0,
+            'td' => 6.0 + 2.0,
+            'tp' => 2.0 + 1.0,
+            'tpa' => 1.0 + 2.0,
+            'tc' => 3.0 + 1.0,
+            'fmp' => 10.0,
+            'aas' => 11.0,
+            'perso' => 10.0 + 7.0 + 5.0 + 3.0,
+        ];
+        $semestertexpected['total'] = array_sum($semestertexpected);
+
+        $semestertexpected['active'] = (
+                ($semestertexpected['td'] + $semestertexpected['tp']
+                    + $semestertexpected['tpa'] + $semestertexpected['tc']
+                    + $semestertexpected['aas'] + $semestertexpected['fmp']
+                )
+                /
+                (
+                    $semestertexpected['cm'] + $semestertexpected['td']
+                    + $semestertexpected['tp'] + $semestertexpected['tpa']
+                    + $semestertexpected['tc'] + $semestertexpected['aas']
+                    + $semestertexpected['fmp']
+                )
+            ) * 100;
+
+        $this->assertEquals($semestertexpected, array_column($semestertotals[0]['programmevalues'], 'sum', 'column'));
     }
 
     /**

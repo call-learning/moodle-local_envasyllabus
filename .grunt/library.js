@@ -2,8 +2,7 @@
 /* jshint node: true */
 /* jshint esversion: 6 */
 const path = require("path");
-const fs = require('fs');
-const {existsSync} = fs;
+const {existsSync} = require('fs');
 /**
  * Find the Moodle root directory by looking for a specific file.
  *
@@ -74,45 +73,20 @@ const buildSass = (grunt) => {
             fix: true,
             cache: false,
             failOnError: false,
+            quietDeprecationWarnings: true,
+            customSyntax: 'postcss-scss',
             config: {
                 rules: {
                     "indentation": 4,
                     "declaration-block-single-line-max-declarations": 1,
+                    "selector-list-comma-newline-after": "always",
                 }
             },
         },
         src: [path.join(moodleRoot, MODULE_PATH, '/styles.css')]
     };
     grunt.config.merge(config);
-    const formatSelectors = (filePath) => {
-        const css = fs.readFileSync(filePath, 'utf8');
-        const formatted = css.replace(/(^|\n)([^\{\n]+)\{/g, (match, prefix, selectors) => {
-            const trimmedSelectors = selectors.trim();
-            if (!trimmedSelectors) {
-                return match;
-            }
-            const indentMatch = selectors.match(/^(\s*)/);
-            const indent = indentMatch ? indentMatch[1] : '';
-            const parts = trimmedSelectors
-                .split(',')
-                .map((selector) => selector.trim())
-                .filter(Boolean);
-            if (parts.length <= 1) {
-                return match;
-            }
-            const formattedSelectors = parts
-                .map((selector) => `${indent}${selector}`)
-                .join(',\n');
-            const effectivePrefix = prefix || '\n';
-            return `${effectivePrefix}${formattedSelectors} {`;
-        });
-        fs.writeFileSync(filePath, formatted);
-    };
-    const formatTaskName = MODULE_NAME + '_formatSelectors';
-    grunt.registerTask(formatTaskName, function () {
-        formatSelectors(path.join(moodleRoot, MODULE_PATH, 'styles.css'));
-    });
-    grunt.registerTask('default', ['sass:' + MODULE_NAME, 'stylelint:' + MODULE_NAME, formatTaskName]);
+    grunt.registerTask('default', ['sass:' + MODULE_NAME, 'stylelint:' + MODULE_NAME]);
 };
 
 module.exports = {
