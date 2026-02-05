@@ -151,7 +151,8 @@
 .local-envasyllabus-ccat .table-hover tbody tr a {
     color: #1d2125;
 }
-.local-envasyllabus-ccat .table-hover tbody tr a:hover, .local-envasyllabus-ccat .table-hover tbody tr a:focus {
+.local-envasyllabus-ccat .table-hover tbody tr a:hover,
+.local-envasyllabus-ccat .table-hover tbody tr a:focus {
     color: #1d2125;
     text-decoration: none;
 }

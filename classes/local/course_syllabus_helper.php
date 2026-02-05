@@ -66,9 +66,9 @@ class course_syllabus_helper {
     /**
      * Get the custom field of type 'sprogramme' with shortname 'programme' from a list of course custom fields data.
      *
-     * @param array|null $coursecustomfieldsdata An array of course custom fields data controllers.
-     * @return data_controller|null The found custom field or null if not found.
-     * @throws \moodle_exception
+     * @param int $courseid The course ID to check.
+     * @param array|null $coursecustomfieldsdata Optional pre-fetched course custom fields data to avoid redundant database calls.
+     * @return data_controller|null The data controller for the 'programme' custom field, or null if not found.
      */
     public static function get_programme_customfield(
         int $courseid,
@@ -142,7 +142,7 @@ class course_syllabus_helper {
             ? array_map(fn($manager) => ['id' => $manager->id, 'fullname' => fullname($manager)], $course->managers)
             : [];
 
-        $responsible = course_syllabus_helper::get_responsible_for_course($course->id);
+        $responsible = self::get_responsible_for_course($course->id);
         $courseinfo->responsible = !empty($responsible)
             ? array_map(fn($manager) => ['id' => $manager->id, 'fullname' => fullname($manager)], $responsible)
             : [];
@@ -221,7 +221,6 @@ class course_syllabus_helper {
      */
     public static function get_active_percentage(array $programmevalues): float {
         $sums = array_map(fn($v) => floatval($v ?? 0), $programmevalues);
-        // ((TD+TP+TPa+TC+AAS+FMP) / (CM+TD+TP+TPa+TC+AAS+FMP)) * 100
         $total = array_sum(
             array_intersect_key(
                 $sums,
@@ -441,7 +440,6 @@ class course_syllabus_helper {
      * Get users matching the responsible role.
      *
      * @param int $courseid
-     * @param array $rolesname
      * @return array
      */
     public static function get_responsible_for_course(int $courseid): array {

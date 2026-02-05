@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License.
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace local_envasyllabus\local;
 
 use core_course\customfield\course_handler;
@@ -24,14 +25,15 @@ use local_envasyllabus\tests\test_helper;
  * @package    local_envasyllabus
  * @copyright  2024 Laurent David <laurent@call-learning.fr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers \local_envasyllabus\local\course_header_data
  */
-class course_header_data_test extends \advanced_testcase {
+final class course_header_data_test extends \advanced_testcase {
     use test_helper;
 
     /**
      * Test compute header data
      */
-    public function test_compute_header_data() {
+    public function test_compute_header_data(): void {
         $this->resetAfterTest();
         $category = $this->getDataGenerator()->create_category();
         $json = file_get_contents(self::get_fixture_path('local_envasyllabus', 'sample-course.json'));
@@ -73,7 +75,7 @@ class course_header_data_test extends \advanced_testcase {
     /**
      * Test compute header data with old syllabus (without new programme feature)
      */
-    public function test_compute_header_data_old_syllabus() {
+    public function test_compute_header_data_old_syllabus(): void {
         $this->resetAfterTest();
         $category = $this->getDataGenerator()->create_category();
         $json = file_get_contents(self::get_fixture_path('local_envasyllabus', 'sample-course-old.json'));

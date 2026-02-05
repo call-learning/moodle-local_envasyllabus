@@ -14,12 +14,9 @@
 // You should have received a copy of the GNU General Public License.
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace local;
+namespace local_envasyllabus\local;
 
 use core_course\customfield\course_handler;
-use local_envasyllabus\external\get_filtered_courses;
-use local_envasyllabus\local\course_syllabus_helper;
-use local_envasyllabus\output\excel_exporter;
 use local_envasyllabus\tests\test_helper;
 
 /**
@@ -28,14 +25,13 @@ use local_envasyllabus\tests\test_helper;
  * @package    local_envasyllabus
  * @copyright  2024 Laurent David <laurent@call-learning.fr>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @covers \local_envasyllabus\local\course_syllabus_helper
  */
 final class course_syllabus_helper_test extends \advanced_testcase {
     use test_helper;
 
     /**
      * Test the is_new_programme_enabled function.
-     *
-     * @covers ::is_new_programme_enabled
      */
     public function test_is_new_programme_enabled(): void {
         $this->resetAfterTest();
@@ -183,8 +179,6 @@ final class course_syllabus_helper_test extends \advanced_testcase {
      * Test build_course_list method
      */
     public function test_build_course_list(): void {
-        $exporter = new excel_exporter(123);
-
         // Create test courses.
         $courses = [
             $this->create_simple_test_course('Course 1', '2024', '1'),

@@ -25,15 +25,13 @@ use local_envasyllabus\tests\test_helper;
  * @package     local_envasyllabus
  * @copyright   2025 CALL Learning - Laurent David <laurent@call-learning>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversDefaultClass \local_envasyllabus\output\course_syllabus
+ * @covers \local_envasyllabus\output\course_syllabus
  */
 final class course_syllabus_test extends \advanced_testcase {
     use test_helper;
 
     /**
      * Test the export_for_template function.
-     *
-     * @covers ::export_for_template
      */
     public function test_export_for_template(): void {
         global $PAGE;
@@ -48,7 +46,12 @@ final class course_syllabus_test extends \advanced_testcase {
         $teacher = $generator->create_user(['firstname' => 'Teacher', 'lastname' => 'One']);
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'teacher');
         $responsable = $generator->create_user(['firstname' => 'Responsible', 'lastname' => 'One']);
-        $this->getDataGenerator()->create_role(['shortname' => course_syllabus_helper::RESPONSABLE_ROLE_NAME, 'archetype' => 'editingteacher']);
+        $this->getDataGenerator()->create_role(
+            [
+                'shortname' => course_syllabus_helper::RESPONSABLE_ROLE_NAME,
+                'archetype' => 'editingteacher',
+            ]
+        );
         $this->getDataGenerator()->enrol_user($responsable->id, $course->id, course_syllabus_helper::RESPONSABLE_ROLE_NAME);
         $syllabus = new course_syllabus($course->id);
         $data = $syllabus->export_for_template($PAGE->get_renderer('local_envasyllabus'));

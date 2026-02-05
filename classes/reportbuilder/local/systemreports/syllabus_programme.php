@@ -120,8 +120,8 @@ class syllabus_programme extends system_report {
                    {$contextalias}.contextlevel = " .
             CONTEXT_COURSE . "
                    WHERE {$rolassignmentalias}.roleid IN (SELECT r.id FROM {role} r WHERE r.shortname = '"
-                    .course_syllabus_helper::RESPONSABLE_ROLE_NAME
-                    ."') AND {$contextalias}.instanceid = {$coursealias}.id)";
+                    . course_syllabus_helper::RESPONSABLE_ROLE_NAME
+                    . "') AND {$contextalias}.instanceid = {$coursealias}.id)";
         $this->add_entity($responsible
             ->add_join("LEFT JOIN {user} {$responsiblealias} ON {$responsiblealias}.id IN $insql"));
         // Now we can call our helper methods to add the content we want to include in the report.

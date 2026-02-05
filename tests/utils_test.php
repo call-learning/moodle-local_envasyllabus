@@ -14,8 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Test for utils class.
+ *
+ * @package     local_envasyllabus
+ * @copyright   2025 CALL Learning - Laurent David <laurent@call-learning>
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 namespace local_envasyllabus;
-
+defined('MOODLE_INTERNAL') || die();
 use local_envasyllabus\output\language_switcher;
 
 /**
@@ -24,18 +31,17 @@ use local_envasyllabus\output\language_switcher;
  * @package     local_envasyllabus
  * @copyright   2025 CALL Learning - Laurent David <laurent@call-learning>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @coversDefaultClass \local_envasyllabus\utils
+ * @covers \local_envasyllabus\utils
  */
 final class utils_test extends \advanced_testcase {
     /**
      * Test get_string_current_lang function.
-     *
-     * @covers ::get_string_current_lang
      */
     public function test_get_string_current_lang(): void {
         $this->resetAfterTest();
         testable_string_manager_for_current_language_tests::set_fake_list_of_installed_languages(
-            ['en' => 'English', 'fr' => 'French']);
+            ['en' => 'English', 'fr' => 'French']
+        );
         $this->markTestSkipped();
         // Test default language (fr).
         language_switcher::set_lang('fr');
@@ -52,9 +58,9 @@ final class utils_test extends \advanced_testcase {
  *
  * @copyright 2022 The Open University
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package local_envasyllabus
  */
 class testable_string_manager_for_current_language_tests extends \core_string_manager_standard {
-
     /** @var array $installedlanguages list of languages which we want to pretend are installed. */
     protected $installedlanguages;
 
@@ -87,6 +93,12 @@ class testable_string_manager_for_current_language_tests extends \core_string_ma
         get_string_manager(true);
     }
 
+    /**
+     * Get the list of installed languages.
+     *
+     * @param bool $returnall not used, just here to match the signature of the parent method.
+     * @return array the list of installed languages.
+     */
     public function get_list_of_translations($returnall = false) {
         return $this->installedlanguages;
     }

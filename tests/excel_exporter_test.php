@@ -136,8 +136,7 @@ final class excel_exporter_test extends \advanced_testcase {
      *
      * @param string $fixturename Name of the fixture file
      * @param array $expected Expected cell values in the spreadsheet
-     * @covers ::create_spreadsheet
-     * @dataProvider test_create_spreadsheet_provider
+     * @dataProvider create_spreadsheet_provider
      */
     public function test_create_spreadsheet(string $fixturename, array $expected): void {
         $category = $this->getDataGenerator()->create_category(['idnumber' => 'CAT1']);
@@ -173,7 +172,7 @@ final class excel_exporter_test extends \advanced_testcase {
     /**
      * Data provider for test_create_spreadsheet
      */
-    public static function test_create_spreadsheet_provider(): Generator {
+    public static function create_spreadsheet_provider(): Generator {
         yield 'Header test' => [
             'fixturename' => 'course-list-sample-simple.json',
             'expected' => [
