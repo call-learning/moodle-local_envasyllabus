@@ -32,6 +32,6 @@ $definitions = [
     'courseinfo' => [
         'mode' => cache_store::MODE_APPLICATION,
         'simplekeys' => true,
-        'invalidationevents' => ['changesincourse', 'customfield_sprogramme/changesinsprogramme'],
+        'invalidationevents' => ['changesincourse'],
     ],
 ];
