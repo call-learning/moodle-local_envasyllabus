@@ -20,14 +20,17 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import {getString} from 'core/str';
+
 /**
  * Build chart data structure for Chart.js stacked bar chart
  *
  * @param {Array} sortedCourses - Courses sorted by year and semester
  * @param {Array} programmecolumns - Programme column definitions
+ * @param {string} currentLang - Current language code for localization
  * @returns {Object} Chart data combining all years
  */
-export const buildChartData = (sortedCourses, programmecolumns) => {
+export const buildChartData = async (sortedCourses, programmecolumns, currentLang) => {
     // Filter out 'active' and 'total' columns for chart display.
     const chartColumns = programmecolumns.filter(
         (col) => col.column !== 'active' && col.column !== 'total'
@@ -48,28 +51,23 @@ export const buildChartData = (sortedCourses, programmecolumns) => {
     });
 
     // Process all years and semesters.
-    sortedCourses.forEach((yearData) => {
-        yearData.semesters.forEach((semester) => {
-            const semesterLabel = semester.semester ?
-                `${yearData.year} - S${semester.semester}` :
-                `${yearData.year} - No Semester`;
+    for (const yearData of sortedCourses) {
+        for (const semester of yearData.semesters) {
+            const semesterLabel = semester.semester !== null
+                ? await getString("semesterlabel", "local_envasyllabus", {
+                    semester: semester.semester,
+                    year: yearData.year
+                }, currentLang)
+                : await getString("nosemester", "local_envasyllabus", yearData.year, currentLang);
             labels.push(semesterLabel);
 
-            // Add data for each programme column from totals.
             chartColumns.forEach((col) => {
-                if (datasets[col.column]) {
-                    let value = 0;
-                    if (semester.totals && semester.totals.programmevalues) {
-                        const pv = semester.totals.programmevalues.find(pv => pv.column === col.column);
-                        if (pv) {
-                            value = parseFloat(pv.sum) || 0;
-                        }
-                    }
-                    datasets[col.column].data.push(value);
-                }
+                const value = semester.totals?.programmevalues?.find(pv => pv.column === col.column)?.sum || 0;
+                datasets[col.column].data.push(parseFloat(value));
             });
-        });
-    });
+        }
+
+    }
 
     // Convert datasets object to array.
     const datasetsArray = Object.values(datasets);
@@ -86,11 +84,11 @@ export const buildChartData = (sortedCourses, programmecolumns) => {
             }
         })),
         labels: labels,
-        title: 'Programme Hours per Semester',
+        title: await getString("charttitle", "local_envasyllabus", '', currentLang),
         axes: {
             x: [],
             y: [{
-                label: 'Hours',
+                label: await getString("labelhours", "local_envasyllabus", '', currentLang),
                 min: 0,
                 position: 'left'
             }]

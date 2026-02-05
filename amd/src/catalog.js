@@ -116,15 +116,17 @@ const refreshCoursesList = (catalogTagId, filterParams = {}) => {
  * @param {Object} element element to render into
  * @param {Array} data list of courses with data
  */
-const renderPage = (element, data) => {
-    LocalisedTemplates.setLanguage(element.dataset.currentLang ?? 'fr');
+const renderPage = async (element, data) => {
+    const currentLang = element.dataset.currentLang ?? 'fr';
+    LocalisedTemplates.setLanguage(currentLang);
     const sortedCourses = buildCourseList(data.courses, data.semestertotals);
     const isChartView = (element.dataset.viewtype === 'chart');
     let templateName = 'local_envasyllabus/catalog_course_categories';
     let context = {};
     if (isChartView) {
+        const chartData = await buildChartData(sortedCourses, data.programmecolumns, currentLang);
         context = {
-            chartdata: JSON.stringify(buildChartData(sortedCourses, data.programmecolumns))
+            chartdata: JSON.stringify(chartData),
         };
         templateName = 'local_envasyllabus/catalog_course_chart';
     } else {
