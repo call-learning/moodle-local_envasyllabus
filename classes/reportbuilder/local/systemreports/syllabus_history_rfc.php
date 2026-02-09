@@ -31,7 +31,6 @@ use customfield_sprogramme\reportbuilder\local\entities\rfc;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class syllabus_history_rfc extends system_report {
-    #[\Override]
     public function get_default_conditions(): array {
         return [];
     }
@@ -144,6 +143,6 @@ class syllabus_history_rfc extends system_report {
 
     #[\Override]
     protected function can_view(): bool {
-        return has_capability('moodle/reportbuilder:edit', \context_system::instance());
+        return has_capability('moodle/reportbuilder:view', \context_system::instance());
     }
 }

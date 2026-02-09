@@ -70,21 +70,19 @@ class programmefull extends programme {
      * @return column
      */
     protected function get_column_for_customfield(string $customfieldshortname): column {
-        global $DB;
         $programmealias = $this->get_table_alias('customfield_sprogramme');
 
-        $fieldid = $DB->get_field(
-            'customfield_field',
-            'id',
-            ['shortname' => $customfieldshortname],
-            MUST_EXIST
-        );
         $fieldparam = database::generate_param_name();
         $cfdataalias = database::generate_alias();
+        $cfieldalias = database::generate_alias();
+        $cfdataprogrammealias = database::generate_alias();
 
-        $sql = "(SELECT {$cfdataalias}.id FROM {customfield_data} {$cfdataalias}
-                  WHERE {$cfdataalias}.instanceid = {$programmealias}.uc
-                    AND {$cfdataalias}.fieldid = :{$fieldparam})";
+        $sql = "SELECT {$cfdataalias}.id
+                  FROM {customfield_data} {$cfdataalias}
+             LEFT JOIN {customfield_field} {$cfieldalias} ON {$cfieldalias}.id = {$cfdataalias}.fieldid
+             LEFT JOIN {customfield_data} {$cfdataprogrammealias} ON {$cfdataprogrammealias}.id = {$programmealias}.datafieldid
+                WHERE {$cfieldalias}.shortname = :{$fieldparam} 
+                AND {$cfdataalias}.instanceid = {$cfdataprogrammealias}.instanceid";
         return (new column(
             $customfieldshortname,
             new lang_string("cf:{$customfieldshortname}", 'local_envasyllabus'),
@@ -92,7 +90,7 @@ class programmefull extends programme {
         ))
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
-            ->add_field($sql, $customfieldshortname, [$fieldparam => $fieldid])
+            ->add_field("($sql)", $customfieldshortname, [$fieldparam => $customfieldshortname])
             ->set_is_sortable(true)
             ->set_callback(function ($value) {
                 if (empty($value)) {
@@ -148,5 +146,10 @@ class programmefull extends programme {
         ))->add_joins($this->get_joins())
         ->set_field_sql($sql, [$fieldparam => $fieldid]);
         return $filter;
+    }
+
+    #[\Override]
+    protected function can_view(): bool {
+        return has_capability('moodle/reportbuilder:view', \context_system::instance());
     }
 }

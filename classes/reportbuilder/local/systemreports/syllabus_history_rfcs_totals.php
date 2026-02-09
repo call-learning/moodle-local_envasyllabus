@@ -31,11 +31,11 @@ use customfield_sprogramme\reportbuilder\local\entities\rfc_totals;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class syllabus_history_rfcs_totals extends system_report {
-    #[\Override]
     protected function add_columns(): void {
         $columns = [
-            'validator:fullnamewithlink',
             'usercreated:fullnamewithlink',
+            'validator:fullnamewithlink',
+            'rfc_totals:type',
             'rfc_totals:timecreated',
             'rfc_totals:timemodified',
             'course:coursefullnamewithlink',
@@ -46,12 +46,12 @@ class syllabus_history_rfcs_totals extends system_report {
             'rfc_totals:tc',
             'rfc_totals:aas',
             'rfc_totals:fmp',
+            'rfc_totals:perso_ap',
+            'rfc_totals:perso_av',
         ];
-
         $this->add_columns_from_entities($columns);
     }
 
-    #[\Override]
     protected function add_filters(): void {
         $filters = [
             'rfc_totals:cm',
@@ -61,11 +61,12 @@ class syllabus_history_rfcs_totals extends system_report {
             'rfc_totals:tc',
             'rfc_totals:aas',
             'rfc_totals:fmp',
+            'rfc_totals:perso_ap',
+            'rfc_totals:perso_av',
         ];
         $this->add_filters_from_entities($filters);
     }
 
-    #[\Override]
     public function get_default_conditions(): array {
         return [];
     }
@@ -87,20 +88,32 @@ class syllabus_history_rfcs_totals extends system_report {
 
         $userentity = new user();
         $userentity->set_entity_name('usercreated');
-        $userentity->set_entity_title(new \lang_string('usercreated'));
+        $userentity->set_entity_title(new \lang_string('rfc:user', 'customfield_sprogramme'));
         $useralias = $userentity->get_table_alias('user');
         $this->add_entity($userentity
             ->add_join("LEFT JOIN {user} {$useralias} ON {$useralias}.id = {$rfcalias}.usercreated"));
 
         $validatorentity = new user();
         $validatorentity->set_entity_name('validator');
-        $validatorentity->set_entity_title(new \lang_string('validator', 'customfield_sprogramme'));
+        $validatorentity->set_entity_title(new \lang_string('rfc:validator', 'customfield_sprogramme'));
         $validatoralias = $validatorentity->get_table_alias('user');
         $this->add_entity($validatorentity
             ->add_join("LEFT JOIN {user} {$validatoralias} ON {$validatoralias}.id = {$rfcalias}.adminid"));
 
         $this->add_columns();
         $this->add_filters();
+
+        // Change column titles.
+        $this->get_column(
+            'usercreated:fullnamewithlink'
+        )->set_title(
+            new \lang_string('rfc:user', 'customfield_sprogramme')
+        );
+        $this->get_column(
+            'validator:fullnamewithlink'
+        )->set_title(
+            new \lang_string('rfc:validator', 'customfield_sprogramme')
+        );
         // Here we do this intentionally as any button inserted in the page results in a javascript error.
         // This is due to fact that if we insert it in an existing form this will nest the form and this is not allowed.
         $isdownloadable = $this->get_parameter('downloadable', true, PARAM_BOOL);
@@ -111,6 +124,6 @@ class syllabus_history_rfcs_totals extends system_report {
 
     #[\Override]
     protected function can_view(): bool {
-        return has_capability('moodle/reportbuilder:edit', \context_system::instance());
+        return has_capability('moodle/reportbuilder:view', \context_system::instance());
     }
 }

@@ -41,7 +41,6 @@ use local_envasyllabus\local\course_syllabus_helper;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class syllabus_programme extends system_report {
-    #[\Override]
     public function get_default_conditions(): array {
         return [];
     }
@@ -53,13 +52,16 @@ class syllabus_programme extends system_report {
         $programmealias = $programmeentity->get_table_alias('customfield_sprogramme');
         $this->set_main_table('customfield_sprogramme', $programmealias);
         $this->add_entity($programmeentity);
+        $cfalias = database::generate_alias();
+        $this->add_join(
+            "JOIN {customfield_data} {$cfalias} ON {$cfalias}.id = {$programmealias}.datafieldid"
+        );
 
-        // Join the course entity to the badge entity, coalescing courseid with the siteid for site badges.
         $courseentity = new course();
         $coursealias = $courseentity->get_table_alias('course');
         $this->add_entity($courseentity
             ->add_join("LEFT JOIN {course} {$coursealias}
-                ON {$coursealias}.id = {$programmealias}.uc"));
+                ON {$coursealias}.id = {$cfalias}.instanceid"));
 
         $userentity = new user();
         $userentity->set_entity_name('usermodified');
@@ -184,7 +186,6 @@ class syllabus_programme extends system_report {
         $this->set_filter_form_default($hasfilters);
     }
 
-    #[\Override]
     protected function add_columns(): void {
         $columns = [
             'programmefull:uc_annee',
@@ -218,7 +219,6 @@ class syllabus_programme extends system_report {
         $this->set_initial_sort_column('programmefull:uc_nombre', SORT_ASC);
     }
 
-    #[\Override]
     protected function add_filters(): void {
         $filters = [
             'responsible:fullname',
@@ -248,11 +248,6 @@ class syllabus_programme extends system_report {
         $this->add_filters_from_entities($filters);
     }
 
-    #[\Override]
-    protected function can_view(): bool {
-        return has_capability('moodle/reportbuilder:edit', \context_system::instance());
-    }
-
     /**
      * Add a number of repeated columns to the report, based on the maximum number of linked records.
      *
@@ -280,5 +275,10 @@ class syllabus_programme extends system_report {
             $newcolumn->set_callback($displaycallback, $index);
             $this->add_column($newcolumn);
         }
+    }
+
+    #[\Override]
+    protected function can_view(): bool {
+        return has_capability('moodle/reportbuilder:view', \context_system::instance());
     }
 }
