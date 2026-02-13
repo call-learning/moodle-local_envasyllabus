@@ -34,6 +34,7 @@ function local_envasyllabus_extend_navigation_course($node, $course, $module) {
     if (!$CFG->enableenvasyllabus) {
         return;
     }
+    $coursecontext = \context_course::instance($course->id);
     $url = new moodle_url('/local/envasyllabus/syllabuspage.php', ['id' => $course->id]);
     $newnode = new navigation_node(
         [
@@ -60,7 +61,7 @@ function local_envasyllabus_extend_navigation_course($node, $course, $module) {
 
     // Add the report node for report to the user node.
 
-    if (has_capability('moodle/reportbuilder:view', \context_system::instance())) {
+    if (has_capability('moodle/reportbuilder:view', $coursecontext)) {
         // Add the reports link.
         $url = new moodle_url('/local/envasyllabus/reports.php');
         $newnode = new navigation_node(
@@ -72,8 +73,10 @@ function local_envasyllabus_extend_navigation_course($node, $course, $module) {
                 'key' => 'envasyllabusreports',
             ]
         );
-
-        $node->add_node($newnode);
+        $reportnode = $node->get('coursereports', navigation_node::TYPE_CONTAINER);
+        if ($reportnode) {
+            $reportnode->add_node($newnode);
+        }
     }
 }
 
