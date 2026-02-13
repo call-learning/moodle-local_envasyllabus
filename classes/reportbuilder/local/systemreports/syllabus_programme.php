@@ -41,6 +41,11 @@ use local_envasyllabus\local\course_syllabus_helper;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class syllabus_programme extends system_report {
+    /**
+     * Get the default conditions for the report.
+     *
+     * @return array
+     */
     public function get_default_conditions(): array {
         return [];
     }
@@ -186,6 +191,11 @@ class syllabus_programme extends system_report {
         $this->set_filter_form_default($hasfilters);
     }
 
+    /**
+     * Add columns to the report.
+     *
+     * @return void
+     */
     protected function add_columns(): void {
         $columns = [
             'programmefull:uc_annee',
@@ -219,6 +229,11 @@ class syllabus_programme extends system_report {
         $this->set_initial_sort_column('programmefull:uc_nombre', SORT_ASC);
     }
 
+    /**
+     * Add filters to the report.
+     *
+     * @return void
+     */
     protected function add_filters(): void {
         $filters = [
             'responsible:fullname',

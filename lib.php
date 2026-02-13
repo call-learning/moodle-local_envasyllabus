@@ -25,55 +25,55 @@
 /**
  * Add navigation for course
  *
- * @param global_navigation $navigation
- * @throws coding_exception
- * @throws moodle_exception
+ * @param navigation_node $node An object representing the navigation tree node.
+ * @param stdClass $course
+ * @param stdClass $module
  */
-function local_envasyllabus_extend_navigation(global_navigation $navigation) {
-    global $CFG, $PAGE;
-    $context = $PAGE->context;
-    if ($CFG->enableenvasyllabus) {
-        if ($context->contextlevel == CONTEXT_COURSE && $context->instanceid != SITEID) {
-            $courseid = $context->instanceid;
-            $node = $navigation->find($courseid, navigation_node::TYPE_COURSE);
-            $url = new moodle_url('/local/envasyllabus/syllabuspage.php', ['id' => $courseid]);
-            $newnode = new navigation_node(
-                [
-                    'text' => get_string('syllabuspage:menu', 'local_envasyllabus'),
-                    'action' => $url,
-                    'type' => navigation_node::TYPE_SETTING,
-                    'icon' => new pix_icon('t/viewdetails', ''),
-                    'key' => 'envasyllabus',
-                ]
-            );
-            $navigation->add_node($newnode);
-        }
-        // Now add the index.
-        $url = new moodle_url('/local/envasyllabus/index.php');
+function local_envasyllabus_extend_navigation_course($node, $course, $module) {
+    global $CFG;
+    if (!$CFG->enableenvasyllabus) {
+        return;
+    }
+    $url = new moodle_url('/local/envasyllabus/syllabuspage.php', ['id' => $course->id]);
+    $newnode = new navigation_node(
+        [
+            'text' => get_string('syllabuspage:menu', 'local_envasyllabus'),
+            'action' => $url,
+            'type' => navigation_node::TYPE_SETTING,
+            'icon' => new pix_icon('t/viewdetails', ''),
+            'key' => 'envasyllabus',
+        ]
+    );
+    $node->add_node($newnode);
+    // Now add the index.
+    $url = new moodle_url('/local/envasyllabus/index.php');
+    $newnode = new navigation_node(
+        [
+            'text' => get_string('catalog:index', 'local_envasyllabus'),
+            'action' => $url,
+            'type' => navigation_node::TYPE_SETTING,
+            'icon' => new pix_icon('t/viewdetails', ''),
+            'key' => 'catalogindex',
+        ]
+    );
+    $node->add_node($newnode);
+
+    // Add the report node for report to the user node.
+
+    if (has_capability('moodle/reportbuilder:view', \context_system::instance())) {
+        // Add the reports link.
+        $url = new moodle_url('/local/envasyllabus/reports.php');
         $newnode = new navigation_node(
             [
-                'text' => get_string('catalog:index', 'local_envasyllabus'),
+                'text' => get_string('syllabusreports', 'local_envasyllabus'),
                 'action' => $url,
-                'type' => navigation_node::TYPE_SETTING,
-                'icon' => new pix_icon('t/viewdetails', ''),
-                'key' => 'catalogindex',
+                'type' => navigation_node::TYPE_CUSTOM,
+                'icon' => new pix_icon('t/reports', ''),
+                'key' => 'envasyllabusreports',
             ]
         );
-        $navigation->add_node($newnode);
-        if (has_capability('moodle/reportbuilder:edit', \context_system::instance())) {
-            // Add the reports link.
-            $url = new moodle_url('/local/envasyllabus/reports.php');
-            $newnode = new navigation_node(
-                [
-                    'text' => get_string('syllabusreports', 'local_envasyllabus'),
-                    'action' => $url,
-                    'type' => navigation_node::TYPE_CUSTOM,
-                    'icon' => new pix_icon('t/reports', ''),
-                    'key' => 'envasyllabusreports',
-                ]
-            );
-            $navigation->add_node($newnode);
-        }
+
+        $node->add_node($newnode);
     }
 }
 

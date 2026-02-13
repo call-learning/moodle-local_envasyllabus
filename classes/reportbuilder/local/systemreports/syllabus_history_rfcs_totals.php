@@ -31,6 +31,11 @@ use customfield_sprogramme\reportbuilder\local\entities\rfc_totals;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class syllabus_history_rfcs_totals extends system_report {
+    /**
+     * Add columns to the report.
+     *
+     * @return void
+     */
     protected function add_columns(): void {
         $columns = [
             'usercreated:fullnamewithlink',
@@ -52,6 +57,11 @@ class syllabus_history_rfcs_totals extends system_report {
         $this->add_columns_from_entities($columns);
     }
 
+    /**
+     * Add filters to the report.
+     *
+     * @return void
+     */
     protected function add_filters(): void {
         $filters = [
             'rfc_totals:cm',
@@ -67,6 +77,11 @@ class syllabus_history_rfcs_totals extends system_report {
         $this->add_filters_from_entities($filters);
     }
 
+    /**
+     * Get the default conditions for the report.
+     *
+     * @return array
+     */
     public function get_default_conditions(): array {
         return [];
     }

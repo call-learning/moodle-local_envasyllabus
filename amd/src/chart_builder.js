@@ -30,7 +30,7 @@ import {getString} from 'core/str';
  * @param {string} currentLang - Current language code for localization
  * @returns {Object} Chart data combining all years
  */
-export const buildChartData = async (sortedCourses, programmecolumns, currentLang) => {
+export const buildChartData = async(sortedCourses, programmecolumns, currentLang) => {
     // Filter out 'active' and 'total' columns for chart display.
     const chartColumns = programmecolumns.filter(
         (col) => col.column !== 'active' && col.column !== 'total'

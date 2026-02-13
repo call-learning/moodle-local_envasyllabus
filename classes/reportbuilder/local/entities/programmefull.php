@@ -81,7 +81,7 @@ class programmefull extends programme {
                   FROM {customfield_data} {$cfdataalias}
              LEFT JOIN {customfield_field} {$cfieldalias} ON {$cfieldalias}.id = {$cfdataalias}.fieldid
              LEFT JOIN {customfield_data} {$cfdataprogrammealias} ON {$cfdataprogrammealias}.id = {$programmealias}.datafieldid
-                WHERE {$cfieldalias}.shortname = :{$fieldparam} 
+                WHERE {$cfieldalias}.shortname = :{$fieldparam}
                 AND {$cfdataalias}.instanceid = {$cfdataprogrammealias}.instanceid";
         return (new column(
             $customfieldshortname,

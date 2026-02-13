@@ -116,7 +116,7 @@ const refreshCoursesList = (catalogTagId, filterParams = {}) => {
  * @param {Object} element element to render into
  * @param {Array} data list of courses with data
  */
-const renderPage = async (element, data) => {
+const renderPage = async(element, data) => {
     const currentLang = element.dataset.currentLang ?? 'fr';
     LocalisedTemplates.setLanguage(currentLang);
     const sortedCourses = buildCourseList(data.courses, data.semestertotals);

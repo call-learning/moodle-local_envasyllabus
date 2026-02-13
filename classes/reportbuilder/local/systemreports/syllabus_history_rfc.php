@@ -31,6 +31,11 @@ use customfield_sprogramme\reportbuilder\local\entities\rfc;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class syllabus_history_rfc extends system_report {
+    /**
+     * Get the default conditions for the report.
+     *
+     * @return array
+     */
     public function get_default_conditions(): array {
         return [];
     }
@@ -80,7 +85,11 @@ class syllabus_history_rfc extends system_report {
         $this->set_filter_form_default($hasfilters);
     }
 
-    #[\Override]
+    /**
+     * Add columns to the report.
+     *
+     * @return void
+     */
     protected function add_columns(): void {
         $columns = [
             'validator:fullnamewithlink',
@@ -111,7 +120,11 @@ class syllabus_history_rfc extends system_report {
         $this->add_columns_from_entities($columns);
     }
 
-    #[\Override]
+    /**
+     * Add filters to the report.
+     *
+     * @return void
+     */
     protected function add_filters(): void {
         $filters = [
             'validator:fullname',
