@@ -32,12 +32,14 @@ class hook_callbacks {
      * @param before_standard_top_of_body_html_generation $hook
      */
     public static function before_standard_top_of_body_html_generation(before_standard_top_of_body_html_generation $hook): void {
-        global $PAGE;
+        global $PAGE, $CFG;
 
         if (!isguestuser() && !isloggedin()) {
             return;
         }
-
+        if (!$CFG->enableenvasyllabus) {
+            return;
+        }
         $context = $PAGE->context;
         if ($context->contextlevel == CONTEXT_COURSE && $context->instanceid != SITEID) {
             if (strpos(trim(strtolower($PAGE->course->shortname)), 'uc') === 0) {

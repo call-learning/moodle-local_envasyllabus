@@ -98,6 +98,10 @@ function local_envasyllabus_extend_navigation_user(
     stdClass $course,
     \core\context $coursecontext,
 ) {
+    global $CFG;
+    if (!$CFG->enableenvasyllabus) {
+        return;
+    }
     if (has_capability('moodle/reportbuilder:edit', \context_system::instance(), $user)) {
         // Add the reports link.
         $url = new moodle_url('/local/envasyllabus/reports.php');
@@ -111,21 +115,6 @@ function local_envasyllabus_extend_navigation_user(
             ]
         );
         $usernode->add_node($newnode);
-    }
-}
-/**
- * Insert "View Syllabus" Button in course header
- *
- * @return void
- */
-function local_envasyllabus_before_standard_top_of_body_html() {
-    global $PAGE;
-    $context = $PAGE->context;
-    if ($context->contextlevel == CONTEXT_COURSE && $context->instanceid != SITEID) {
-        if (strpos(trim(strtolower($PAGE->course->shortname)), 'uc') === 0) {
-            $canedit = has_capability('customfield/sprogramme:edit', $context);
-            $PAGE->requires->js_call_amd('local_envasyllabus/syllabus_button', 'init', [$PAGE->course->id]);
-        }
     }
 }
 
