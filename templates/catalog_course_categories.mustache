@@ -54,7 +54,7 @@
                             <th scope="col">{{#str}}th:ects, local_envasyllabus{{/str}}</th>
                             {{#extendedmodus}}
                                 {{#programmecolumns}}
-                                    <th scope="col" data-id="{{column}}" {{#help}}class="hashelp" data-toggle="popover" data-placement="bottom" data-html="true" data-content="{{{help}}}"{{/help}}>{{label}}</th>
+                                    <th scope="col" data-id="{{column}}" {{#help}}class="hashelp" data-bs-toggle="popover" data-bs-placement="bottom" data-bs-html="true" data-bs-content="{{{help}}}"{{/help}}>{{label}}</th>
                                 {{/programmecolumns}}
                             {{/extendedmodus}}
                         </tr>
@@ -64,8 +64,8 @@
                             {{>local_envasyllabus/table_course}}
                         {{/courses}}
                         {{#totals}}
-                            <tr class="table-active font-weight-bold">
-                                <td colspan="3" class="text-right"><strong>Total</strong></td>
+                            <tr class="table-active fw-bold">
+                                <td colspan="3" class="text-end"><strong>Total</strong></td>
                                 <td class="ects-column"><strong>{{ects}}</strong></td>
                                 {{#extendedmodus}}
                                     {{#programmevalues}}

@@ -66,16 +66,21 @@
 }
 
 /* Catalog filters */
-.path-local-enva_syllabus div[data-region=catalog-filter] {
+.path-local-enva_syllabus div[data-region="catalog-filter"] {
     /* Hide the 'No selection' text */
 }
-.path-local-enva_syllabus div[data-region=catalog-filter] .fcontainer label {
+.path-local-enva_syllabus div[data-region="catalog-filter"] .fcontainer label {
     margin-bottom: 0;
 }
-.path-local-enva_syllabus div[data-region=catalog-filter] .form-autocomplete-selection {
+.path-local-enva_syllabus
+    div[data-region="catalog-filter"]
+    .form-autocomplete-selection {
     min-height: 0;
 }
-.path-local-enva_syllabus div[data-region=catalog-filter] .form-autocomplete-selection > .m-1.h-5 {
+.path-local-enva_syllabus
+    div[data-region="catalog-filter"]
+    .form-autocomplete-selection
+    > .m-1.h-5 {
     display: none;
 }
 
@@ -100,6 +105,13 @@
 .local-envasyllabus-ccat .course-card .card-img-top {
     height: 200px;
     width: 100%;
+    overflow: hidden;
+}
+.local-envasyllabus-ccat .course-card .card-img-top .course-img-el {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 .local-envasyllabus-ccat .course-img {
     background-size: cover;

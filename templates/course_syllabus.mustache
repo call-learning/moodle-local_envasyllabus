@@ -139,13 +139,13 @@
         {{$content}}
             <div class="d-flex flex-wrap">
                 {{#teachers}}
-                    <div class="media teacherbox">
+                    <div class="d-flex teacherbox">
                         {{#userpicture}}
-                            <div class="d-flex align-items-center align-self-stretch userpicture">
+                            <div class="d-flex align-items-center align-self-stretch userpicture flex-shrink-0">
                                 {{{ userpicture }}}
                             </div>
                             {{/userpicture}}
-                        <div class="media-body">
+                        <div class="flex-grow-1 ms-1">
                             <div>{{ userfullname }}</div>
                             <div>{{{ useremail }}}</div>
                         </div>

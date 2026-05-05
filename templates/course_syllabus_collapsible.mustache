@@ -40,12 +40,12 @@
     <div class="collapse-header d-flex align-items-center mb-2">
         <div class="d-flex position-relative align-items-center flex-grow-1">
             <a role="button"
-                data-toggle="collapse"
+                data-bs-toggle="collapse"
                 href="#syllabuscollapse{{$id}}{{/id}}"
                 id="collapsereport{{$id}}{{/id}}"
                 aria-expanded="{{^contentcollapsed}}true{{/contentcollapsed}}{{#contentcollapsed}}false{{/contentcollapsed}}"
                 aria-controls="syllabuscollapse{{$id}}{{/id}}"
-                class="btn btn-icon mr-1 icons-collapse-expand justify-content-center stretched-link
+                class="btn btn-icon me-1 icons-collapse-expand justify-content-center stretched-link
                     {{#contentcollapsed}} collapsed {{/contentcollapsed}}"
                 aria-label="{{title}}">
                 <span class="expanded-icon icon-no-margin p-2" title="{{#str}} collapse, core {{/str}}">
@@ -57,8 +57,8 @@
                 </span>
             </a>
             <h1
-                    data-toggle="collapse"
-                    data-target="#syllabuscollapse{{$id}}{{/id}}"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#syllabuscollapse{{$id}}{{/id}}"
                     aria-expanded="{{^contentcollapsed}}true{{/contentcollapsed}}{{#contentcollapsed}}false{{/contentcollapsed}}"
                     aria-controls="syllabuscollapse{{$id}}{{/id}}" >
                 <span>{{$title}}{{/title}}</span>

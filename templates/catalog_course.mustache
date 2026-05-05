@@ -35,14 +35,14 @@
 <div class="card course-card" data-course-id="{{{id}}}">
     <div class="card-img-top course-img">
         <img    src="{{courseimageurl}}"
-                alt="{{#str}}aria:courseimage, core_course{{/str}}"
+                alt="{{#str}}aria:courseimage, local_envasyllabus{{/str}}"
                 loading="lazy"
                 decoding="async"
                 class="w-100 h-100 course-img-el" >
     </div>
     <div class="text-muted muted d-flex mb-1 flex-wrap">
-        <span class="sr-only">
-            {{#str}}aria:courseshortname, core_course{{/str}}
+        <span class="visually-hidden">
+            {{#str}}aria:courseshortname, local_envasyllabus{{/str}}
         </span>
         <div class="cshortname text-white headline-v2 d-inline p-2">
             {{{shortname}}}
@@ -51,10 +51,10 @@
     <div class="card-body p-2 flex-grow-1 d-flex flex-column" id="course-info-container-{{id}}">
         <div class="d-flex align-items-start p-b-1 flex-grow-1">
             <div class="w-100 text-wrap">
-                <span class="sr-only ">
+                <span class="visually-hidden ">
                     {{#str}}aria:coursename, core_course{{/str}}
                 </span>
-                <span class="font-weight-bold">
+                <span class="fw-bold">
                     {{{displayname}}}
                 </span>
                 {{^visible}}

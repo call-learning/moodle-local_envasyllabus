@@ -33,13 +33,13 @@
     }
 }}
 <div class="d-flex align-items-center">
-    <div class="custom-control custom-switch ml-auto">
-        <input type="checkbox" class="custom-control-input" id="catalog-extendedmode" data-action="extendedmode" {{#extendedmodus}}checked{{/extendedmodus}}>
-        <label class="custom-control-label" for="catalog-extendedmode" data-action="extendedmode" {{#extendedmodus}}checked{{/extendedmodus}}>{{#str}}extendedmode, local_envasyllabus{{/str}}</label>
+    <div class="form-check form-switch ms-auto">
+        <input type="checkbox" class="form-check-input" id="catalog-extendedmode" data-action="extendedmode" {{#extendedmodus}}checked{{/extendedmodus}} switch>
+        <label class="form-check-label" for="catalog-extendedmode" data-action="extendedmode" {{#extendedmodus}}checked{{/extendedmodus}}>{{#str}}extendedmode, local_envasyllabus{{/str}}</label>
     </div>
 
-    <div class="btn-toolbar ml-3" role="toolbar" aria-label="Toolbar with button groups" data-region="catalogueviewtoggle">
-        <div class="btn-group mr-2" role="group" aria-label="First group">
+    <div class="btn-toolbar ms-3" role="toolbar" aria-label="Toolbar with button groups" data-region="catalogueviewtoggle">
+        <div class="btn-group me-2" role="group" aria-label="First group">
             <button type="button" data-action="listview" class="btn btn-secondary icon-no-margin {{#listview}}active{{/listview}}" title="{{#str}}listview, local_envasyllabus{{/str}}">
                 <i class="icon fas fa fa-bars"></i>
             </button>
@@ -54,7 +54,7 @@
     {{#canexport}}
         {{>local_envasyllabus/export_button}}
     {{/canexport}}
-    <div class="local-envasyllabus-language-switcher ml-3">
+    <div class="local-envasyllabus-language-switcher ms-3">
         {{#languageswitcher}}
             {{>core/single_select}}
         {{/languageswitcher}}
@@ -71,11 +71,13 @@
     </div>
     <div data-region="catalog-view-content" id="catalog-content-{{uniqid}}">
         <div class="catalog-courses" data-viewtype="{{viewtype}}" data-modus="{{modus}}" data-category-root-id="{{categoryrootid}}" {{#currentlang}}data-current-lang="{{.}}"{{/currentlang}}>
-            <div class="card-deck dashboard-card-deck one-row overflow-hidden" style="height: 350px">
+            <div class="local-envasyllabus-ccat">
+            <div class="catalog-grid" style="height: 350px">
                 {{> core_course/placeholder-course }}
                 {{> core_course/placeholder-course }}
                 {{> core_course/placeholder-course }}
                 {{> core_course/placeholder-course }}
+            </div>
             </div>
         </div>
     </div>
