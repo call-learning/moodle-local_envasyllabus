@@ -25,11 +25,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['actions'] = 'Actions';
+$string['active_help'] = 'Percentage of active teaching methods implemented within the UC';
 $string['aria:courseimage'] = 'Course image';
 $string['aria:coursename'] = 'Course name';
 $string['aria:courseshortname'] = 'Course short name';
-$string['actions'] = 'Actions';
-$string['active_help'] = 'Percentage of active teaching methods implemented within the UC';
 $string['catalog:extended:percentactive'] = '% Active';
 $string['catalog:extended:perso'] = 'Perso.';
 $string['catalog:extended:total'] = 'Total';

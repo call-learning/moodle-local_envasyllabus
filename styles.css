@@ -72,15 +72,10 @@
 .path-local-enva_syllabus div[data-region="catalog-filter"] .fcontainer label {
     margin-bottom: 0;
 }
-.path-local-enva_syllabus
-    div[data-region="catalog-filter"]
-    .form-autocomplete-selection {
+.path-local-enva_syllabus div[data-region="catalog-filter"] .form-autocomplete-selection {
     min-height: 0;
 }
-.path-local-enva_syllabus
-    div[data-region="catalog-filter"]
-    .form-autocomplete-selection
-    > .m-1.h-5 {
+.path-local-enva_syllabus div[data-region="catalog-filter"] .form-autocomplete-selection > .m-1.h-5 {
     display: none;
 }
 
