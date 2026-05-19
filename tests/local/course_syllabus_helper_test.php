@@ -103,6 +103,7 @@ final class course_syllabus_helper_test extends \advanced_testcase {
         $coursedef = json_decode($json, true);
         $coursedef['category'] = 'CAT1';
         $course = $this->create_course_from_def($coursedef);
+        $this->setAdminUser();
         $category = \core_course_category::get($category->id);
         $categorycourses = $category->get_courses(['recursive' => true, 'coursecontacts' => true]);
         $courselistelement = null;

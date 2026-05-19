@@ -45,7 +45,7 @@ trait test_helper {
                 'value' => $value,
             ];
         }
-        $coursecats = core_course_category::get_all();
+        $coursecats = core_course_category::get_all(['returnhidden' => true]);
         $category = null;
         foreach ($coursecats as $coursecat) {
             if ($coursecat->idnumber == $coursedef['category']) {
