@@ -121,6 +121,9 @@ class course_syllabus_helper {
     ): object {
         $sprogrammefield = self::get_programme_customfield($course->id, $coursecfs);
         $courseinfo = new \stdClass();
+        if (empty($sprogrammefield)) {
+            return $courseinfo;
+        }
         $courseinfo->programmevalues = self::process_programme_values($sprogrammefield);
         $courseinfo->categoryname = self::get_category_name_for_id($course->category);
         $courseinfo->courseimageurl = (new moodle_url('/local/envasyllabus/pix/nocourseimage.jpg'))->out();
