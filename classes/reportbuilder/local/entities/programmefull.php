@@ -147,9 +147,4 @@ class programmefull extends programme {
         ->set_field_sql($sql, [$fieldparam => $fieldid]);
         return $filter;
     }
-
-    #[\Override]
-    protected function can_view(): bool {
-        return has_capability('moodle/reportbuilder:view', \context_system::instance());
-    }
 }
